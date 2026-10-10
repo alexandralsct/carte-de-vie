@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Fichiers autorisés seulement
         run: |
-          ok='^(\.nojekyll|\.github/workflows/[^/]+\.yml|CLAUDE\.md|README\.md|index\.html|sw\.js|monde\.js|bretagne\.js|manifest(-test)?\.webmanifest|icon-(192|512|maskable-512)\.png|tests/[^/]+\.mjs|passerelle/[^/]+\.gs|essai/index\.html)$'
+          ok='^(\.nojekyll|\.github/workflows/[^/]+\.yml|CLAUDE\.md|README\.md|index\.html|sw\.js|monde\.js|manifest(-test)?\.webmanifest|icon-(192|512|maskable-512)\.png|tests/[^/]+\.mjs|passerelle/[^/]+\.gs)$'
           interdits=$(git ls-files | grep -Ev "$ok" || true)
           if [ -n "$interdits" ]; then echo "::error::Fichiers non autorisés dans le dépôt public :"; echo "$interdits"; exit 1; fi
       - name: Aucun secret
@@ -30,3 +30,12 @@ jobs:
             echo "::error::Adresse e-mail trouvée."; exit 1; fi
           if git grep -nIE "\bAlexandra\b|\bPMA\b|\bFIV\b" -- . ':!.github'; then
             echo "::error::Prénom ou mention de santé trouvée."; exit 1; fi
+      - name: Aucun mot de la liste privée
+        # La liste est un secret du dépôt (Settings → Secrets and variables → Actions → MOTS_INTERDITS),
+        # mots séparés par | ; elle n'apparaît jamais ici ni dans les journaux. Seuls les fichiers fautifs sont nommés.
+        env:
+          MOTS: ${{ secrets.MOTS_INTERDITS }}
+        run: |
+          if [ -z "$MOTS" ]; then echo "::warning::Secret MOTS_INTERDITS absent : contrôle des mots privés non fait."; exit 0; fi
+          fautifs=$(git grep -lIiE -- "$MOTS" -- . ':!.github' || true)
+          if [ -n "$fautifs" ]; then echo "::error::Mot privé trouvé dans :"; echo "$fautifs"; exit 1; fi
