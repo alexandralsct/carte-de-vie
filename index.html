@@ -1696,6 +1696,9 @@ html.calme :is(.souris,.chatmot,.griffes){display:none}
 .cpn.face .fl1{animation:dospas var(--pas,.36s) ease-in-out infinite alternate}.cpn.face .fl2{animation:dospas var(--pas,.36s) calc(var(--pas,.36s)/2) ease-in-out infinite alternate}
 .cpn.face .fbd{transform-origin:50% 100%;animation:dosbal calc(var(--pas,.36s)*2) ease-in-out infinite alternate}.cpn.face .tlf{transform-origin:0% 100%;animation:queuevit 1.4s ease-in-out infinite}
 .cpn.face .feyes{transform-origin:50% 50%;animation:petblink 3.4s infinite}
+
+.cpn.walk .tail{animation:queuehaute 1.8s ease-in-out infinite!important;transform-origin:100% 100%}
+@keyframes queuehaute{0%,100%{rotate:0deg}50%{rotate:-7deg}}
 </style>
 <script>
 /* version test : ?test=1 → données à part (préfixe « test: » sur tout le stockage local), jamais celles de la carte principale */
@@ -5901,12 +5904,12 @@ function fete(x,y){ burst(x,y); setTimeout(()=>burst(x-70,y-30),140); setTimeout
   const place=()=>{ cat.style.transform=`translate(${C.x-W()/2}px,${C.y-H()}px)`; };
   const wait=ms=>new Promise(r=>setTimeout(r,ms));
   const pose=p=>{ if(p&&animal==="chien") p=p.replace("carton","sit"); cat.classList.remove("walk","sit","joue","ronron","feule","carton","etire","griffe","miaule","queue","dos","face"); if(p) p.split(" ").forEach(k=>cat.classList.add(k)); };
-  function moveTo0(x,y,speed){ const id=run, d=Math.hypot(x-C.x,y-C.y); cat.style.setProperty("--pas",Math.max(.16,Math.min(.6,26/(speed||62))).toFixed(2)+"s"); if(d<4) return Promise.resolve(); cat.style.setProperty("--dir",x<C.x?-1:1); pose("walk"); if(animal==="chat"&&y<C.y-12&&Math.abs(y-C.y)>Math.abs(x-C.x)*.8) cat.classList.add("dos"); else if(animal==="chat"&&y>C.y+12&&Math.abs(y-C.y)>Math.abs(x-C.x)*.8) cat.classList.add("face");
+  function moveTo0(x,y,speed){ speed=(speed||62)>150?(speed||62)*.7:(speed||62)*.5; const id=run, d=Math.hypot(x-C.x,y-C.y); cat.style.setProperty("--pas",Math.max(.16,Math.min(.6,26/(speed||62))).toFixed(2)+"s"); if(d<4) return Promise.resolve(); cat.style.setProperty("--dir",x<C.x?-1:1); pose("walk"); if(animal==="chat"&&y<C.y-140&&Math.abs(y-C.y)>Math.abs(x-C.x)*1.5) cat.classList.add("dos"); else if(animal==="chat"&&y>C.y+140&&Math.abs(y-C.y)>Math.abs(x-C.x)*1.5) cat.classList.add("face");
     const from=`translate(${C.x-W()/2}px,${C.y-H()}px)`, to=`translate(${x-W()/2}px,${y-H()}px)`;
     return new Promise(res=>{ const a=cat.animate([{transform:from},{transform:to}],{duration:d/(speed||62)*1000,easing:(speed||62)>100?"cubic-bezier(.25,.6,.35,1)":"cubic-bezier(.45,.05,.55,.95)"}); a.onfinish=()=>{ C={x,y}; place(); res(); }; a.oncancel=res; cat._a=a; }).then(()=>{ if(id===run) pose(""); }); }
   /* un chat ne glisse pas en diagonale : il suit une ligne, s'arrête une seconde, regarde, puis repart dans l'autre sens */
   async function moveTo(x,y,speed){ const id=run, dx=x-C.x, dy=y-C.y;
-    if(Math.abs(dx)>40&&Math.abs(dy)>50&&(speed||62)<160){ const vertD=Math.random()<.55;
+    if(Math.abs(dx)>40&&Math.abs(dy)>50&&(speed||62)<160){ const vertD=Math.random()<.3;
       if(vertD) await moveTo0(C.x+dx*.08,y,(speed||62)*.9); else await moveTo0(x,C.y+dy*.08,speed);
       if(id!==run) return; pose(Math.random()<.3?"sit":""); await wait(180+Math.random()*420); if(id!==run) return; }
     return moveTo0(x,y,speed); }
@@ -6341,7 +6344,7 @@ start();
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=146; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=147; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
