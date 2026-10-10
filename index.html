@@ -1141,8 +1141,6 @@ html:not(.proprio) .v3sug{display:none}
 #trajPage h2,#memPage h2,#valPage h2,#noterPage h2,#aujPage h2,#cheminPage h2,#revuePage h2,#cherchePage h2{font:600 clamp(1.6rem,6vw,2.3rem)/1.05 var(--display)}
 .lead{font-size:.95rem}
 /* « Où j'en suis » */
-.v3point{display:grid;gap:10px;padding:2px 2px 8px}
-.v3point .ppas{margin:0}
 .v3av{display:grid;gap:4px;font-size:.85rem;color:var(--muted)}.v3av i{display:block;height:8px;border-radius:99px;background:color-mix(in srgb,var(--ink) 15%,var(--surface));position:relative;overflow:hidden}.v3av i::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--p);background:var(--ink);border-radius:99px}
 .v3h{font:600 1rem var(--display);margin:6px 0 0;color:var(--ink)}
 .v3l{list-style:none;margin:0;padding:0;display:grid;gap:6px}
@@ -1153,7 +1151,6 @@ html:not(.proprio) .v3sug{display:none}
 .v3c{all:unset;box-sizing:border-box;width:26px;height:26px;flex:none;border-radius:50%;border:2px solid var(--ink);cursor:pointer;position:relative}
 .v3c::before{content:"";position:absolute;inset:-9px}.v3c.on{background:var(--ink)}.v3c.on::after{content:"";position:absolute;left:8px;top:4px;width:6px;height:11px;border:solid var(--surface);border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
 .v3c:focus-visible{outline:3px solid var(--pale)}
-.v3swipe{font-size:.8rem;color:var(--muted);text-align:right;margin:4px 0 0}
 .v3hab li{padding:0;border:0;background:none}
 .v3hb{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:6px 14px;background:var(--surface);border:1.5px solid color-mix(in srgb,var(--ink) 18%,transparent);border-radius:14px}
 .v3hb.on{background:color-mix(in srgb,var(--ink) 9%,var(--surface))}.v3hb.on span{text-decoration:line-through;text-decoration-thickness:1.5px;color:var(--muted)}
@@ -1434,7 +1431,7 @@ html:not(.zz1):not(.zz2) body .board.stack .node:not(.nbulle) .ico{width:74px!im
 html:not(.zz1):not(.zz2) body .board.stack .node.full:not(.nbulle) .ico{width:70px!important;height:70px!important}
 html:not(.zz1):not(.zz2) body .board.stack .node:not(.nbulle) .ico[data-k="genealogie"]{width:64px!important;height:64px!important;margin:5px 0!important}
 /* ===== espace : plus de page « Où j'en suis » ; en-tête compact, un seul système de pages, onglet Moi ===== */
-#drawer .rpdots,#drawer .v3swipe,#drawer .rangerbtn{display:none!important}
+#drawer .rangerbtn{display:none!important}
 #drawer .hero{display:grid!important;grid-template-columns:58px minmax(0,1fr) auto!important;align-items:center!important;gap:10px!important;margin:6px 0 8px!important;min-height:0!important}
 #drawer .heroL{grid-column:1;grid-row:1;width:58px!important;height:58px!important;margin:0!important}
 #drawer #heroArt{width:58px!important;height:58px!important;border-width:2px!important}
@@ -1729,8 +1726,23 @@ html.nu #board .node{z-index:2}
 #valIn .card>h3{font:500 13px/1.2 var(--mono)!important;letter-spacing:.06em;background:#c9d6f0!important;color:#002FA7!important;border-radius:999px;padding:6px 12px!important;display:inline-block}
 @media (max-width:760px){ .wrap{padding-right:0!important} }
 html:not(.zz1):not(.zz2) body .board.stack .zgrid{justify-content:center}
+/* les anciens onglets « Rubriques / Outils de l'espace / IA et Moi » ne reviennent plus */
+#pane>.tabbar.pages,#pane>.dots,#pane .tabbar.pages+.dots{display:none!important}
+/* menu « Plus » : il s'ouvre sur toute la largeur de l'en-tête, jamais hors de l'écran */
+#drawer .hero{position:relative}
+#drawer .v3outils,#drawer .v3menu{position:static!important}
+#drawer .v3menuIn{left:0!important;right:0!important;top:auto!important;margin-top:8px;min-width:0!important;max-width:none!important}
+/* listes des rubriques : les longs textes vont à la ligne au lieu de sortir à droite */
+#pane .rl{grid-template-columns:minmax(0,1fr)}
+#pane .rl li{min-width:0}#pane .rl li>*{min-width:0;overflow-wrap:anywhere}
+#pane .rl li>span:not(:first-child),#pane .rl li>label{flex:1 1 auto}
+/* bandeau d'activité : il tient dans la largeur, le texte trop long se termine par « … » */
+.v3band{grid-template-columns:minmax(0,1fr)}
+.v3bl{max-width:100%;min-width:0}
+/* dessins des rubriques : jamais plus larges que la page */
+#pane .rpage svg:not(.arbbox svg){max-width:100%}
+html[data-theme="sombre"] body #drawer .v3outils .v3cr,html[data-theme="sombre"] body #drawer .v3outils .v3menu>summary{color:var(--nt)!important;border-color:#a9bfff!important;background:var(--surface)!important}
 /* ===== V3.1 ===== */
-#pane.v31rubs>.tabbar.pages,#pane.v31rubs>.dots{display:none!important}
 .v31act{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:4px;padding:10px 12px;border-radius:16px;background:var(--surface);border:1.5px solid color-mix(in srgb,var(--ink) 22%,transparent)}
 .v31act:focus-visible{outline:3px solid var(--pale)}
 .v31al{display:flex;align-items:baseline;gap:6px;min-width:0;font-size:.88rem}.v31al i{font-style:normal;color:var(--muted);width:12px}.v31al.on i{color:var(--ink)}
@@ -1743,7 +1755,6 @@ html:not(.zz1):not(.zz2) body .board.stack .zgrid{justify-content:center}
 .v31idee{display:grid;gap:8px;margin-top:4px}.v31idee>.btn{justify-self:start}
 .v31p{background:var(--surface);border:1.5px solid color-mix(in srgb,var(--ink) 18%,transparent);border-radius:14px;padding:10px 12px}
 .v31filtre{display:flex;align-items:center;gap:10px;margin:8px 0;padding:8px 12px;background:var(--surface);border:1.5px solid var(--ink);border-radius:999px;font-weight:600}.v31filtre span{flex:1}
-.v31back{margin-bottom:10px}
 
 
 /* chat V3 : s'étirer (dos rond), griffes, miaou silencieux, souris */
@@ -2496,9 +2507,7 @@ document.addEventListener("change",e=>{ const t=e.target; if(t.matches&&t.matche
     const pg=pageOf(sect)==="rubs"&&pane.querySelector(":scope>.rpgs");
     if(pg&&pg._pas){ const dansPages=!!e.target.closest(".rptrack"); if(!dansPages&&pg._pas(dx<0?1:-1)) return; if(dx>0) return; if(dansPages&&!(pd&&pd[0]===pd[1]-1)) return; }
     else if(e.target.closest(".rptrack")) return;
-    const ks=TABN.map(x=>x[0]), cur=pageOf(sect), i=ks.indexOf(cur), n=Math.max(0,Math.min(ks.length-1,i+(dx<0?1:-1))); if(n===i) return;
-    flushNotes(); sect=ks[n]; kick(); renderPane(cats.get(openId)); pane.classList.remove("swl","swr"); void pane.offsetWidth; pane.classList.add(dx<0?"swl":"swr");
-    const sel=pane.querySelector('.tabbar [aria-selected="true"]'); if(sel) sel.scrollIntoView({inline:"center",block:"nearest"}); },{passive:true}); })();
+    },{passive:true}); })();
 function kick(){ pane.classList.add("anim"); clearTimeout(kick.t); kick.t=setTimeout(()=>pane.classList.remove("anim"),450); }
 function playIco(x){ if(!x||x.classList.contains("play")) return; x.classList.add("play"); setTimeout(()=>x.classList.remove("play"),2700); village(x); fx(x); }
 /* mouvements propres à certaines icônes : cœurs, étincelles, bulles, poussière, parties qui bougent (queue, jambe, lettre) */
@@ -4200,16 +4209,16 @@ function ordonne(c,rub,DS){ let R=[...rub]; if(DS.ordre){ const ix=id=>{ const i
 /* pages de rubriques : les groupes de l'espace (GROUPES), une page par groupe ; un groupe d'une seule rubrique rejoint le précédent */
 const RPI={};
 /* un classeur de pages à faire glisser (rubriques, tableaux de bord) : onglets en mono qui restent visibles, toutes les pages de la même hauteur, points ; quand on change de page, on revient en haut de la page */
-function classeur(cle,P){ if(classeur.collecte){ const z=el("section",{className:"rpcol"}); z._pages=P; return z; } const box=el("section",{className:"rpgs"}), nav=el("div",{className:"rpnav",role:"tablist"}), tr=el("div",{className:"rptrack"}), dots=el("div",{className:"rpdots"});
+function classeur(cle,P){ if(classeur.collecte){ const z=el("section",{className:"rpcol"}); z._pages=P; return z; } const box=el("section",{className:"rpgs"}), nav=el("div",{className:"rpnav",role:"tablist"}), tr=el("div",{className:"rptrack"});
   const va=(i,lisse)=>tr.scrollTo({left:i*tr.clientWidth,behavior:lisse?"smooth":"auto"});
-  P.forEach((p,i)=>{ tr.appendChild(el("div",{className:"rpage"},p.el)); const t=el("button",{type:"button",className:"rpt",textContent:p.nom}); t.setAttribute("role","tab"); t.onclick=()=>va(i,true); nav.appendChild(t); dots.appendChild(el("i")); });
+  P.forEach((p,i)=>{ tr.appendChild(el("div",{className:"rpage"},p.el)); const t=el("button",{type:"button",className:"rpt",textContent:p.nom}); t.setAttribute("role","tab"); t.onclick=()=>va(i,true); nav.appendChild(t); });
   box._pas=d=>{ const n=Math.max(0,Math.min(P.length-1,cur+d)); if(n===cur) return false; va(n,true); return true; }; box._ou=()=>[cur,P.length];
-  box.append(nav,tr,dots); try{ box.style.setProperty("--rpbg",getComputedStyle(drawer).backgroundColor); }catch(_){}
+  box.append(nav,tr); try{ box.style.setProperty("--rpbg",getComputedStyle(drawer).backgroundColor); }catch(_){}
   let cur=-1, att=0, raf=0, aller=false;
   const haut=()=>{ const f=tr.scrollLeft/Math.max(1,tr.clientWidth), a=tr.children[Math.floor(f)], b=tr.children[Math.ceil(f)], h=Math.max(a?a.offsetHeight:0,b?b.offsetHeight:0); if(h) tr.style.height=h+"px"; };
   const enHaut=()=>{ const d=box.closest(".page"); if(!d) return; const bt=box.getBoundingClientRect().top, dt=d.getBoundingClientRect().top; if(bt<dt-4) d.scrollTo({top:d.scrollTop+bt-dt-6,behavior:"smooth"}); };
   const maj=()=>{ if(!tr.isConnected) return; const i=Math.max(0,Math.min(P.length-1,Math.round(tr.scrollLeft/Math.max(1,tr.clientWidth)))); if(i===cur) return; if(cur>=0) aller=true; cur=i; RPI[cle]=i;
-    [...nav.children].forEach((b,j)=>b.setAttribute("aria-selected",String(j===i))); [...dots.children].forEach((x,j)=>x.classList.toggle("on",j===i));
+    [...nav.children].forEach((b,j)=>b.setAttribute("aria-selected",String(j===i)));
     const t=nav.children[i]; if(t&&nav.scrollWidth>nav.clientWidth) nav.scrollTo({left:t.offsetLeft-24,behavior:"smooth"}); };
   tr.addEventListener("scroll",()=>{ cancelAnimationFrame(raf); raf=requestAnimationFrame(()=>{ maj(); haut(); }); clearTimeout(att); att=setTimeout(()=>{ if(aller){ aller=false; enHaut(); } },140); },{passive:true});
   /* au doigt, c'est nous qui tournons les pages (le défilement natif du téléphone ratait parfois le passage) : la page suit le doigt, puis on va à la suivante dès un quart de largeur ou un geste vif */
@@ -4600,9 +4609,7 @@ pane.addEventListener("click",e=>{ if(ranger&&pane.classList.contains("ranger")&
 const TABN=[["rubs","Rubriques"],["outils","Outils de l'espace"],["iamoi","IA et Moi"]];
 /* page à laquelle appartient une vue détaillée */
 const pageOf=k=>!k?"rubs":(k==="rubs"||k==="newrub"||k.startsWith("rub:"))?"rubs":(k==="sugg"||k==="moi"||k==="iamoi")?"iamoi":"outils";
-function tabBar(){ const bar=el("div",{className:"tabbar pages",role:"tablist"}), cur=pageOf(sect);
-  const hb=(cats.get(openId)||{}).type==="habitudes"; TABN.forEach(([k,l])=>{ const b=el("button",{textContent:hb&&k==="rubs"?"Habitudes":l}); b.setAttribute("role","tab"); b.setAttribute("aria-selected",String(cur===k)); b.onclick=()=>{ flushNotes(); sect=k; kick(); renderPane(cats.get(openId)); }; bar.appendChild(b); });
-  const dots=el("div",{className:"dots",ariaHidden:"true"}); TABN.forEach(([k])=>dots.appendChild(el("i",{className:cur===k?"on":""}))); return [bar,dots]; }
+
 /* toucher une carte (hors champs et boutons) l'ouvre en grand */
 function addOpen(){pane.querySelectorAll("section[data-k]").forEach(x=>{ const k=x.dataset.k;
       x.addEventListener("click",e=>{ if(e.target.closest("input,button,textarea,select,a,label,form,li,.pick")) return; flushNotes(); sect=k; kick(); renderPane(cats.get(openId)); drawer.scrollTop=Math.max(0,pane.offsetTop-24); }); x.classList.add("openable"); }); }
@@ -4610,12 +4617,11 @@ function renderPane(c){ paneT=performance.now(); paneSig=sigCat(c); { const ici=
   pane.textContent=""; artSeq=0; pane.classList.toggle("ptrack",c.type==="habitudes"); drawer.classList.toggle("simple",c.forme==="bulle"); if(c.forme==="bulle"){ renderUrgences(c); if((c.ass||[]).includes("LIFE")) renderCockpit(); return; } const rub=c.rub||[];
   if(!sect||(sect.startsWith("rub:")&&!rub.some(r=>"rub:"+r.id===sect))) sect="rubs";
   drawer.classList.toggle("detail",!TABN.some(x=>x[0]===sect));
-  pane.append(...tabBar());
   if(sect==="rubs"){ if(c.type==="habitudes"){ renderNiveau(c); renderHabits(c); renderNoteRapide(c); const ht=pane.querySelector(".htab"), d=pane.querySelector(".dots"); if(ht&&d){ d.after(ht); const he=pane.querySelector(".hedit"); if(he) ht.after(he); } enPages(c); } else { classeur.collecte=true; try{ const SM=SURMESURE[c.id]; if(SM){ renderVitrine(c,!SIG_GARDE[c.id]); SM(c); paginerTableau(c); } else renderVitrine(c); if(c.id==="sport"){ renderProgrammes(c); renderSurMesure(c); renderCourse(c); renderMurYoga(c); } if(c.id==="cuisine"){ renderPlacard(c); renderLivres(c); } if(c.id==="gencive") renderRoutine(c); if(c.id==="journal") renderCarnets(c); if(c.id==="genealogie") renderArbre(c); if(c.id==="bourse") renderNews(c); const td_=todoDe(c); if(estCuisine(c)) renderCourses(c); if(td_){ if(c.id==="amoureux") renderPas(c); else if(c.id==="cheveux") renderSoins(c); else { const keep=tab, nt=(c.tasks||[]).filter(k=>!k.done).length; tab="tasks"; target=el("section",{className:"card todo"},el("h3",{textContent:td_})); target.dataset.k="tasks"; pane.appendChild(target); renderOne(c); tab=keep; } } renderNoteRapide(c); renderNiveau(c); if(!SM) renderRubTiles(c); else if(SM===renderSide) renderRubTiles(c,["Idées de business"]); } finally{ classeur.collecte=false; } enPages(c); } return; }
   if(sect==="outils"){ const keep=tab, nt=(c.tasks||[]).filter(k=>!k.done).length; for(const [k,label] of outilsDe(c)){ tab=k; target=el("section",{className:"card"+(k==="tasks"?" todo":"")},el("h3",{textContent:k==="tasks"&&nt?label+" · "+nt:label})); target.dataset.k=k; pane.appendChild(target); renderOne(c); } tab=keep; const DOS=["#BCD0F5","#c9d6f0","#c9d6f0","#6C8FE0","#c9d6f0","#E3EAF8"], DSYM={recap:"graphique",ideas:"ampoule",dates:"calendrier",links:"boussole",rel:"spirale",log:"plume"};
     if(c.type!=="habitudes") [...pane.querySelectorAll("section.card[data-k]")].forEach((x,i)=>{ x.classList.add("dossier"); x.style.setProperty("--tab",DOS[i%DOS.length]); const h=x.querySelector("h3"), ic=el("span",{className:"dico"}); ic.innerHTML=symSvg(DSYM[x.dataset.k]||"star"); if(h) h.prepend(ic); }); addOpen(); return; }
   if(sect==="iamoi"){ if((c.ass||[]).includes("LIFE")) renderCockpit(); if(c.type!=="habitudes") renderQuiz(c); renderAssistants(c); renderSugg(c); renderRub(c,"moi"); addOpen(); return; }
-  const back=el("button",{className:"btn ghost",textContent:"← "+TABN.find(x=>x[0]===pageOf(sect))[1]}); back.onclick=()=>{ if(PILE.length) return retour(); flushNotes(); sect=pageOf(sect); kick(); renderPane(cats.get(openId)); };
+  const back=el("button",{className:"btn ghost",textContent:"← Retour"}); back.onclick=()=>{ if(PILE.length) return retour(); flushNotes(); sect="rubs"; kick(); renderPane(cats.get(openId)); };
   pane.appendChild(el("div",{className:"crumb"},back));
   if(sect==="sugg") renderSugg(c);
   else if(sect.startsWith("rub:")||sect==="newrub"||sect==="moi") renderRub(c,sect);
@@ -5250,24 +5256,6 @@ const V3={
     bar.append(hi,act); h.prepend(bar); this.bonjour(); },
   bonjour(){ const b=document.querySelector(".top3 .bonjour"); if(!b) return; const p=this.prenom(), H=new Date().getHours(); b.textContent=document.documentElement.classList.contains("proprio")?"Ma carte de vie":(H<5||H>=18?"Bonsoir":"Bonjour")+(p?" "+p:""); },
   /* --- « Où j'en suis » : la première page de chaque espace --- */
-  point(c){ const td=today(), box=el("div",{className:"v3point"}), perso=(ESSAI.tr.pas||{})[c.id], T=(c.tasks||[]).filter(t=>!t.done), t0=T[0], txt=perso||(t0&&t0.text);
-    const fait=(c.tasks||[]).filter(t=>t.done).length, tot=(c.tasks||[]).length;
-    const pp=el("section",{className:"ppas"},el("small",{className:"mono",textContent:"Prochain pas"}));
-    if(txt){ pp.appendChild(el("b",{textContent:txt})); const ok=el("button",{type:"button",className:"btn",textContent:"✓ Fait"}); ok.onclick=()=>{ fetel(ok);
-        if(perso) ESSAI.ecritTr({pas:Object.assign({},ESSAI.tr.pas,{[c.id]:""})}); else if(t0){ const cur=cats.get(c.id); write(c.id,{tasks:cur.tasks.map(t=>t.id===t0.id?Object.assign({},t,{done:true,fait:new Date().toISOString()}):t)}); }
-        setTimeout(()=>renderDrawer(true),400); }; pp.appendChild(ok); }
-    else pp.appendChild(help("Rien de prévu ici pour l'instant."));
-    pp.appendChild(ESSAI.champ("",txt?"Changer de prochain pas":"Mon prochain pas",v=>{ if(v){ ESSAI.ecritTr({pas:Object.assign({},ESSAI.tr.pas||{},{[c.id]:v})}); renderDrawer(true); } }));
-    box.appendChild(pp);
-    if(tot){ const pc=Math.round(fait*100/tot); box.appendChild(el("div",{className:"v3av"},el("span",{textContent:fait+" sur "+tot+" fait"+(fait>1?"es":"")}),el("i",{style:"--p:"+pc+"%"}))); }
-    const af=T.filter(t=>t!==t0||perso).slice(0,5); if(af.length){ const ul=el("ul",{className:"v3l"}); af.forEach(t=>{ const b=el("button",{type:"button",className:"v3c"}); b.setAttribute("aria-label","Cocher "+t.text);
-        b.onclick=()=>{ fetel(b); const cur=cats.get(c.id); write(c.id,{tasks:cur.tasks.map(x=>x.id===t.id?Object.assign({},x,{done:true,fait:new Date().toISOString()}):x)}); setTimeout(()=>renderDrawer(true),350); };
-        ul.appendChild(el("li",{className:t.due&&t.due<td?"retard":""},b,el("span",{textContent:t.text}),t.due?el("small",{textContent:t.due<td?"en retard":fmtDate(t.due)}):"")); });
-      box.append(el("h3",{className:"v3h",textContent:"À faire"+(T.length>af.length?" · "+T.length:"")}),ul); }
-    const D=(c.dates||[]).filter(d=>d.date>=td).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,3); if(D.length){ const ul=el("ul",{className:"v3l"}); D.forEach(d=>ul.appendChild(el("li",{},el("small",{className:"v3d",textContent:fmtDate(d.date,d.time)}),el("span",{textContent:d.text||"Rendez-vous"})))); box.append(el("h3",{className:"v3h",textContent:"Bientôt"}),ul); }
-    if(/^(a traiter|notes)$/.test(plNorm(c.name||""))&&$("notesBtn2")){ const b=el("button",{type:"button",className:"btn ghost",textContent:"Mes notes libres →"}); b.onclick=()=>{ closeDrawerV3(); $("notesBtn2").click(); }; box.appendChild(b); }
-    box.appendChild(el("p",{className:"v3swipe",textContent:"Glisse vers la gauche pour tes rubriques →"}));
-    return box; },
   /* --- ✎ Modifier : feuille avec nom, icône (3 choix + mon image), place dans ma vie, catégorie, couleur, supprimer --- */
   feuille(){ const pi=document.querySelector("#drawer .page-in"); if(!pi) return null; let f=pi.querySelector(".v3sheet"); if(f) return f;
     f=el("div",{className:"v3sheet",hidden:true}); f.setAttribute("role","dialog"); f.setAttribute("aria-label","Modifier l'espace");
@@ -5535,21 +5523,6 @@ const V31={ filtre:null, enVal:false,
   ASS(){ return ((cockpit||{}).assistants)||{}; },
   nomAss(id){ const a=this.ASS()[id]||{}; return (typeof ASS_NOMS!=="undefined"&&ASS_NOMS[id])||a.nom||id; },
   pistes(c){ return (c.sugg||[]).filter(s=>s&&!s.done&&(s.titre||s.texte)); },
-  /* la ligne d'activité des assistants de cet espace, façon messagerie */
-  activite(c){ const ids=(c.ass||[]).filter(i=>i!=="LIFE"); if(!ids.length) return null; const V=V2.veilles(), P=this.pistes(c);
-    const L=ids.map(id=>{ const E=V.filter(e=>e.source===id), q=E.map(e=>String(e.quand||"")).sort().pop()||"", a=this.ASS()[id]||{}; return {id,n:E.length,q,st:a.statut}; }).sort((a,b)=>b.n-a.n||b.q.localeCompare(a.q));
-    const box=el("button",{type:"button",className:"v31act"}); box.setAttribute("aria-label","Activité des assistants de cet espace : voir dans À valider");
-    L.slice(0,2).forEach(x=>{ const quand=x.q?new Date(x.q.replace(" ","T")).toLocaleDateString("fr-FR",{day:"numeric",month:"short"})+(x.q.length>10?" "+x.q.slice(11,16):""):"";
-      box.appendChild(el("span",{className:"v31al"+(x.n?" on":"")},el("i",{textContent:x.n?"●":"○"}),el("b",{textContent:this.nomAss(x.id)}),el("small",{textContent:x.n?x.n+" à voir"+(quand?" · "+quand:""):(x.st==="actif"?"rien de neuf":"en préparation")}))); });
-    if(L.length>2) box.appendChild(el("small",{className:"v31plus",textContent:"+"+(L.length-2)+" autre"+(L.length>3?"s":"")}));
-    if(P.length) box.appendChild(el("span",{className:"v31al on"},el("i",{textContent:"✦"}),el("b",{textContent:"Pistes proposées"}),el("small",{textContent:P.length+" à voir"})));
-    box.onclick=()=>{ this.filtre=c.id; ESSAI.ouvreVal(); }; return box; },
-  /* 3 outils au plus, puis « ••• » */
-  outils(c){ const O=outilsDe(c), cach=["log","rel","recap"], vis=O.filter(o=>!cach.includes(o[0])&&o[0]!=="tasks").slice(0,3), plus=O.filter(o=>!vis.includes(o)&&o[0]!=="tasks");
-    const row=el("div",{className:"v31out"}), go=k=>{ flushNotes(); sect=k; kick(); renderPane(cats.get(c.id)); };
-    vis.forEach(([k,n])=>{ const b=el("button",{type:"button",className:"vchip",textContent:n}); b.onclick=()=>go(k); row.appendChild(b); });
-    if(plus.length){ const d=el("details",{className:"v31more"}); d.appendChild(el("summary",{textContent:"•••"})); const m=el("div",{className:"v31menu"}); plus.forEach(([k,n])=>{ const b=el("button",{type:"button",className:"btn ghost",textContent:n}); b.onclick=()=>go(k); m.appendChild(b); }); const t=el("button",{type:"button",className:"btn ghost",textContent:"Tous les outils"}); t.onclick=()=>go("outils"); m.appendChild(t); d.appendChild(m); row.appendChild(d); }
-    return row; },
   /* un seul bouton IA ; ses pistes s'affichent ici et dans À valider */
   idee(c){ const z=el("div",{className:"v31idee"}); const P=this.pistes(c);
     const b=el("button",{type:"button",className:"btn ghost",textContent:suggBusy?"L'IA réfléchit…":"✦ Une idée pour avancer"}); b.disabled=suggBusy||!sampler||prioOf(c)===1; b.onclick=()=>askSugg(); z.appendChild(b);
@@ -5565,12 +5538,7 @@ const V31={ filtre:null, enVal:false,
     const n=el("button",{type:"button",className:"btn ghost",textContent:"Non"}); n.onclick=()=>{ write(c.id,{sugg:ret()}); apres(); };
     li.appendChild(el("div",{className:"bact"},a,i,n)); return li; }
 };
-{ /* « Où j'en suis » enrichi */
-  const oP=V3.point.bind(V3); V3.point=function(c){ const box=oP(c); const act=V31.activite(c); if(act) box.insertBefore(act,box.firstChild);
-    const sw=box.querySelector(".v3swipe"); const o=V31.outils(c); if(o.children.length) box.insertBefore(el("h3",{className:"v3h",textContent:"Mes outils"}),sw), box.insertBefore(o,sw);
-    box.insertBefore(V31.idee(c),sw); return box; };
-  /* plus d'onglets Outils / IA et Moi sur la page principale de l'espace */
-  const oPP=V2.pasPane.bind(V2); V2.pasPane=function(c){ oPP(c); const p=$("pane"); if(p) p.classList.toggle("v31rubs",pageOf(sect)==="rubs"); if(p&&pageOf(sect)!=="rubs"&&!p.querySelector(".v31back")){ const b=el("button",{type:"button",className:"btn ghost v31back",textContent:"← Retour"}); b.onclick=()=>{ sect=null; kick(); renderPane(cats.get(openId)); }; p.insertBefore(b,p.firstChild); } };
+{ /* réglages des espaces : IA et À valider */
   /* l'IA n'écrit plus directement dans les espaces (question du jour, petite action) */
   autoIa=function(){};
   /* À valider : filtré sur un espace, et les pistes des espaces y arrivent aussi */
@@ -6472,7 +6440,7 @@ start();
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=150; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=151; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
