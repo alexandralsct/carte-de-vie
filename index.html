@@ -1714,6 +1714,21 @@ html.nu #board .node{z-index:2}
   :root{--tw:min(112px,calc((50vw - 230px) / 3.6))}
 }
 @media (min-width:1000px){ html:not(.zz1):not(.zz2) body .board.stack>.moi{width:170px!important;height:170px!important} html:not(.zz1):not(.zz2) body .board.stack>:is(.ia,#iaBtn){margin:175px 0 0 150px!important;width:64px!important;height:64px!important} }
+/* détail des annonces */
+.kcarte{-webkit-line-clamp:4!important}
+.annPage{position:fixed;inset:0;z-index:80;background:rgba(0,20,70,.35);display:grid;place-items:end center;padding:12px}
+.annPage[hidden]{display:none}
+.annIn{width:min(560px,100%);max-height:86vh;overflow:auto;background:var(--surface);border:2px solid #002FA7;border-radius:20px;box-shadow:4px 4px 0 #c9d6f0;padding:16px 16px 14px;display:grid;gap:10px;color:#002FA7}
+.annT{font:600 20px/1.2 var(--display)}.annO{margin:0;font-weight:600}
+.annL{margin:0;padding-left:18px;display:grid;gap:4px;font-size:15px;line-height:1.35;color:var(--fg,#002FA7)}
+.annQ{font-size:11px;opacity:.8}.annLien{justify-self:start}
+#valIn .vprop .annL{font-size:14px;margin:6px 0 8px}
+:root[data-theme="sombre"] .annIn{background:var(--surface);border-color:#a9bfff;color:var(--nt);box-shadow:4px 4px 0 #070f22}
+:root[data-theme="sombre"] .annL{color:var(--nt)}
+#valIn .vprop{padding:12px 12px 10px!important}
+#valIn .card>h3{font:500 13px/1.2 var(--mono)!important;letter-spacing:.06em;background:#c9d6f0!important;color:#002FA7!important;border-radius:999px;padding:6px 12px!important;display:inline-block}
+@media (max-width:760px){ .wrap{padding-right:0!important} }
+html:not(.zz1):not(.zz2) body .board.stack .zgrid{justify-content:center}
 /* ===== V3.1 ===== */
 #pane.v31rubs>.tabbar.pages,#pane.v31rubs>.dots{display:none!important}
 .v31act{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:4px;padding:10px 12px;border-radius:16px;background:var(--surface);border:1.5px solid color-mix(in srgb,var(--ink) 22%,transparent)}
@@ -5479,6 +5494,39 @@ $("agClose").onclick=()=>{ $("agPage").hidden=true; };
 /* ordinateur : les catégories se répartissent à gauche et à droite de Moi */
 { const cote=()=>{ const bd=$("board"); if(!bd) return; const Z=[...bd.querySelectorAll(":scope>.zone")]; Z.forEach((z,i)=>{ z.classList.toggle("zg",i%2===0); z.classList.toggle("zd",i%2===1); z.style.gridRow=matchMedia("(min-width:1000px)").matches?String(2+Math.floor(i/2)):""; }); bd.style.setProperty("--zr",String(Math.max(1,Math.ceil(Z.length/2)))); };
   const oRB4=renderBoard; renderBoard=function(){ const r=oRB4.apply(this,arguments); cote(); return r; }; addEventListener("resize",cote); cote(); }
+/* ===== le détail des annonces : dans le tableau des candidatures et dans « À valider » ===== */
+const ANN={
+  /* toutes les offres connues des assistants (à relire + alertes) */
+  toutes(){ const C=(typeof cockpit!=="undefined"&&cockpit)||{}; return [...(C.a_relire||[]),...(C.alertes||[])].filter(e=>e&&e.objet); },
+  /* l'offre qui correspond à une carte : le nom avant « : » ou les mots du titre */
+  trouve(txt){ const t=plNorm(String(txt||"")), nom=plNorm(String(txt||"").split(/[:—–-]/)[0]).trim(); if(!t) return null;
+    const L=this.toutes(); return L.find(e=>nom.length>2&&plNorm(e.objet).includes(nom))||L.find(e=>{ const o=plNorm(e.objet); return o.length>4&&t.includes(o.split(/\s+—\s+|\s+-\s+/)[0]); })||null; },
+  /* les morceaux du détail, lisibles : sans adresse web, la pertinence en clair */
+  morceaux(e){ return String(e.detail||"").split(/\s·\s|;\s*/).map(x=>x.replace(/https?:\/\/\S+/g,"").trim()).filter(Boolean).map(x=>x.replace(/^score\s*(\d+)/i,"Pertinence $1/5")); },
+  fiche(e,titre){ const box=el("div",{className:"annFiche"}); if(titre) box.appendChild(el("b",{className:"annT",textContent:titre}));
+    if(e){ if(titre&&plNorm(titre)!==plNorm(e.objet)) box.appendChild(el("p",{className:"annO",textContent:e.objet}));
+      const ul=el("ul",{className:"annL"}); this.morceaux(e).forEach(m=>ul.appendChild(el("li",{textContent:m}))); if(ul.children.length) box.appendChild(ul);
+      if(e.quand) box.appendChild(el("small",{className:"annQ",textContent:"Repérée le "+new Date(String(e.quand).replace(" ","T")).toLocaleDateString("fr-FR",{day:"numeric",month:"long"})+(e.qui?" · "+e.qui:"")}));
+      if(/^https?:\/\//.test(e.lien||"")) box.appendChild(el("a",{className:"btn annLien",href:e.lien,target:"_blank",rel:"noopener",textContent:"Voir l'annonce ↗"})); }
+    else box.appendChild(help("Pas d'annonce liée trouvée pour cette carte. Ajoute le lien de l'annonce dans le texte de la carte pour la retrouver ici."));
+    return box; },
+  ouvre(x){ const txt=x.textContent.trim(), e=this.trouve(txt); let f=$("annPage"); if(!f){ f=el("div",{id:"annPage",className:"annPage"}); f.setAttribute("role","dialog"); f.setAttribute("aria-label","Détail de la candidature"); document.body.appendChild(f); }
+    f.textContent=""; const inn=el("div",{className:"annIn"}); inn.appendChild(el("small",{className:"mono",textContent:"Candidature"})); inn.appendChild(this.fiche(e,txt));
+    const lienTxt=(txt.match(/https?:\/\/\S+/)||[])[0]; if(!e&&lienTxt) inn.appendChild(el("a",{className:"btn annLien",href:lienTxt,target:"_blank",rel:"noopener",textContent:"Voir l'annonce ↗"}));
+    const av=el("button",{type:"button",className:"btn",textContent:"Faire avancer →"}), fe=el("button",{type:"button",className:"btn ghost",textContent:"Fermer"});
+    av.onclick=()=>{ f.hidden=true; x.dataset.go="1"; x.click(); }; fe.onclick=()=>{ f.hidden=true; }; inn.appendChild(el("div",{className:"bact"},av,fe)); f.appendChild(inn); f.hidden=false;
+    f.onclick=ev=>{ if(ev.target===f) f.hidden=true; }; }
+};
+document.addEventListener("click",ev=>{ const x=ev.target.closest&&ev.target.closest(".kcarte"); if(!x) return; if(x.dataset.go==="1"){ delete x.dataset.go; return; } ev.stopImmediatePropagation(); ev.preventDefault(); ANN.ouvre(x); },true);
+document.addEventListener("keydown",ev=>{ const f=$("annPage"); if(ev.key==="Escape"&&f&&!f.hidden){ f.hidden=true; ev.stopImmediatePropagation(); } },true);
+/* « À valider » : le détail complet de chaque offre au lieu d'une ligne coupée */
+{ const oVV=V2.veillesVal.bind(V2); V2.veillesVal=function(z){ oVV(z); const L=V2.veilles(); z.querySelectorAll(".vprop").forEach(li=>{ const t=(li.querySelector("b")||{}).textContent||""; const e=L.find(x=>plNorm(x.objet)===plNorm(t)); if(!e) return; const p=li.querySelector("p.mut"); const m=ANN.morceaux(e); if(!m.length) return;
+    const ul=el("ul",{className:"annL"}); m.forEach(s=>ul.appendChild(el("li",{textContent:s}))); if(p) p.replaceWith(ul); else li.insertBefore(ul,li.querySelector(".bact"));
+    const a=li.querySelector(".bact a.btn"); if(a&&/^Ouvrir ↗$/.test(a.textContent)) a.textContent="Voir l'annonce ↗"; }); }; }
+/* la taille des tuiles se calcule sur la largeur réelle de la catégorie (aucun débordement, quel que soit l'écran) */
+{ const taille=()=>{ const bd=$("board"); if(!bd||!bd.classList.contains("stack")) return; const z=bd.querySelector(".zone"); if(!z) return; const cs=getComputedStyle(z), w=z.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-4;
+    const max=matchMedia("(min-width:1000px)").matches?112:100, tw=Math.max(64,Math.min(max,Math.floor((w-2*8)/3))); bd.style.setProperty("--tw",tw+"px"); };
+  const oRB5=renderBoard; renderBoard=function(){ const r=oRB5.apply(this,arguments); requestAnimationFrame(taille); return r; }; addEventListener("resize",()=>requestAnimationFrame(taille)); setTimeout(taille,300); }
 
 /* ===== V3.1 : une proposition pour les outils et l'IA des espaces =====
    « Où j'en suis » = activité des assistants, prochain pas, à faire, bientôt, 3 outils, « ✦ Une idée pour avancer » ; puis les rubriques.
@@ -6424,7 +6472,7 @@ start();
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=149; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=150; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
