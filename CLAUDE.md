@@ -1,6 +1,6 @@
 # Pour Claude : dépôt PUBLIC, code seulement
 
-Ce dépôt est public (servi par GitHub Pages). Il ne doit contenir **que le code** de l'app : `index.html`, `sw.js`, `monde.js`, `bretagne.js`, manifestes, icônes de l'app, `tests/`, `passerelle/`.
+Ce dépôt est public (servi par GitHub Pages). Il ne doit contenir **que le code** de l'app : `index.html`, `sw.js`, `monde.js`, `bretagne.js`, manifestes, icônes de l'app, `tests/`, `passerelle/`, et `essai/index.html` (version d'essai de l'app, même règles).
 
 Interdit ici, même temporairement (l'historique git est public) :
 - toute capture d'écran de la vraie carte, maquette ou planche de design ;

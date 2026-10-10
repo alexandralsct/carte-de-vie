@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Fichiers autorisés seulement
         run: |
-          ok='^(\.nojekyll|\.github/workflows/[^/]+\.yml|CLAUDE\.md|README\.md|index\.html|sw\.js|monde\.js|bretagne\.js|manifest(-test)?\.webmanifest|icon-(192|512|maskable-512)\.png|tests/[^/]+\.mjs|passerelle/[^/]+\.gs)$'
+          ok='^(\.nojekyll|\.github/workflows/[^/]+\.yml|CLAUDE\.md|README\.md|index\.html|sw\.js|monde\.js|bretagne\.js|manifest(-test)?\.webmanifest|icon-(192|512|maskable-512)\.png|tests/[^/]+\.mjs|passerelle/[^/]+\.gs|essai/index\.html)$'
           interdits=$(git ls-files | grep -Ev "$ok" || true)
           if [ -n "$interdits" ]; then echo "::error::Fichiers non autorisés dans le dépôt public :"; echo "$interdits"; exit 1; fi
       - name: Aucun secret
