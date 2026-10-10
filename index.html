@@ -1701,6 +1701,19 @@ html.nu #board #wires{display:block!important;z-index:0}
 html.nu #board #wires line.spoke{display:inline!important;stroke:#c9d6f0!important;stroke-width:1.6!important;stroke-dasharray:none!important}
 :root[data-theme="sombre"] html.nu #board #wires line.spoke,html.nu[data-theme="sombre"] #board #wires line.spoke{stroke:#2b4278!important}
 html.nu #board .node{z-index:2}
+/* ===== ordinateur : Moi au centre, les catégories de part et d'autre ===== */
+@media (min-width:1000px){
+  html:not(.zz1):not(.zz2) body .board.stack{grid-template-columns:minmax(0,1fr) 230px minmax(0,1fr)!important;grid-auto-flow:row dense}
+  html:not(.zz1):not(.zz2) body .board.stack>.v3add{grid-column:1!important;grid-row:1!important;justify-self:start}
+  html:not(.zz1):not(.zz2) body .board.stack>.rgBtn{grid-column:3!important;grid-row:1!important;justify-self:end}
+  html:not(.zz1):not(.zz2) body .board.stack>.moi{grid-column:2!important;grid-row:2 / span var(--zr,3)!important;align-self:center;justify-self:center;margin:0!important;position:sticky;top:40%}
+  html:not(.zz1):not(.zz2) body .board.stack>:is(.ia,#iaBtn){grid-column:2!important;grid-row:2 / span var(--zr,3)!important;align-self:center;justify-self:center;margin:150px 0 0 120px!important;z-index:3}
+  html:not(.zz1):not(.zz2) body .board.stack>.zone.zg{grid-column:1!important}
+  html:not(.zz1):not(.zz2) body .board.stack>.zone.zd{grid-column:3!important}
+  html:not(.zz1):not(.zz2) body .board.stack .zgrid{grid-template-columns:repeat(3,var(--tw))!important;justify-content:center}
+  :root{--tw:min(112px,calc((50vw - 230px) / 3.6))}
+}
+@media (min-width:1000px){ html:not(.zz1):not(.zz2) body .board.stack>.moi{width:170px!important;height:170px!important} html:not(.zz1):not(.zz2) body .board.stack>:is(.ia,#iaBtn){margin:175px 0 0 150px!important;width:64px!important;height:64px!important} }
 /* ===== V3.1 ===== */
 #pane.v31rubs>.tabbar.pages,#pane.v31rubs>.dots{display:none!important}
 .v31act{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:4px;padding:10px 12px;border-radius:16px;background:var(--surface);border:1.5px solid color-mix(in srgb,var(--ink) 22%,transparent)}
@@ -5463,6 +5476,10 @@ $("agClose").onclick=()=>{ $("agPage").hidden=true; };
 { const net=()=>{ const H=document.documentElement; if(H.classList.contains("nucat")) H.classList.remove("nu","nucat"); H.classList.remove("dedans","fin"); };
   const oRB3=renderBoard; renderBoard=function(){ net(); return oRB3.apply(this,arguments); }; net(); try{ renderBoard(); }catch(_){} }
 
+/* ordinateur : les catégories se répartissent à gauche et à droite de Moi */
+{ const cote=()=>{ const bd=$("board"); if(!bd) return; const Z=[...bd.querySelectorAll(":scope>.zone")]; Z.forEach((z,i)=>{ z.classList.toggle("zg",i%2===0); z.classList.toggle("zd",i%2===1); z.style.gridRow=matchMedia("(min-width:1000px)").matches?String(2+Math.floor(i/2)):""; }); bd.style.setProperty("--zr",String(Math.max(1,Math.ceil(Z.length/2)))); };
+  const oRB4=renderBoard; renderBoard=function(){ const r=oRB4.apply(this,arguments); cote(); return r; }; addEventListener("resize",cote); cote(); }
+
 /* ===== V3.1 : une proposition pour les outils et l'IA des espaces =====
    « Où j'en suis » = activité des assistants, prochain pas, à faire, bientôt, 3 outils, « ✦ Une idée pour avancer » ; puis les rubriques.
    Plus d'onglets « Outils » et « IA et Moi » ; historique et liens logiques derrière « ••• ». Toutes les propositions dans À valider. */
@@ -6407,7 +6424,7 @@ start();
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=148; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=149; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
