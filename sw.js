@@ -1,4 +1,4 @@
-const C="carte-de-vie-v143";
+const C="carte-de-vie-v144";
 const FILES=["./","./index.html","./manifest.webmanifest","./manifest-test.webmanifest","./icon-192.png","./icon-512.png","./icon-maskable-512.png","./monde.js","./bretagne.js"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()));});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(n=>n!==C&&n!=="carte-rappels").map(n=>caches.delete(n)))).then(()=>self.clients.claim()));});
