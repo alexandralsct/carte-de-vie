@@ -2180,7 +2180,7 @@ function diffLog(c,p){
 }
 function renderBoard(){ NUS=isNu()?anneaux(cats.size).s:1; requestAnimationFrame(()=>{ if(typeof placeNotes==="function") placeNotes(); });
   if(dragging) return;
-  board.querySelectorAll(".node,.linklab,.zone").forEach(n=>n.remove()); const Z=new Map(), links=[], RC={}; const stack=isStack(), G=new Map(), TW=tileW(), HR=boardR()/2; document.documentElement.classList.toggle("proprio",!!(document.documentElement.classList.contains("claude")||(db&&db.cfg&&db.cfg()&&/^alexandralsct\//i.test(db.cfg().repo||"")))); if(typeof rangeHaut==="function") rangeHaut(); board.classList.toggle("stack",stack); board.classList.toggle("libre",isLibre()); board.classList.toggle("reorg",stack&&reorg); board.querySelectorAll(".rgBtn").forEach(n=>n.remove()); if(stack){ const rb=el("button",{type:"button",className:"rgBtn"+(reorg?" on":""),textContent:reorg?"✓ Terminé":"↕ Réorganiser"}); rb.onclick=()=>{ reorg=!reorg; renderBoard(); placeMoiS(); }; board.appendChild(rb); } const LB=isLibre(), MP=LB?MOI_TEL:mp, NU=isNu(), PK=posKeys(), DEF=NU?ringSlots([...cats.values()],MP):{}, PX=c=>NU?(c[PK[0]]??DEF[c.id].x):(c.x??50), PY=c=>NU?(c[PK[1]]??DEF[c.id].y):(c.y??50);
+  board.querySelectorAll(".node,.linklab,.zone").forEach(n=>n.remove()); const Z=new Map(), links=[], RC={}; const stack=isStack(), G=new Map(), TW=tileW(), HR=boardR()/2; document.documentElement.classList.toggle("proprio",!!(document.documentElement.classList.contains("claude")||(db&&db.cfg&&db.cfg()&&estProprio(db.cfg().repo||"")))); if(typeof rangeHaut==="function") rangeHaut(); board.classList.toggle("stack",stack); board.classList.toggle("libre",isLibre()); board.classList.toggle("reorg",stack&&reorg); board.querySelectorAll(".rgBtn").forEach(n=>n.remove()); if(stack){ const rb=el("button",{type:"button",className:"rgBtn"+(reorg?" on":""),textContent:reorg?"✓ Terminé":"↕ Réorganiser"}); rb.onclick=()=>{ reorg=!reorg; renderBoard(); placeMoiS(); }; board.appendChild(rb); } const LB=isLibre(), MP=LB?MOI_TEL:mp, NU=isNu(), PK=posKeys(), DEF=NU?ringSlots([...cats.values()],MP):{}, PX=c=>NU?(c[PK[0]]??DEF[c.id].x):(c.x??50), PY=c=>NU?(c[PK[1]]??DEF[c.id].y):(c.y??50);
   wires.textContent="";
   const list=[...cats.values()].sort((a,b)=>(a.order||0)-(b.order||0));
   state.hidden=list.length>0;
@@ -3751,7 +3751,7 @@ const PIN={ K:"carte-de-vie-pinterest", api:"https://widgets.pinterest.com/v3/pi
         msg.textContent="Tes tableaux, du plus récent au plus ancien : j'ouvre le premier."; const ch=el("div",{className:"chips"});
         [...B].forEach(([url,nom],i)=>{ const b=el("button",{type:"button",className:"vchip",textContent:nom}); b.setAttribute("aria-pressed",String(i===0)); b.onclick=()=>{ ch.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed","false")); b.setAttribute("aria-pressed","true"); const [,u,bb]=url.split("/"); tableau(u,bb,nom); }; ch.appendChild(b); });
         box.insertBefore(ch,zone); const [u0,[url0,nom0]]=[0,[...B][0]]; const [,u,bb]=url0.split("/"); tableau(u,bb,nom0); }
-      catch(e){ const net=e instanceof TypeError; msg.textContent=net?"Je n'arrive pas à joindre Pinterest depuis cette page ("+String(e.message||e).slice(0,60)+"). Ouvre l'app depuis son icône sur ton écran d'accueil (ou alexandralsct.github.io/carte-de-vie), puis réessaie.":"Je ne trouve pas le compte « "+L.u+" » ("+String(e.message||e).slice(0,60)+"). Il faut ton identifiant Pinterest, pas ton nom affiché : ouvre ton profil dans Pinterest → Partager → Copier le lien, et colle-le ici (s'il commence par pin.it, ouvre-le d'abord dans le navigateur et copie l'adresse complète)."; } };
+      catch(e){ const net=e instanceof TypeError; msg.textContent=net?"Je n'arrive pas à joindre Pinterest depuis cette page ("+String(e.message||e).slice(0,60)+"). Ouvre l'app depuis son icône sur ton écran d'accueil, puis réessaie.":"Je ne trouve pas le compte « "+L.u+" » ("+String(e.message||e).slice(0,60)+"). Il faut ton identifiant Pinterest, pas ton nom affiché : ouvre ton profil dans Pinterest → Partager → Copier le lien, et colle-le ici (s'il commence par pin.it, ouvre-le d'abord dans le navigateur et copie l'adresse complète)."; } };
     if(mem) f.requestSubmit(); else inp.focus(); } };
 /* photos des souvenirs : réduites (1600 px), gardées sur l'appareil et envoyées dans le dépôt des données (dossier photos/) */
 const PH={ async reduit(f){ const bm=await createImageBitmap(f), k=Math.min(1,1600/Math.max(bm.width,bm.height)), cv=document.createElement("canvas"); cv.width=Math.round(bm.width*k); cv.height=Math.round(bm.height*k); cv.getContext("2d").drawImage(bm,0,0,cv.width,cv.height); return await new Promise(ok=>cv.toBlob(ok,"image/jpeg",.82)); },
@@ -5530,7 +5530,7 @@ function semPasserelle(c){ const o=PASS.lit(), d=el("details",{className:"sempas
     msg.textContent="Je relis ton tableau…"; try{ await PASS.recopie(); await PASS.relire(true); msg.textContent="C'est branché."; renderPane(cats.get(c.id)); }catch(x){ msg.textContent="La passerelle ne répond pas ("+String(x.message||x).slice(0,60)+") : vérifie l'adresse, la clé, et que le déploiement est accessible à « Tout le monde »."; } };
   const re=el("button",{type:"button",className:"vbtn ghostb",textContent:"Relire et recopier maintenant"}); re.onclick=async()=>{ msg.textContent="…"; try{ const n=await PASS.recopie(); await PASS.relire(true); msg.textContent=(n?n+" moment(s) recopié(s) · ":"")+"tableau relu."; renderPane(cats.get(c.id)); }catch(x){ msg.textContent="Échec : "+String(x.message||x).slice(0,80); } };
   const ol=el("ol",{className:"sempas"}); ["Ouvre ton tableau « Tracking Planning » → Extensions → Apps Script.","Colle le code de la passerelle (bouton ci-dessous), puis enregistre.","Paramètres du projet (roue dentée) → Propriétés du script → ajoute CLE avec un mot de passe à toi.","Déployer → Nouveau déploiement → type « Application web » ; exécuter en tant que : moi ; accès : tout le monde. Autorise, puis copie l'adresse qui finit par /exec.","Colle l'adresse et ta clé ici. Fais-le sur chaque appareil (elles ne quittent pas l'appareil)."].forEach(t=>ol.appendChild(el("li",{textContent:t})));
-  const code=el("a",{className:"vbtn ghostb",href:"https://github.com/alexandralsct/carte-de-vie/blob/main/passerelle/tracking-planning.gs",target:"_blank",rel:"noopener",textContent:"Voir le code de la passerelle ↗"});
+  const code=el("a",{className:"vbtn ghostb",href:"passerelle/tracking-planning.gs",target:"_blank",rel:"noopener",textContent:"Voir le code de la passerelle ↗"});
   d.append(el("p",{className:"mut",textContent:"La passerelle relit ton tableau à chaque ouverture de « Ma semaine » (au plus toutes les 10 min) et y écrit les moments ajoutés ici, avec la couleur de la catégorie."}),ol,code,f,PASS.ok()?re:"",msg); return d; }
 function hAjout(c,H,save){ const s=el("section",{className:"card hab hajout"},el("h3",{textContent:"Nouvelle habitude"}));
   const deja=new Set(H.map(h=>h.name.toLowerCase())), chips=el("div",{className:"hidees"});
@@ -6010,7 +6010,7 @@ function start(){
           out.append(ul,el("div",{className:"fbbar"},go)); },()=>{ out.textContent="Impossible de lire cette version."; }); };
       $("syncNow").onclick=()=>{ $("syncInfo").textContent="Synchronisation…"; db.sync().then(()=>refresh()); };
       $("syncEdit").onclick=()=>{ $("syncForm").hidden=false; $("syncToken").focus(); };
-      $("syncLink").onclick=()=>{ const c=db.cfg(); if(!c) return; const base=CL?"https://alexandralsct.github.io/carte-de-vie/":location.href.split("#")[0];
+      $("syncLink").onclick=()=>{ const c=db.cfg(); if(!c) return; const base=location.href.split("#")[0];
         const link=base+"#relier="+btoa(unescape(encodeURIComponent(JSON.stringify({r:c.repo,t:c.token})))).replace(/=+$/,"");
         const done=()=>{ $("syncInfo").textContent="Lien copié. Il contient ta clé : ouvre-le seulement sur ton autre appareil, ne l'envoie à personne."; };
         if(!confirm("Ce lien contient la clé de ta synchro. Ne l'ouvre que sur tes propres appareils et ne le partage pas. Copier le lien ?")) return; (navigator.clipboard?navigator.clipboard.writeText(link):Promise.reject()).then(done,()=>{ window.prompt("Copie ce lien :",link); }); };
@@ -6053,7 +6053,11 @@ function start(){
    Il n'est lu que pour un dépôt de son compte, avec sa clé ; ailleurs l'app reste générique. */
 const PERSO_K="carte-de-vie-perso";
 function persoEval(t){ try{ eval(t); return true; }catch(err){ console.warn("module perso",err); return false; } }
-function persoOk(){ const c=AUD.cfg(); return !!(c&&c.repo&&c.token&&/^alexandralsct\//i.test(c.repo)); }
+/* propriétaire : un dépôt de son compte, reconnu par empreinte (le nom du compte n'est pas écrit ici) */
+function estProprio(r){ const o=String(r||"").split("/")[0].toLowerCase(); let h1=0xdeadbeef, h2=0x41c6ce57; for(let i=0;i<o.length;i++){ const ch=o.charCodeAt(i); h1=Math.imul(h1^ch,2654435761); h2=Math.imul(h2^ch,1597334677); }
+  h1=Math.imul(h1^(h1>>>16),2246822507); h1^=Math.imul(h2^(h2>>>13),3266489909); h2=Math.imul(h2^(h2>>>16),2246822507); h2^=Math.imul(h1^(h1>>>13),3266489909);
+  return String(r||"").includes("/") && (4294967296*(2097151&h2)+(h1>>>0)).toString(36)==="h7637qhg6a"; }
+function persoOk(){ const c=AUD.cfg(); return !!(c&&c.repo&&c.token&&estProprio(c.repo)); }
 { let t=null; try{ t=persoOk()?localStorage.getItem(PERSO_K):null; }catch(_){} if(t) persoEval(t); }
 start();
 if(persoOk()) setTimeout(async()=>{ const b=await AUD.recupere("perso/module.js","text/plain"); if(!b) return; const t=await b.text(); let avant=null; try{ avant=localStorage.getItem(PERSO_K); }catch(_){}
@@ -6075,7 +6079,7 @@ if(persoOk()) setTimeout(async()=>{ const b=await AUD.recupere("perso/module.js"
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=156; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=157; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
