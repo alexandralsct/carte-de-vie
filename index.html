@@ -1812,6 +1812,39 @@ html.calme :is(.souris,.chatmot,.griffes){display:none}
 
 .cpn.walk .tail{animation:queuehaute 1.8s ease-in-out infinite!important;transform-origin:100% 100%}
 @keyframes queuehaute{0%,100%{rotate:0deg}50%{rotate:-7deg}}
+
+/* Mon suivi */
+#suiviPage{--c:var(--ink);background:var(--bg)}
+#suiviPage h2{font:600 28px/1.1 var(--display)!important;margin:0}
+#suiviIn{padding-bottom:96px}
+#suiviIn .card{display:grid;gap:10px;margin-bottom:18px;border:2px solid #002FA7;box-shadow:4px 4px 0 #c9d6f0}
+#suiviIn .card>h3{font-size:20px;line-height:1.2}
+#suiviIn details.card>summary{cursor:pointer;font-weight:700;font-size:18px}
+#suiviIn .vprop,#suiviIn .vprop b,#suiviIn .vprop p{font-size:15px}
+:root[data-theme="sombre"] #suiviIn .card{border-color:#a9bfff;box-shadow:4px 4px 0 #070f22}
+:root[data-theme="sombre"] #suiviIn .vprop small.mono{color:#a9bfff!important}
+.sform{display:flex;flex-direction:column;gap:8px;margin-top:8px;padding:12px;border-radius:14px;background:var(--surface);border:1.5px solid color-mix(in srgb,var(--ink) 30%,transparent);min-width:0}
+.slab{display:flex;flex-direction:column;gap:4px;min-width:0}
+.slab>small,.vprop .slab>small{font:600 .8rem var(--body)!important;letter-spacing:0!important;text-transform:none!important;color:var(--fg)!important}
+.sform textarea,.sform input,.srow input{font:inherit;font-size:.95rem;border:1.5px solid color-mix(in srgb,var(--ink) 30%,transparent);border-radius:10px;padding:8px 10px;background:var(--board);color:var(--fg);width:100%;min-width:0;box-sizing:border-box}
+.sform textarea{resize:vertical;min-height:64px}
+.spas{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,9.5em);gap:8px}
+@media (max-width:420px){.spas{grid-template-columns:minmax(0,1fr)}}
+.srow{display:flex;gap:8px;align-items:center;min-width:0}.srow input{flex:1 1 auto}
+.sbloc{display:flex;flex-direction:column;gap:2px}.sbloc p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.vprop .sbloc small{text-transform:none!important;letter-spacing:0!important;font-family:var(--body)!important;font-weight:600;color:var(--fg)!important;opacity:.75}
+.vprop .sprochain small{text-transform:none!important;letter-spacing:0!important;font-family:var(--body)!important;font-weight:600;color:#002FA7!important}
+.sprochain{display:flex;flex-direction:column;gap:2px;margin:0;padding:8px 10px;border-radius:12px;background:#c9d6f0;color:#002FA7}
+.sprochain.urg{background:#002FA7;color:#FBF8F1}.vprop .sprochain.urg small{color:#dbe3f3!important}
+.sfiche.e-fait b{text-decoration:line-through;text-decoration-thickness:1px;opacity:.8}
+.shist summary{cursor:pointer;font-size:.85rem}
+.slien{margin:8px 0}
+.suiviBar{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:8px;flex-wrap:wrap;width:100%;margin:-4px 0 12px;padding:9px 12px;border-radius:14px;border:1.5px dashed var(--ink);color:var(--ink);background:var(--surface);font-size:.9rem;min-width:0}
+.suiviBar i{font-style:normal;font-weight:700}.suiviBar b{font-weight:700}
+.suiviBar span{flex:1 1 12em;min-width:0;overflow-wrap:anywhere;opacity:.85}.suiviBar em{font-style:normal;font-weight:700}
+.suiviBar.urg{border-style:solid;background:var(--ink);color:var(--surface)}
+.suiviBar:focus-visible{outline:3px solid var(--pale);outline-offset:2px}
+
 </style>
 <script>
 /* version test : ?test=1 → données à part (préfixe « test: » sur tout le stockage local), jamais celles de la carte principale */
@@ -1946,6 +1979,7 @@ html.calme :is(.souris,.chatmot,.griffes){display:none}
 <aside class="page" id="aujPage" hidden aria-label="Aujourd'hui"><div class="page-in"><div><button class="btn ghost" id="aujClose">← Ma carte</button></div><h2>Aujourd'hui</h2><div id="aujIn"></div></div></aside>
 <aside class="page" id="trajPage" hidden aria-label="Ma trajectoire"><div class="page-in"><div><button class="btn ghost" id="trajClose">← Ma carte</button></div><div id="trajIn"></div></div></aside>
 <aside class="page" id="memPage" hidden aria-label="Ma mémoire"><div class="page-in"><div><button class="btn ghost" id="memClose">← Ma carte</button></div><div id="memIn"></div></div></aside>
+<aside class="page" id="suiviPage" hidden aria-label="Mon suivi"><div class="page-in"><div><button class="btn ghost" id="suiviClose">← Ma carte</button></div><div id="suiviIn"></div></div></aside>
 <aside class="page" id="valPage" hidden aria-label="À valider"><div class="page-in"><div><button class="btn ghost" id="valClose">← Ma carte</button></div><div id="valIn"></div></div></aside>
 <aside class="page noterp" id="noterPage" hidden aria-label="Noter"><div class="page-in"><div><button class="btn ghost" id="noterClose">← Ma carte</button></div>
  <h2>Noter</h2><textarea id="noterTxt" rows="5" placeholder="Ce qui me passe par la tête. Une ligne = une chose."></textarea>
@@ -4766,7 +4800,7 @@ const ESSAI={ tr:{}, me:{}, pr:[], memF:"tout",
       if(x.pourquoi) box.appendChild(el("p",{className:"mut",textContent:x.pourquoi}));
       const a=el("button",{type:"button",className:"btn",textContent:"Accepter"}), p=el("button",{type:"button",className:"btn ghost",textContent:"Plus tard"}), n=el("button",{type:"button",className:"btn ghost",textContent:"Non"});
       a.onclick=()=>{ fetel(a); this.repond(x,"acceptee",ed?ed.value.trim():null); }; p.onclick=()=>this.repond(x,"plus_tard"); n.onclick=()=>this.repond(x,"refusee");
-      box.appendChild(el("div",{className:"bact"},a,p,n)); return box; };
+      box.appendChild(el("div",{className:"bact"},a,p,n)); if(window.SUIVI) SUIVI.attache(box,{titre:x.titre||d.text,contexte:[x.titre&&d.text,x.pourquoi].filter(Boolean).join(" · "),source:[TY[x.type]||x.type,c&&c.name].filter(Boolean).join(" · "),lien:d.url,range:()=>SUIVI.rangeProp(x)}); return box; };
     const sec=this.carte(z,L.length?L.length+" proposition"+(L.length>1?"s":""):"Rien à valider");
     if(!L.length) sec.appendChild(help("Tout est traité. Les prochaines propositions arriveront ici."));
     /* gestion facile : accepter d'un geste toutes les propositions d'un même type */
@@ -4870,7 +4904,7 @@ const V2={
             ok.onclick=()=>{ const r=ta.value.trim(); if(!r){ ta.focus(); return; } const av={id:uid(),t:new Date().toISOString(),source:src,objet:String(e.objet||"").slice(0,200),lien:/^https?:\/\//.test(e.lien||"")?e.lien:"",detail:String(e.detail||"").slice(0,300),raison:r.slice(0,400)};
               AVIS_OFFRES=[av,...AVIS_OFFRES].slice(0,300); if(db) db.doc("meta/avis_offres").set({liste:AVIS_OFFRES}).catch(()=>{}); fetel(ok); masque(e,false); };
             an.onclick=()=>f.remove(); f.append(ta,el("div",{className:"bact"},ok,an)); li.appendChild(f); ta.focus(); }; act.appendChild(pa); }
-        li.appendChild(act); sec.appendChild(li); });
+        li.appendChild(act); if(window.SUIVI) SUIVI.attache(li,{titre:(li.querySelector("b")||{}).textContent,contexte:(li.querySelector("p.mut")||{}).textContent||"",source:NOM[src]||src,lien:e.lien,range:()=>SUIVI.rangeVeille(e)}); sec.appendChild(li); });
       if(E.length>5&&!tout){ const b=el("button",{type:"button",className:"btn ghost",textContent:"Voir les "+(E.length-5)+" autres"}); b.onclick=()=>{ this["_tout"+src]=true; ESSAI.ouvreVal(true); }; sec.appendChild(b); }
       z.appendChild(sec); }); }
 };
@@ -5244,7 +5278,7 @@ const V31={ filtre:null, enVal:false,
     const a=el("button",{type:"button",className:"btn",textContent:"À faire"}); a.onclick=()=>{ fetel(a); const cur=cats.get(c.id); write(c.id,{tasks:[...(cur.tasks||[]),{id:uid(),text:txt,done:false,due:"",auto:true}],sugg:ret()}); apres(); };
     const i=el("button",{type:"button",className:"btn ghost",textContent:"Garder en idée"}); i.onclick=()=>{ const cur=cats.get(c.id); write(c.id,{ideas:[...(cur.ideas||[]),{id:uid(),text:txt}],sugg:ret()}); apres(); };
     const n=el("button",{type:"button",className:"btn ghost",textContent:"Non"}); n.onclick=()=>{ write(c.id,{sugg:ret()}); apres(); };
-    li.appendChild(el("div",{className:"bact"},a,i,n)); return li; }
+    li.appendChild(el("div",{className:"bact"},a,i,n)); if(window.SUIVI) SUIVI.attache(li,{titre:s.titre||String(s.texte).slice(0,200),contexte:s.titre&&s.texte?String(s.texte):"",source:"Piste · "+c.name,range:()=>SUIVI.rangePiste(c,s,apres)}); return li; }
 };
 { /* réglages des espaces : IA et À valider */
   /* l'IA n'écrit plus directement dans les espaces (question du jour, petite action) */
@@ -5261,6 +5295,103 @@ const V31={ filtre:null, enVal:false,
     if(F){ /* les propositions de Claude qui ne concernent pas cet espace sont masquées */ const c1=z.querySelector(".card"); if(c1&&/PROPOSITION|Rien à valider/i.test((c1.querySelector("h3")||{}).textContent||"")){ const P=ESSAI.aValider().L.filter(x=>(x.data||{}).cat===F.id); if(!P.length) c1.remove(); } } };
   $("valClose").addEventListener("click",()=>{ V31.filtre=null; });
 }
+
+/* ===== Mon suivi : ouvrir une proposition, dire comment on voit les choses et comment on prévoit d'agir, puis la suivre =====
+   meta/suivi {liste:[{id,titre,contexte,source,lien,etat,vois,agir,pas,date,t,maj,fait,hist:[{t,m}]}]}
+   etat : a_decider, decide, en_cours, fait. On ajoute ou on complète, on ne retire jamais un sujet. */
+window.SUIVI={ L:[],
+  ET:[["a_decider","À décider"],["decide","Décidé"],["en_cours","En cours"],["fait","Fait"]],
+  lib(k){ return (this.ET.find(e=>e[0]===k)||[k,k])[1]; },
+  charge(d){ this.L=(d&&Array.isArray(d.liste))?d.liste:[]; this.rappel(); if(!$("suiviPage").hidden) this.ouvre(true); },
+  ecrit(L){ this.L=L; if(db) db.doc("meta/suivi").set({liste:L}).catch(()=>{}); this.rappel(); },
+  ouverts(){ return this.L.filter(x=>x&&x.etat!=="fait"); },
+  jourFr(k){ return k?new Date(k+(k.length===10?"T12:00":"")).toLocaleDateString("fr-FR",{day:"numeric",month:"short"}):""; },
+  /* « aujourd'hui », « en retard » ou la date du prochain pas */
+  quand(x){ if(!x.date) return ""; const t=today(); return x.date<t?"en retard ("+this.jourFr(x.date)+")":x.date===t?"aujourd'hui":"le "+this.jourFr(x.date); },
+  /* le formulaire : comment je vois les choses, comment je prévois d'agir, le prochain pas, l'état */
+  form(x,ok,an){ const f=el("div",{className:"sform"}), lab=(t,c)=>el("label",{className:"slab"},el("small",{textContent:t}),c);
+    const vo=el("textarea",{rows:3,maxLength:2000,value:x.vois||"",placeholder:"Ce que j'en pense, ce qui compte pour moi, ce qui me freine…"});
+    const ag=el("textarea",{rows:3,maxLength:2000,value:x.agir||"",placeholder:"Ce que je vais faire, à ma façon, et quand"});
+    const pa=el("input",{maxLength:200,value:x.pas||"",placeholder:"ex. appeler, écrire, relire, demander…"}), da=el("input",{type:"date",value:x.date||""});
+    pa.setAttribute("aria-label","Mon prochain pas"); da.setAttribute("aria-label","Date du prochain pas");
+    let et=x.etat||"a_decider"; const ch=el("div",{className:"chips"}); ch.setAttribute("role","group"); ch.setAttribute("aria-label","Où j'en suis");
+    const maj=()=>[...ch.children].forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.k===et)));
+    this.ET.forEach(([k,n])=>{ const b=el("button",{type:"button",className:"vchip",textContent:n}); b.dataset.k=k; b.onclick=()=>{ et=k; maj(); }; ch.appendChild(b); }); maj();
+    const no=x.id?el("textarea",{rows:2,maxLength:1000,placeholder:"Où j'en suis aujourd'hui (facultatif)"}):null;
+    const b1=el("button",{type:"button",className:"btn",textContent:x.id?"Enregistrer":"Garder dans mon suivi"}), b2=el("button",{type:"button",className:"btn ghost",textContent:"Annuler"});
+    b1.onclick=()=>ok({vois:vo.value.trim(),agir:ag.value.trim(),pas:pa.value.trim(),date:da.value||"",etat:et,note:no?no.value.trim():""},b1); b2.onclick=an;
+    f.append(lab("Comment je vois les choses",vo),lab("Comment je prévois d'agir",ag),el("div",{className:"spas"},lab("Mon prochain pas",pa),lab("Quand",da)),lab("Où j'en suis",ch));
+    if(no) f.appendChild(lab("Un point d'étape",no)); f.appendChild(el("div",{className:"bact"},b1,b2)); return f; },
+  /* sur chaque proposition à choix : « Ouvrir et suivre » ; une fois gardée, elle quitte « À valider » et vit dans Mon suivi */
+  attache(box,o){ const act=box.querySelector(".bact"); if(!act||box.querySelector(".souvre")) return;
+    const b=el("button",{type:"button",className:"btn ghost souvre",textContent:"Ouvrir et suivre ✎"}); b.title="Dire comment tu vois les choses et comment tu prévois d'agir, puis le retrouver dans Mon suivi";
+    b.onclick=()=>{ const v=box.querySelector(".sform"); if(v){ v.remove(); return; }
+      const f=this.form({},(r,bt)=>{ const now=new Date().toISOString(), m=r.note;
+        const n={id:uid(),titre:String(o.titre||"").slice(0,200),contexte:String(o.contexte||"").slice(0,400),source:String(o.source||"").slice(0,80),lien:/^https?:\/\//.test(o.lien||"")?String(o.lien).slice(0,500):"",etat:r.etat,vois:r.vois,agir:r.agir,pas:r.pas,date:r.date,t:now,maj:now,hist:[{t:now,m:"Ouvert · "+this.lib(r.etat)}]};
+        if(r.etat==="fait") n.fait=now; if(m) n.hist.push({t:now,m});
+        this.ecrit([n,...this.L]); fetel(bt); try{ if(o.range) o.range(); }catch(_){} $("saved").textContent="Gardé dans Mon suivi"; },()=>f.remove());
+      box.appendChild(f); const t=f.querySelector("textarea"); if(t) t.focus(); };
+    act.appendChild(b); },
+  /* la proposition quitte « À valider » une fois qu'on l'a prise en main */
+  rangeProp(x){ const now=new Date().toISOString(); ESSAI.ecritPr(ESSAI.pr.map(y=>y.id===x.id?Object.assign({},y,{etat:"suivie",repondu:now}):y)); ESSAI.ouvreVal(true); },
+  rangeVeille(e){ ckMasques=[...new Set([...ckMasques,e._k])].slice(-500); if(db) db.doc("meta/cockpit_masques").set({ids:ckMasques,coches:ckCoches}).catch(()=>{}); ESSAI.ouvreVal(true); V2.bande(); },
+  rangePiste(c,s,apres){ const cur=cats.get(c.id); if(cur) write(c.id,{sugg:(cur.sugg||[]).filter(q=>q.id!==s.id)}); if(apres) apres(); },
+  /* rappel visible tant que ce n'est pas fait : une ligne sous les puces de l'accueil */
+  rappel(){ const bd=$("bande"); if(!bd) return; let r=$("suiviBar"); const O=this.ouverts();
+    if(!O.length||bd.hidden){ if(r) r.hidden=true; return; }
+    if(!r){ r=el("button",{type:"button",id:"suiviBar",className:"suiviBar"}); r.onclick=()=>this.ouvre(); } if(r.previousElementSibling!==bd) bd.after(r);
+    const t=today(), urg=O.filter(x=>x.date&&x.date<=t).sort((a,b)=>a.date.localeCompare(b.date)), pro=urg[0]||O.filter(x=>x.pas).sort((a,b)=>(a.date||"9").localeCompare(b.date||"9"))[0];
+    r.textContent=""; r.hidden=false; r.classList.toggle("urg",!!urg.length);
+    r.append(el("i",{textContent:"◎"}),el("b",{textContent:"Mon suivi · "+O.length+" ouvert"+(O.length>1?"s":"")}),el("span",{textContent:pro?"Prochain pas : "+(pro.pas||pro.titre)+(pro.date?" · "+this.quand(pro):""):"Comment tu prévois d'agir, où tu en es"}),el("em",{textContent:"→"})); },
+  /* la page Mon suivi */
+  ouvre(garde){ const pg=$("suiviPage"), y=garde===true?pg.scrollTop:0; pg.hidden=false; const z=$("suiviIn"); z.textContent="";
+    z.appendChild(el("div",{className:"hero"},el("div",{className:"hero-t"},el("h2",{textContent:"Mon suivi"}),el("p",{className:"lead",textContent:"Les sujets que tu as ouverts : comment tu vois les choses, comment tu prévois d'agir, où tu en es. Ils restent ici tant qu'ils ne sont pas faits."}))));
+    /* ouvrir un sujet soi-même */
+    const nv=el("section",{className:"card rv"},el("h3",{textContent:"Ouvrir un sujet"})), ti=el("input",{maxLength:200,placeholder:"De quoi s'agit-il ? (ex. une offre, une décision, une démarche)"}); ti.setAttribute("aria-label","Sujet à suivre");
+    const go=el("button",{type:"button",className:"btn",textContent:"Ouvrir"}); go.onclick=()=>{ const v=ti.value.trim(); if(!v){ ti.focus(); return; } if(nv.querySelector(".sform")) return;
+      nv.appendChild(this.form({},r=>{ const now=new Date().toISOString(), n={id:uid(),titre:v.slice(0,200),contexte:"",source:"",etat:r.etat,vois:r.vois,agir:r.agir,pas:r.pas,date:r.date,t:now,maj:now,hist:[{t:now,m:"Ouvert · "+this.lib(r.etat)}]}; if(r.etat==="fait") n.fait=now; this.ecrit([n,...this.L]); this.ouvre(true); },()=>this.ouvre(true))); };
+    nv.appendChild(el("div",{className:"srow"},ti,go)); z.appendChild(nv);
+    const O=this.ouverts(), F=this.L.filter(x=>x&&x.etat==="fait");
+    if(!O.length) z.appendChild(el("section",{className:"card rv"},el("h3",{textContent:"Rien en cours"}),help("Dans « À valider », touche « Ouvrir et suivre ✎ » sur une proposition pour dire comment tu vois les choses et comment tu prévois d'agir. Elle arrivera ici.")));
+    [["en_cours","En cours"],["decide","Décidé, à faire"],["a_decider","À décider"]].forEach(([k,n])=>{ const G=O.filter(x=>(x.etat||"a_decider")===k).sort((a,b)=>(a.date||"9").localeCompare(b.date||"9")||String(b.maj||b.t).localeCompare(String(a.maj||a.t))); if(!G.length) return;
+      const sec=el("section",{className:"card rv"},el("h3",{textContent:n+" : "+G.length})); G.forEach(x=>sec.appendChild(this.fiche(x))); z.appendChild(sec); });
+    if(F.length){ const d=el("details",{className:"card rv"}); d.appendChild(el("summary",{textContent:"Faits : "+F.length})); F.sort((a,b)=>String(b.fait||b.maj).localeCompare(String(a.fait||a.maj))).forEach(x=>d.appendChild(this.fiche(x))); z.appendChild(d); }
+    pg.scrollTop=y; },
+  fiche(x){ const box=el("div",{className:"vprop sfiche e-"+(x.etat||"a_decider")});
+    box.appendChild(el("small",{className:"mono",textContent:[this.lib(x.etat||"a_decider"),x.source,"ouvert le "+this.jourFr(String(x.t||"").slice(0,10))].filter(Boolean).join(" · ")}));
+    box.appendChild(el("b",{textContent:x.titre||"Sans titre"})); if(x.contexte) box.appendChild(el("p",{className:"mut",textContent:x.contexte}));
+    if(/^https?:\/\//.test(x.lien||"")) box.appendChild(el("a",{className:"lien",href:x.lien,target:"_blank",rel:"noopener",textContent:"Ouvrir le lien ↗"}));
+    const bloc=(t,v)=>{ if(v) box.appendChild(el("div",{className:"sbloc"},el("small",{textContent:t}),el("p",{textContent:v}))); };
+    bloc("Comment je vois les choses",x.vois); bloc("Comment je prévois d'agir",x.agir);
+    if(x.pas||x.date){ const q=this.quand(x); box.appendChild(el("p",{className:"sprochain"+(x.etat!=="fait"&&x.date&&x.date<=today()?" urg":"")},el("small",{textContent:"Prochain pas"}),el("span",{textContent:(x.pas||"—")+(q?" · "+q:"")}))); }
+    if(!x.vois&&!x.agir&&x.etat!=="fait") box.appendChild(help("Pas encore écrit comment tu vois les choses : touche « Ouvrir »."));
+    const H=(x.hist||[]).slice(-6).reverse(); if(H.length>1){ const d=el("details",{className:"shist"}); d.appendChild(el("summary",{textContent:"Le fil : "+(x.hist||[]).length})); const ul=el("ul",{className:"rvl"}); H.forEach(h=>ul.appendChild(el("li",{},el("small",{textContent:this.jourFr(String(h.t).slice(0,10))+" · "}),el("span",{textContent:h.m})))); d.appendChild(ul); box.appendChild(d); }
+    /* changer d'état d'un geste, ou ouvrir pour écrire */
+    const act=el("div",{className:"bact"}), suiv={a_decider:["decide","J'ai décidé"],decide:["en_cours","Je commence"],en_cours:["fait","C'est fait ✓"]}[x.etat||"a_decider"];
+    if(suiv){ const b=el("button",{type:"button",className:"btn",textContent:suiv[1]}); b.onclick=()=>{ fetel(b); this.maj(x,{etat:suiv[0]},""); }; act.appendChild(b); }
+    else { const b=el("button",{type:"button",className:"btn ghost",textContent:"Rouvrir"}); b.onclick=()=>this.maj(x,{etat:"en_cours"},""); act.appendChild(b); }
+    const o=el("button",{type:"button",className:"btn ghost",textContent:"Ouvrir ✎"}); o.onclick=()=>{ const v=box.querySelector(".sform"); if(v){ v.remove(); return; }
+      const f=this.form(x,r=>{ const p={vois:r.vois,agir:r.agir,pas:r.pas,date:r.date,etat:r.etat}; this.maj(x,p,r.note); },()=>f.remove()); box.appendChild(f); const t=f.querySelector("textarea"); if(t) t.focus(); };
+    act.appendChild(o); box.appendChild(act); return box; },
+  /* compléter un sujet : on garde la trace de chaque changement dans son fil */
+  maj(x,p,note){ const now=new Date().toISOString(), H=[...(x.hist||[])];
+    if(p.etat&&p.etat!==x.etat) H.push({t:now,m:this.lib(p.etat)});
+    ["vois","agir"].forEach(k=>{ if(k in p&&p[k]!==(x[k]||"")) H.push({t:now,m:(k==="vois"?"Ma façon de voir : ":"Mon plan : ")+String(p[k]).slice(0,160)}); });
+    if("pas" in p&&(p.pas!==(x.pas||"")||p.date!==(x.date||""))&&(p.pas||p.date)) H.push({t:now,m:"Prochain pas : "+(p.pas||"—")+(p.date?" · "+this.jourFr(p.date):"")});
+    if(note) H.push({t:now,m:note});
+    const y=Object.assign({},x,p,{maj:now,hist:H.slice(-60)}); if(p.etat==="fait"&&x.etat!=="fait") y.fait=now;
+    this.ecrit(this.L.map(z=>z.id===x.id?y:z)); this.ouvre(true); }
+};
+{ $("suiviClose").onclick=()=>{ $("suiviPage").hidden=true; };
+  document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("suiviPage").hidden){ $("suiviPage").hidden=true; e.stopImmediatePropagation(); } },true);
+  /* le rappel suit les puces de l'accueil */
+  const oB=V2.bande.bind(V2); V2.bande=function(){ const r=oB.apply(this,arguments); SUIVI.rappel(); return r; };
+  /* dans « À valider » : un lien vers Mon suivi en haut */
+  const oV=ESSAI.ouvreVal.bind(ESSAI); ESSAI.ouvreVal=function(a){ oV(a); const z=$("valIn"), h=z.querySelector(".hero"), n=SUIVI.ouverts().length;
+    if(h&&!z.querySelector(".slien")){ const b=el("button",{type:"button",className:"btn ghost slien",textContent:"Mon suivi"+(n?" · "+n+" ouvert"+(n>1?"s":""):"")+" →"}); b.onclick=()=>{ $("valPage").hidden=true; SUIVI.ouvre(); }; h.after(b); } };
+  /* dans le menu de droite */
+  const rb=document.querySelector(".v3railIn"); if(rb){ const b=el("button",{type:"button"},el("i",{textContent:"◎"}),el("span",{textContent:"Mon suivi"})); b.onclick=()=>{ const r=document.querySelector(".v3rail"); if(r) r.classList.remove("on"); SUIVI.ouvre(); };
+    const av=[...rb.children].find(x=>/À valider/.test(x.textContent)); if(av) av.after(b); else rb.appendChild(b); } }
 
 /* A8 : une icône qui ne charge pas laisse la place au logo de l'app, plus de carré blanc */
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&!i.dataset.repli&&(i.classList.contains("lgimg")||i.closest(".node,.ico"))){ i.dataset.repli="1"; i.src="icon-192.png"; i.classList.add("repli"); } },true);
@@ -5984,7 +6115,7 @@ function localDb(){ const KEY="carte-de-vie-v1", CKEY="carte-de-vie-sync"; let s
 /* --- dans Claude : les données restent dans la base de la page, la synchro GitHub et l'IA s'ajoutent --- */
 function claudeDb(d){ const CKEY="carte-de-vie-sync"; let cfg=null; try{ cfg=JSON.parse(localStorage.getItem(CKEY)||"null"); }catch(_){}
   const store={}, live=k=>store[k]&&!store[k]._del, stamp=(x,k)=>{ const now=Date.now(); return Object.assign({},x,{_m:now,_f:fieldsNow(x,k?store[k]:null,now),_x:tombes(k?store[k]:null,x)}); };
-  ["meta/moi","meta/layout","meta/feedback","meta/compagnon","meta/suggestions","meta/base","meta/notes","meta/cockpit","meta/cockpit_masques","meta/fonds","meta/icones","meta/semaine","meta/journees","meta/app","meta/energie","meta/revues","meta/trajectoire","meta/memoire","meta/propositions"].forEach(k=>d.doc(k).onSnapshot(s=>{ if(s.exists) store[k]=s.data(); else delete store[k]; },()=>{}));
+  ["meta/moi","meta/layout","meta/feedback","meta/compagnon","meta/suggestions","meta/base","meta/notes","meta/cockpit","meta/cockpit_masques","meta/fonds","meta/icones","meta/semaine","meta/journees","meta/app","meta/energie","meta/revues","meta/trajectoire","meta/memoire","meta/propositions","meta/suivi"].forEach(k=>d.doc(k).onSnapshot(s=>{ if(s.exists) store[k]=s.data(); else delete store[k]; },()=>{}));
   d.collection("espaces").onSnapshot(s=>{ Object.keys(store).forEach(k=>{ if(k.startsWith("espaces/")) delete store[k]; }); s.docs.forEach(x=>{ store["espaces/"+x.id]=x.data(); }); },()=>{});
   const after=p=>p.then(v=>{ api.dirty=true; api.queue(); return v; });
   const doc=path=>{ const r=d.doc(path); return { id:r.id, path,
@@ -6100,7 +6231,7 @@ function start(){
     const semRe=()=>{ const c=openId&&cats.get(openId); if(c&&c.type==="habitudes") quandLibre("semaine",()=>renderPane(cats.get(openId))); };
     db.doc("meta/semaine").onSnapshot(x=>{ SEMAINE=x.exists?x.data():null; semRe(); },()=>{}); db.doc("meta/journees").onSnapshot(x=>{ JOURNEES=x.exists?x.data():null; semRe(); },()=>{});
     db.doc("meta/icones").onSnapshot(x=>ICOLIB.recoit(x.exists?x.data():null),()=>{});
-    db.doc("meta/energie").onSnapshot(x=>PILOTE.energie(x.exists?x.data():null),()=>{}); db.doc("meta/revues").onSnapshot(x=>PILOTE.revues(x.exists?x.data():null),()=>{}); db.doc("meta/trajectoire").onSnapshot(x=>ESSAI.trajectoire(x.exists?x.data():null),()=>{}); db.doc("meta/memoire").onSnapshot(x=>ESSAI.memoire(x.exists?x.data():null),()=>{}); db.doc("meta/propositions").onSnapshot(x=>ESSAI.propositions(x.exists?x.data():null),()=>{});
+    db.doc("meta/energie").onSnapshot(x=>PILOTE.energie(x.exists?x.data():null),()=>{}); db.doc("meta/revues").onSnapshot(x=>PILOTE.revues(x.exists?x.data():null),()=>{}); db.doc("meta/trajectoire").onSnapshot(x=>ESSAI.trajectoire(x.exists?x.data():null),()=>{}); db.doc("meta/memoire").onSnapshot(x=>ESSAI.memoire(x.exists?x.data():null),()=>{}); db.doc("meta/propositions").onSnapshot(x=>ESSAI.propositions(x.exists?x.data():null),()=>{}); db.doc("meta/suivi").onSnapshot(x=>{ if(window.SUIVI) SUIVI.charge(x.exists?x.data():null); },()=>{});
     db.doc("meta/fonds").onSnapshot(x=>FOND.recoit(x.exists?x.data():null),()=>{});
     db.doc("meta/suggestions").onSnapshot(x=>{ if(window._suggestions) window._suggestions(x.exists?x.data():null); },()=>{});
     db.doc("meta/notes").onSnapshot(x=>{ if(window._notes) window._notes(x.exists?x.data():null); },()=>{}); db.doc("meta/claude_notes").onSnapshot(x=>{ if(window._claudeNotes) window._claudeNotes(x.exists?x.data():null); },()=>{}); db.doc("meta/avis_offres").onSnapshot(x=>{ AVIS_OFFRES=(x.exists&&Array.isArray(x.data().liste))?x.data().liste:[]; },()=>{}); db.doc("meta/cockpit").onSnapshot(x=>{ cockpit=x.exists?x.data():null; },()=>{}); db.doc("meta/cockpit_masques").onSnapshot(x=>{ ckMasques=(x.exists&&Array.isArray(x.data().ids))?x.data().ids:[]; ckCoches=(x.exists&&Array.isArray(x.data().coches))?x.data().coches:[]; },()=>{}); db.doc("meta/echanges").onSnapshot(x=>{ echanges=(x.exists&&Array.isArray(x.data().liste))?x.data().liste:[]; },()=>{});
@@ -6143,13 +6274,13 @@ if(persoOk()) setTimeout(async()=>{ const b=await AUD.recupere("perso/module.js"
     garde=()=>{ try{ for(let d=prof();d<2;d++) history.pushState({carte:1,d:d+1},""); }catch(_){} };
   /* Chrome ignore au bouton retour les entrées posées sans « vrai » geste : sur téléphone, le toucher ne compte qu'au moment où le doigt se lève (touchend, pointerup, click) — on pose donc les gardes là */
   ["pointerup","touchend","click","keydown"].forEach(t=>addEventListener(t,garde,{capture:true,passive:true})); addEventListener("pointerdown",e=>{ if(e.pointerType==="mouse") garde(); },true);
-  addEventListener("popstate",()=>{ let dessus=false; ["recPage","fbPage","relPage","moiPage","setPage","syncPage","sugPage","addPage","notesPage","revuePage","cherchePage","trajPage","memPage","valPage","noterPage","aujPage","cheminPage","agPage"].forEach(k=>{ const x=document.getElementById(k); if(x&&!x.hidden){ x.hidden=true; dessus=true; } });
+  addEventListener("popstate",()=>{ let dessus=false; ["recPage","fbPage","relPage","moiPage","setPage","syncPage","sugPage","addPage","notesPage","revuePage","cherchePage","trajPage","memPage","valPage","suiviPage","noterPage","aujPage","cheminPage","agPage"].forEach(k=>{ const x=document.getElementById(k); if(x&&!x.hidden){ x.hidden=true; dessus=true; } });
     document.querySelectorAll(".notesmenu").forEach(x=>{ if(!x.hidden){ x.hidden=true; dessus=true; } }); document.querySelectorAll(".prioChoix").forEach(x=>{ x.remove(); dessus=true; }); document.querySelectorAll(".phov").forEach(x=>{ x.remove(); dessus=true; });
     if(!dessus&&window._retourCarte) window._retourCarte(); setTimeout(garde,0); }); })();</script>
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=159; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=160; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
