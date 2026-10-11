@@ -1847,6 +1847,30 @@ html.calme :is(.souris,.chatmot,.griffes){display:none}
 .suiviBar.urg{border-style:solid;background:var(--ink);color:var(--surface)}
 .suiviBar:focus-visible{outline:3px solid var(--pale);outline-offset:2px}
 
+/* Suivis (en tête de Mon suivi) */
+#suiviIn .svsec>h3{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.svnb{display:inline-block;font:700 .78rem var(--body);padding:3px 9px;border-radius:999px;background:var(--ink);color:var(--surface);letter-spacing:0;text-transform:none}
+.svgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;min-width:0}
+@media (min-width:900px){.svgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.svcol{display:flex;flex-direction:column;gap:10px;min-width:0}
+.svcol>h4{margin:0;font-size:16px;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.svfiche{min-width:0;overflow-wrap:anywhere}
+.svfiche.retard{border:2px solid var(--ink);box-shadow:3px 3px 0 color-mix(in srgb,var(--ink) 35%,transparent)}
+.svfiche.s-fait b,.svfiche.s-abandonne b{text-decoration:line-through;text-decoration-thickness:1px;opacity:.8}
+.svfiche.s-propose{border-style:dashed}
+.svfiche.retard,.svfiche.s-propose{padding:10px 12px;border-radius:14px}
+.svliens{display:flex;flex-wrap:wrap;gap:12px}
+.svregles summary{cursor:pointer;font-weight:700}
+.svregles .svfiche{margin-top:8px;opacity:.85}
+.svmsg:empty{display:none}
+.svmsg{margin:0;padding:8px 10px;border-radius:12px;background:var(--surface);border:1.5px dashed var(--ink);color:var(--fg)}
+.svadd,.svoubli{justify-self:start}
+.svcle{display:flex;flex-direction:column;gap:6px}
+.svcle input{font:inherit;font-size:.95rem;border:1.5px solid color-mix(in srgb,var(--ink) 30%,transparent);border-radius:10px;padding:8px 10px;background:var(--board);color:var(--fg);width:100%;min-width:0;box-sizing:border-box}
+.svform .chips{display:flex;flex-wrap:wrap;gap:6px}
+.suiviBar .svbar{font-weight:700;opacity:1}
+.svcle .srow{flex-wrap:wrap}.svcle .srow input{flex:1 1 12em}
+
 </style>
 <script>
 /* version test : ?test=1 → données à part (préfixe « test: » sur tout le stockage local), jamais celles de la carte principale */
@@ -2675,6 +2699,8 @@ function renderAssistants(c){ const ids=Array.isArray(c.ass)?c.ass:[]; if(!ids.l
 
 let LIEN_URL=""; const LIEN_CLE="carte-de-vie-lien";
 let echanges=[];
+const lienCle=()=>{ try{ return localStorage.getItem(LIEN_CLE)||""; }catch(_){ return ""; } };
+const lienPost=(corps,cle)=>fetch(LIEN_URL,{method:"POST",headers:{"Content-Type":"application/json","X-Cle-App":cle},body:JSON.stringify(corps)});
 const cleEch=e=>e.type+"|"+e.quand+"|"+e.objet;
 function ouvrirDetail(e){ const old=document.getElementById("ckDet"); if(old) old.remove();
   const box=el("div",{id:"ckDet",className:"ckdet"}), fermer=()=>{ box.remove(); document.body.classList.remove("ckouvert"); };
@@ -2699,7 +2725,7 @@ function ouvrirDetail(e){ const old=document.getElementById("ckDet"); if(old) ol
     const envoyer=async type=>{ const texte=ta.value.trim(); if(!texte||occupe) return;
       if(type==="ordre"&&!confirm("Donner cet ordre à "+(e.qui||e.source||"l'assistant")+" ?\n\n« "+texte+" »\n\nIl sera appliqué en brouillon au prochain passage de l'assistant Aménagement (toutes les 3 h). Pour une simple question, choisis plutôt « Poser la question ».")) return;
       occupe=true; bq.disabled=bo.disabled=true; msg.textContent=type==="ordre"?"Envoi de l'ordre…":"L'assistant lit et réfléchit… (quelques secondes)";
-      try{ const r=await fetch(LIEN_URL,{method:"POST",headers:{"Content-Type":"application/json","X-Cle-App":cle},body:JSON.stringify({type,texte,element:e})});
+      try{ const r=await lienPost({type,texte,element:e},cle);
         if(r.status===401||r.status===403){ msg.textContent="Clé du lien refusée : vérifie-la (bouton « Oublier la clé », puis recolle-la)."; return; }
         if(r.status===404){ msg.textContent="Le lien n'est pas encore activé côté système."; return; }
         if(!r.ok){ msg.textContent="Le système a répondu une erreur ("+r.status+"). Réessaie dans un moment."; return; }
@@ -5399,6 +5425,106 @@ window.SUIVI={ L:[],
   const rb=document.querySelector(".v3railIn"); if(rb){ const b=el("button",{type:"button"},el("i",{textContent:"◎"}),el("span",{textContent:"Mon suivi"})); b.onclick=()=>{ const r=document.querySelector(".v3rail"); if(r) r.classList.remove("on"); SUIVI.ouvre(); };
     const av=[...rb.children].find(x=>/À valider/.test(x.textContent)); if(av) av.after(b); else rb.appendChild(b); } }
 
+/* ===== Suivis (engagements) : en tête de « Mon suivi » =====
+   meta/suivis { <id>:{cote:"moi"|"attente",qui,quoi,echeance,depuis,source,statut:"propose"|"ouvert"|"fait"|"abandonne",lien,brouillon}, _m, _f }
+   Le document est déposé par l'agent du système (matin et soir) ; un suivi absent est archivé.
+   L'app ne l'écrit jamais : chaque geste part au lien avec le système (même adresse, même clé que le cockpit),
+   et la réponse est affichée tout de suite, en attendant la prochaine synchro.
+   Tout texte vient en partie de messages reçus : textContent seulement, liens http(s) seulement. */
+window.SUIVIS={ D:null, P:{}, msg:"", occupe:false, ajout:false, F:{cote:"moi",qui:"",quoi:"",echeance:""},
+  ST:{propose:"Proposé",ouvert:"En cours",fait:"Fait",abandonne:"Abandonné"},
+  lienSur(u){ u=String(u||"").trim(); return /^https?:\/\/[^\s]+$/i.test(u)?u.slice(0,1000):""; },
+  dateOk(d){ return /^\d{4}-\d{2}-\d{2}$/.test(String(d||""))?String(d):""; },
+  propre(id,x){ if(!x||typeof x!=="object"||Array.isArray(x)) return null; const t=v=>typeof v==="string"?v.slice(0,600):(typeof v==="number"?String(v):"");
+    return {id:String(id).slice(0,40),cote:x.cote==="attente"?"attente":"moi",qui:t(x.qui),quoi:t(x.quoi),echeance:this.dateOk(x.echeance),depuis:t(x.depuis).slice(0,25),source:t(x.source).slice(0,40),
+      statut:this.ST[x.statut]?x.statut:"ouvert",lien:this.lienSur(x.lien),brouillon:this.lienSur(x.brouillon)}; },
+  charge(d){ this.D=d&&typeof d==="object"?d:null; const m=+((this.D&&this.D._m)||0);
+    /* une réponse du système reste affichée jusqu'à ce que le document synchronisé soit plus récent qu'elle */
+    Object.keys(this.P).forEach(k=>{ if(m>=this.P[k]._t||Date.now()-this.P[k]._t>864e5) delete this.P[k]; });
+    SUIVI.rappel(); this.rafraichit(); },
+  liste(){ const o={}; if(this.D) Object.keys(this.D).forEach(k=>{ if(k.startsWith("_")||!/^[\w-]{1,40}$/.test(k)) return; const x=this.propre(k,this.D[k]); if(x) o[k]=x; });
+    Object.keys(this.P).forEach(k=>{ const x=this.propre(k,this.P[k]); if(x) o[k]=x; }); return Object.values(o); },
+  enRetard(x){ return x.statut==="ouvert"&&!!x.echeance&&x.echeance<today(); },
+  retards(){ return this.liste().filter(x=>this.enRetard(x)).sort((a,b)=>a.echeance.localeCompare(b.echeance)); },
+  /* le geste part au système ; même appel que l'échange du cockpit */
+  async envoie(action,x,bt){ if(this.occupe) return; const cle=lienCle();
+    if(!LIEN_URL){ this.dit("Le lien avec le système n'est pas activé sur cet appareil."); return; }
+    if(!cle){ this.dit("Colle d'abord la clé du lien avec le système (ci-dessous)."); this.cleOuverte=true; this.rafraichit(); return; }
+    this.occupe=true; this.dit(action==="ajouter"?"Envoi du suivi…":"Envoi au système…"); this.rafraichit();
+    const s={action}; if(x.id) s.id=x.id; ["cote","qui","quoi","echeance"].forEach(k=>{ s[k]=x[k]||""; });
+    try{ const r=await lienPost({type:"suivi",suivi:s},cle);
+      if(r.status===401||r.status===403){ this.dit("Clé du lien refusée : vérifie-la (« Oublier la clé », puis recolle-la)."); return; }
+      if(r.status===404){ this.dit("Le lien n'est pas encore activé côté système."); return; }
+      if(!r.ok){ this.dit("Le système a répondu une erreur ("+r.status+"). Réessaie dans un moment."); return; }
+      const j=await r.json().catch(()=>({}));
+      const y=j&&j.suivi&&typeof j.suivi==="object"&&/^[\w-]{1,40}$/.test(String(j.suivi.id||""))?j.suivi:null;
+      if(y&&j.ok!==false){ this.P[String(y.id)]=Object.assign({},y,{_t:Date.now()}); if(action==="ajouter"){ this.ajout=false; this.F={cote:"moi",qui:"",quoi:"",echeance:""}; } if(bt) fetel(bt); }
+      this.dit(typeof j.reponse==="string"&&j.reponse.trim()?j.reponse.trim().slice(0,600):(j.ok===false?"Le système n'a pas pu le faire.":"C'est noté."));
+    }catch(_){ this.dit("Le système n'a pas répondu (connexion ?). Réessaie dans un moment."); }
+    finally{ this.occupe=false; SUIVI.rappel(); this.rafraichit(); } },
+  dit(t){ this.msg=t; const m=document.querySelector("#suivisSec .svmsg"); if(m) m.textContent=t; },
+  jourFr(k){ return k?new Date(k+"T12:00").toLocaleDateString("fr-FR",{day:"numeric",month:"short"}):""; },
+  fiche(x){ const ret=this.enRetard(x), box=el("div",{className:"vprop svfiche s-"+x.statut+(ret?" retard":"")});
+    const dep=this.dateOk(String(x.depuis).slice(0,10));
+    box.appendChild(el("small",{className:"mono",textContent:[ret?"En retard":this.ST[x.statut],x.source,dep?"depuis le "+this.jourFr(dep):""].filter(Boolean).join(" · ")}));
+    box.appendChild(el("b",{textContent:x.quoi||"Sans intitulé"}));
+    if(x.qui) box.appendChild(el("p",{className:"mut",textContent:(x.cote==="attente"?"De : ":"Pour : ")+x.qui}));
+    if(x.echeance) box.appendChild(el("p",{className:"sprochain"+(ret?" urg":"")},el("small",{textContent:"Échéance"}),el("span",{textContent:this.jourFr(x.echeance)+(ret?" · en retard":x.echeance===today()?" · aujourd'hui":"")})));
+    const L=[]; if(x.lien) L.push(el("a",{className:"lien",href:x.lien,target:"_blank",rel:"noopener noreferrer",textContent:"Ouvrir le lien ↗"}));
+    if(x.brouillon) L.push(el("a",{className:"lien",href:x.brouillon,target:"_blank",rel:"noopener noreferrer",textContent:"Voir le brouillon ↗"}));
+    if(L.length) box.appendChild(el("div",{className:"svliens"},...L));
+    const act=el("div",{className:"bact"}), bt=(t,a,g)=>{ const b=el("button",{type:"button",className:"btn"+(g?" ghost":""),textContent:t,disabled:this.occupe}); b.onclick=()=>this.envoie(a,x,b); act.appendChild(b); };
+    if(x.statut==="propose"){ bt("Garder","ok"); bt("Refuser","non",true); } else if(x.statut==="ouvert") bt("Fait ✓","fait");
+    if(act.children.length) box.appendChild(act); return box; },
+  formAjout(){ const f=el("div",{className:"sform svform"}), lab=(t,c)=>el("label",{className:"slab"},el("small",{textContent:t}),c);
+    const F=this.F; const ch=el("div",{className:"chips"}); ch.setAttribute("role","group"); ch.setAttribute("aria-label","De quel côté");
+    const maj=()=>[...ch.children].forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.k===F.cote)));
+    [["moi","🙋 À moi de jouer"],["attente","⏳ J'attends un retour"]].forEach(([k,n])=>{ const b=el("button",{type:"button",className:"vchip",textContent:n}); b.dataset.k=k; b.onclick=()=>{ F.cote=k; maj(); }; ch.appendChild(b); }); maj();
+    const qui=el("input",{maxLength:120,value:F.qui,placeholder:"Une personne, un service…"}), quoi=el("input",{maxLength:300,value:F.quoi,placeholder:"Ce qui est promis ou attendu"}), ech=el("input",{type:"date",value:F.echeance});
+    qui.oninput=()=>{ F.qui=qui.value; }; quoi.oninput=()=>{ F.quoi=quoi.value; }; ech.onchange=()=>{ F.echeance=ech.value; };
+    qui.setAttribute("aria-label","Qui"); quoi.setAttribute("aria-label","Quoi"); ech.setAttribute("aria-label","Échéance");
+    const ok=el("button",{type:"button",className:"btn",textContent:"Ajouter le suivi",disabled:this.occupe}), an=el("button",{type:"button",className:"btn ghost",textContent:"Annuler"});
+    ok.onclick=()=>{ const q=quoi.value.trim(); if(!q){ quoi.focus(); return; } this.envoie("ajouter",{cote:F.cote,qui:qui.value.trim(),quoi:q,echeance:this.dateOk(ech.value)},ok); };
+    an.onclick=()=>{ this.ajout=false; this.rafraichit(); };
+    f.append(lab("Côté",ch),lab("Qui",qui),lab("Quoi",quoi),lab("Échéance",ech),el("div",{className:"bact"},ok,an)); return f; },
+  zoneCle(){ const z=el("div",{className:"svcle"}), k=el("input",{type:"password",placeholder:"Clé du lien avec le système",autocomplete:"off"}), ok=el("button",{type:"button",className:"btn",textContent:"Enregistrer sur cet appareil"});
+    k.setAttribute("aria-label","Clé du lien avec le système"); ok.onclick=()=>{ const v=k.value.trim(); if(!v) return; try{ localStorage.setItem(LIEN_CLE,v); }catch(_){} this.cleOuverte=false; this.dit(""); this.rafraichit(); };
+    z.append(help("Pour agir sur tes suivis, colle une fois la clé du lien (celle donnée par ton système d'automatisation)."),el("div",{className:"srow"},k,ok)); return z; },
+  section(){ const L=this.liste(), R=L.filter(x=>this.enRetard(x)), sec=el("section",{className:"card rv svsec",id:"suivisSec"});
+    sec.appendChild(el("h3",{},"Suivis",R.length?el("span",{className:"svnb",textContent:R.length+" en retard"}):""));
+    const m=el("p",{className:"help svmsg",textContent:this.msg}); m.setAttribute("aria-live","polite"); sec.appendChild(m);
+    const actifs=L.filter(x=>x.statut==="propose"||x.statut==="ouvert"), regles=L.filter(x=>x.statut==="fait"||x.statut==="abandonne");
+    if(!L.length) sec.appendChild(help("Aucun suivi pour l'instant : l'agent carte les dépose à 7 h 30 et 19 h 30."));
+    else { const rang=x=>this.enRetard(x)?0:x.statut==="propose"?1:2, tri=(a,b)=>rang(a)-rang(b)||(a.echeance||"9").localeCompare(b.echeance||"9")||String(a.quoi).localeCompare(String(b.quoi));
+      const g=el("div",{className:"svgrid"});
+      [["moi","🙋 À moi de jouer","Rien à faire de ton côté."],["attente","⏳ J'attends un retour","Tu n'attends rien de personne."]].forEach(([k,t,vide])=>{ const G=actifs.filter(x=>x.cote===k).sort(tri), n=G.filter(x=>this.enRetard(x)).length;
+        const col=el("div",{className:"svcol"},el("h4",{},t+" · "+G.length,n?el("span",{className:"svnb",textContent:n+" en retard"}):""));
+        if(!G.length) col.appendChild(help(vide)); G.forEach(x=>col.appendChild(this.fiche(x))); g.appendChild(col); });
+      sec.appendChild(g);
+      if(regles.length){ const d=el("details",{className:"svregles"}); d.appendChild(el("summary",{textContent:"Réglés ces 14 derniers jours : "+regles.length}));
+        regles.sort((a,b)=>String(b.depuis).localeCompare(String(a.depuis))).forEach(x=>d.appendChild(this.fiche(x))); sec.appendChild(d); } }
+    if(this.ajout) sec.appendChild(this.formAjout());
+    else { const b=el("button",{type:"button",className:"btn ghost svadd",textContent:"+ Ajouter"}); b.onclick=()=>{ this.ajout=true; this.rafraichit(); const i=document.querySelector("#suivisSec .svform input:not([type=date])"); if(i) i.focus(); }; sec.appendChild(b); }
+    const cle=lienCle(); if(LIEN_URL&&(!cle||this.cleOuverte)) sec.appendChild(this.zoneCle());
+    else if(LIEN_URL&&cle){ const o=el("button",{type:"button",className:"btn ghost svoubli",textContent:"Oublier la clé sur cet appareil"}); o.onclick=()=>{ try{ localStorage.removeItem(LIEN_CLE); }catch(_){} this.rafraichit(); }; sec.appendChild(o); }
+    return sec; },
+  /* remplace la section en place, sans bouger la page */
+  rafraichit(){ const pg=$("suiviPage"); if(!pg||pg.hidden) return; const z=$("suiviIn"), old=$("suivisSec"), y=pg.scrollTop, f=document.activeElement&&old&&old.contains(document.activeElement);
+    if(f&&document.activeElement.tagName==="INPUT"&&this.ajout&&!this.occupe) return;
+    const s=this.section(); if(old) old.replaceWith(s); else { const h=z.querySelector(".hero"); if(h) h.after(s); else z.prepend(s); } pg.scrollTop=y; }
+};
+{ /* dans la page Mon suivi : la section Suivis en tête */
+  const oO=SUIVI.ouvre.bind(SUIVI); SUIVI.ouvre=function(garde){ const pg=$("suiviPage"), y=garde===true?pg.scrollTop:0; oO(garde); SUIVIS.rafraichit(); pg.scrollTop=y; };
+  /* sur l'accueil : les suivis en retard remontent dans le rappel de Mon suivi */
+  const oR=SUIVI.rappel.bind(SUIVI); SUIVI.rappel=function(){ oR(); const R=SUIVIS.retards(), bd=$("bande"); if(!R.length||!bd||bd.hidden) return;
+    let r=$("suiviBar"); if(!r){ r=el("button",{type:"button",id:"suiviBar",className:"suiviBar"}); r.onclick=()=>SUIVI.ouvre(); }
+    if(r.previousElementSibling!==bd) bd.after(r);
+    if(r.hidden){ r.textContent=""; r.append(el("i",{textContent:"◎"}),el("b",{textContent:"Mon suivi"}),el("em",{textContent:"→"})); r.hidden=false; }
+    const old=r.querySelector(".svbar"); if(old) old.remove();
+    const x=R[0], t=(R.length>1?R.length+" suivis en retard":"1 suivi en retard")+" : "+String(x.quoi||"").slice(0,80)+(x.qui?" ("+String(x.qui).slice(0,40)+")":"");
+    r.classList.add("urg"); r.insertBefore(el("span",{className:"svbar",textContent:"⏳ "+t}),r.querySelector("em")); };
+}
+
 /* A8 : une icône qui ne charge pas laisse la place au logo de l'app, plus de carré blanc */
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&!i.dataset.repli&&(i.classList.contains("lgimg")||i.closest(".node,.ico"))){ i.dataset.repli="1"; i.src="icon-192.png"; i.classList.add("repli"); } },true);
 
@@ -6133,7 +6259,7 @@ function localDb(){ const KEY="carte-de-vie-v1", CKEY="carte-de-vie-sync"; let s
 /* --- dans Claude : les données restent dans la base de la page, la synchro GitHub et l'IA s'ajoutent --- */
 function claudeDb(d){ const CKEY="carte-de-vie-sync"; let cfg=null; try{ cfg=JSON.parse(localStorage.getItem(CKEY)||"null"); }catch(_){} if(cfg&&!repoOk(cfg.repo)) cfg=null;
   const store={}, live=k=>store[k]&&!store[k]._del, stamp=(x,k)=>{ const now=Date.now(); return Object.assign({},x,{_m:now,_f:fieldsNow(x,k?store[k]:null,now),_x:tombes(k?store[k]:null,x)}); };
-  ["meta/moi","meta/layout","meta/feedback","meta/compagnon","meta/suggestions","meta/base","meta/notes","meta/cockpit","meta/cockpit_masques","meta/fonds","meta/icones","meta/semaine","meta/journees","meta/app","meta/energie","meta/revues","meta/trajectoire","meta/memoire","meta/propositions","meta/suivi"].forEach(k=>d.doc(k).onSnapshot(s=>{ if(s.exists) store[k]=s.data(); else delete store[k]; },()=>{}));
+  ["meta/moi","meta/layout","meta/feedback","meta/compagnon","meta/suggestions","meta/base","meta/notes","meta/cockpit","meta/cockpit_masques","meta/fonds","meta/icones","meta/semaine","meta/journees","meta/app","meta/energie","meta/revues","meta/trajectoire","meta/memoire","meta/propositions","meta/suivi","meta/suivis"].forEach(k=>d.doc(k).onSnapshot(s=>{ if(s.exists) store[k]=s.data(); else delete store[k]; },()=>{}));
   d.collection("espaces").onSnapshot(s=>{ Object.keys(store).forEach(k=>{ if(k.startsWith("espaces/")) delete store[k]; }); s.docs.forEach(x=>{ store["espaces/"+x.id]=x.data(); }); },()=>{});
   const after=p=>p.then(v=>{ api.dirty=true; api.queue(); return v; });
   const doc=path=>{ const r=d.doc(path); return { id:r.id, path,
@@ -6249,7 +6375,7 @@ function start(){
     const semRe=()=>{ const c=openId&&cats.get(openId); if(c&&c.type==="habitudes") quandLibre("semaine",()=>renderPane(cats.get(openId))); };
     db.doc("meta/semaine").onSnapshot(x=>{ SEMAINE=x.exists?x.data():null; semRe(); },()=>{}); db.doc("meta/journees").onSnapshot(x=>{ JOURNEES=x.exists?x.data():null; semRe(); },()=>{});
     db.doc("meta/icones").onSnapshot(x=>ICOLIB.recoit(x.exists?x.data():null),()=>{});
-    db.doc("meta/energie").onSnapshot(x=>PILOTE.energie(x.exists?x.data():null),()=>{}); db.doc("meta/revues").onSnapshot(x=>PILOTE.revues(x.exists?x.data():null),()=>{}); db.doc("meta/trajectoire").onSnapshot(x=>ESSAI.trajectoire(x.exists?x.data():null),()=>{}); db.doc("meta/memoire").onSnapshot(x=>ESSAI.memoire(x.exists?x.data():null),()=>{}); db.doc("meta/propositions").onSnapshot(x=>ESSAI.propositions(x.exists?x.data():null),()=>{}); db.doc("meta/suivi").onSnapshot(x=>{ if(window.SUIVI) SUIVI.charge(x.exists?x.data():null); },()=>{});
+    db.doc("meta/energie").onSnapshot(x=>PILOTE.energie(x.exists?x.data():null),()=>{}); db.doc("meta/revues").onSnapshot(x=>PILOTE.revues(x.exists?x.data():null),()=>{}); db.doc("meta/trajectoire").onSnapshot(x=>ESSAI.trajectoire(x.exists?x.data():null),()=>{}); db.doc("meta/memoire").onSnapshot(x=>ESSAI.memoire(x.exists?x.data():null),()=>{}); db.doc("meta/propositions").onSnapshot(x=>ESSAI.propositions(x.exists?x.data():null),()=>{}); db.doc("meta/suivi").onSnapshot(x=>{ if(window.SUIVI) SUIVI.charge(x.exists?x.data():null); },()=>{}); db.doc("meta/suivis").onSnapshot(x=>{ if(window.SUIVIS) SUIVIS.charge(x.exists?x.data():null); },()=>{});
     db.doc("meta/fonds").onSnapshot(x=>FOND.recoit(x.exists?x.data():null),()=>{});
     db.doc("meta/suggestions").onSnapshot(x=>{ if(window._suggestions) window._suggestions(x.exists?x.data():null); },()=>{});
     db.doc("meta/notes").onSnapshot(x=>{ if(window._notes) window._notes(x.exists?x.data():null); },()=>{}); db.doc("meta/claude_notes").onSnapshot(x=>{ if(window._claudeNotes) window._claudeNotes(x.exists?x.data():null); },()=>{}); db.doc("meta/avis_offres").onSnapshot(x=>{ AVIS_OFFRES=(x.exists&&Array.isArray(x.data().liste))?x.data().liste:[]; },()=>{}); db.doc("meta/cockpit").onSnapshot(x=>{ cockpit=x.exists?x.data():null; },()=>{}); db.doc("meta/cockpit_masques").onSnapshot(x=>{ ckMasques=(x.exists&&Array.isArray(x.data().ids))?x.data().ids:[]; ckCoches=(x.exists&&Array.isArray(x.data().coches))?x.data().coches:[]; },()=>{}); db.doc("meta/echanges").onSnapshot(x=>{ echanges=(x.exists&&Array.isArray(x.data().liste))?x.data().liste:[]; },()=>{});
@@ -6313,7 +6439,7 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=161; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=162; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
