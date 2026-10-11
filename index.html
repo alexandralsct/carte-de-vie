@@ -1871,6 +1871,40 @@ html.calme :is(.souris,.chatmot,.griffes){display:none}
 .suiviBar .svbar{font-weight:700;opacity:1}
 .svcle .srow{flex-wrap:wrap}.svcle .srow input{flex:1 1 12em}
 
+/* suivi de mesures */
+.card.rub.mes{grid-column:1/-1}
+.mesec{display:flex;flex-direction:column;gap:8px;border:1.5px solid var(--ink);border-radius:20px;padding:12px 14px;background:var(--surface)}
+.mesec h4{margin:0;font-family:var(--mono);font-size:.74rem;letter-spacing:.06em;text-transform:uppercase}
+.mestop{display:flex;flex-direction:column;gap:4px}
+.mesvit{margin:0;font-weight:600}
+.mspark .fac{stroke-width:1.4;stroke-dasharray:3 3}.mspark .fac.ai{stroke:var(--ink)}.mspark .fac.fr{stroke:var(--muted)}
+.meslg{margin:0;font-size:.78rem;display:flex;align-items:center;gap:6px;color:var(--muted)}
+.meslg i{display:inline-block;width:14px;border-top:2px dashed var(--ink)}.meslg i.fr{border-color:var(--muted)}
+.mesform{display:flex;flex-direction:column;gap:6px}
+.mesph{position:relative;overflow:hidden;cursor:pointer}.mesph input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.mesdet summary{cursor:pointer;font-size:.86rem;padding:6px 0;min-height:32px}
+.meslist,.mesfac{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.meslist li,.mesfac li{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--pale);padding:4px 0}
+.mesnote{flex:1;min-width:0;font-size:.84rem;color:var(--muted);overflow-wrap:anywhere}
+.mesmini{width:44px;height:44px;object-fit:cover;border-radius:10px;border:1.5px solid var(--ink);cursor:zoom-in}
+.mesduo{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mesduo figure{margin:0;display:flex;flex-direction:column;gap:4px}
+.mesduo img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:14px;border:1.5px solid var(--ink);background:var(--pale);cursor:zoom-in}
+.mesduo figcaption{font-family:var(--mono);font-size:.7rem}
+.mesdiff{grid-column:1/-1;margin:0}
+.mesgrille{display:grid;grid-template-columns:minmax(64px,1.3fr) repeat(var(--n),minmax(0,1fr));gap:3px;align-items:center;min-width:0}
+.mesgrille small.mono{text-align:center;font-size:.7rem}.mesgrille small.auj{font-weight:700;text-decoration:underline}
+.mesg{display:flex;flex-direction:column;min-width:0}.mesg b{font-size:.84rem;overflow-wrap:anywhere}.mesg small{font-size:.7rem;color:var(--muted)}
+.mescase{min-height:32px;min-width:0;padding:0;border-radius:10px;border:1.5px solid var(--pale);background:transparent;color:var(--surface);font-weight:700;cursor:pointer}
+.mescase.auj{border-color:var(--ink)}.mescase.on{background:var(--ink);border-color:var(--ink)}
+.meschip{font-family:var(--mono);font-size:.68rem;padding:2px 8px;border-radius:999px;border:1.5px solid var(--ink)}
+.meschip.ai{background:var(--ink);color:var(--surface)}.meschip.fr{border-color:var(--muted);color:var(--muted)}.meschip.ob{border-style:dashed}
+.mesfac li span:nth-child(2){flex:1;min-width:0;overflow-wrap:anywhere}
+.mesauj{display:flex;flex-wrap:wrap;gap:6px}
+.vitrine .mspark .ligne{stroke:currentColor}.vitrine .mspark .der{fill:currentColor}.vitrine .mspark .pt{fill:transparent;stroke:currentColor}.vitrine .mspark .cib,.vitrine .mspark .fac{stroke:currentColor;opacity:.55}
+.vitrine .pspark{color:var(--nt,var(--surface))}
+.vitrine .mesauj+*,.vitrine small.mono{color:inherit;opacity:.8}
+
 </style>
 <script>
 /* version test : ?test=1 → données à part (préfixe « test: » sur tout le stockage local), jamais celles de la carte principale */
@@ -3609,9 +3643,10 @@ const RID=(()=>{
   const MONDE=d=>{ const v=(d.r.pays||[]).length, rv=(d.r.reves||[]).length; return `<span class="cl">${T(d)}<span class="rnum"><b>${v}</b><small>pays vus${rv?" · "+rv+" rêvés":""}</small></span></span>${A(sv("0 0 200 96",`<path d="M20 30c10-12 34-14 44-4s0 22-8 26-8 18-18 18-16-12-18-20-8-12 0-20zM78 22c8-8 22-8 26 0s-4 12 0 18 8 20-2 30-18-4-20-14-12-26-4-34zM120 20c16-10 50-8 62 4s-2 20-12 22-14 6-10 14-14 10-20 2-12-16-20-14-12-18 0-28zM160 64c8-4 20 0 18 8s-14 10-20 6-6-12 2-14z" fill="${L}"/>${Array.from({length:Math.min(v,12)},(_,i)=>`<circle cx="${30+hh(i+"x"+d.name)%150}" cy="${24+hh(i+"y"+d.name)%50}" r="3" fill="${N}"/>`).join("")}`),"mde")}`; };
   const PRIX=d=>{ const S2=d.r.suivis||[], b=S2.map(x=>{ const R=(x.releves||[]).slice().sort((a,c)=>a.d.localeCompare(c.d)); return R.length?{x,R}:null; }).filter(Boolean)[0];
     return `${T(d)}<span class="rnum"><b>${S2.length}</b><small>prix suivi${S2.length>1?"s":""}${b?" · "+esc(b.x.nom)+" : "+esc(fmtN(+b.R[b.R.length-1].p,b.x.unite||"€")):""}</small></span>${b&&b.R.length>1?`<span class="ra spk">${sparkPrix(b.R,b.x.cible)}</span>`:A(sv("0 0 200 50",`<polyline points="0,30 30,26 60,34 90,18 120,24 150,12 200,20" fill="none" stroke="${L}" stroke-width="3" stroke-dasharray="6 5"/>`))}`; };
+  const MESU=d=>{ const ms=MES.stats(d.r); return `${T(d)}<span class="rnum"><b>${ms.last?esc(fmtN(+ms.last.v,ms.u)):"–"}</b><small>${esc(MES.resume(ms))}</small></span>${ms.n>1?`<span class="ra spk">${MES.courbe(d.r)}</span>`:A(sv("0 0 200 50",`<polyline points="0,40 40,36 80,30 120,24 160,16 200,10" fill="none" stroke="${L}" stroke-width="3" stroke-dasharray="6 5"/>`))}`; };
   /* on choisit l'objet de chaque rubrique : d'abord par son nom, puis par son type, jamais deux fois le même dans un espace */
   const choix=(c,rub)=>{ const pris=new Set(); return rub.map(r=>{ const d=data(r);
-    if(r.type==="monde") return {d,k:"monde",w:2,html:MONDE}; if(r.type==="prix") return {d,k:"prix",w:2,html:PRIX};
+    if(r.type==="monde") return {d,k:"monde",w:2,html:MONDE}; if(r.type==="prix") return {d,k:"prix",w:2,html:PRIX}; if(r.type==="mesures") return {d,k:"mesures",w:2,html:MESU};
     const n=nrm(d.name), ok=o=>o.t.includes(d.type)&&(o.multi||!pris.has(o.k));
     let o=O.find(o=>ok(o)&&(o.fit?o.fit(d,c):o.re&&o.re.test(n)));
     if(!o) o=O.find(o=>ok(o)&&!o.re&&!o.fit);
@@ -4067,8 +4102,9 @@ function renderRubTiles(c,sauf){ const rub=(c.rub||[]).filter(r=>!(sauf||[]).inc
     if(r.type==="objectif"){ const cur=+r.actuel||0, cib=Math.max(1,+r.cible||1), pc=Math.min(100,Math.round(cur*100/cib)); num=fmtN(cur,r.unite||""); last="sur "+fmtN(cib,r.unite||"")+" · "+pc+" %"; if(doux){ const nd=cib<=60?cib:40, on=Math.round(Math.min(cur,cib)*nd/cib); extra=el("span",{className:"tdots"}); for(let q=0;q<nd;q++) extra.appendChild(el("i",{className:q<on?"on":""})); } else { last="objectif "+fmtN(cib,r.unite||"")+" · "+pc+" %"; extra=el("span",{className:"tbar"},el("i",{style:"width:"+pc+"%"})); } }
     else if(r.type==="monde"){ const v=(r.pays||[]).length; num=String(v); last="Colorie les pays que tu as vus et ceux dont tu rêves"; }
     else if(r.type==="prix"){ const S=r.suivis||[], best=S.map(x=>{ const R=(x.releves||[]).slice().sort((a,b2)=>a.d.localeCompare(b2.d)); return R.length?{x,last:R[R.length-1]}:null; }).filter(Boolean)[0]; num=String(S.length); last=best?best.x.nom+" : "+fmtN(+best.last.p,best.x.unite||"€"):"prix suivis · note-les quand tu regardes"; if(best){ const R=(best.x.releves||[]).slice().sort((a,b2)=>a.d.localeCompare(b2.d)); if(R.length>1){ const sp=el("span",{className:"tspark"}); sp.innerHTML=sparkPrix(R,best.x.cible); extra=sp; } } }
+    else if(r.type==="mesures"){ const ms=MES.stats(r); num=ms.last?fmtN(+ms.last.v,""):"–"; last=ms.last?MES.resume(ms):"Note ta première mesure"; if(ms.n>1){ const sp=el("span",{className:"tspark"}); sp.innerHTML=MES.courbe(r); extra=sp; } }
     else { num=String(items.length); const L=r.journal?[...items].sort((a,b2)=>String(b2.t||"").localeCompare(String(a.t||"")))[0]:items[items.length-1]; last=L?L.text:"Vide pour l'instant"; const nd=items.filter(k=>k.done).length; if(!r.journal&&items.length&&nd) extra=el("span",{className:"tbar"},el("i",{style:"width:"+Math.round(nd*100/items.length)+"%"})); }
-    const mn=el("b",{className:"mnum",textContent:num}); if(r.type!=="objectif"&&r.type!=="prix"&&r.type!=="monde") mn.dataset.u=r.journal?(+num>1?"pages":"page"):(+num>1?"éléments":"élément"); else if(r.type==="monde") mn.dataset.u="pays"; else if(r.type==="prix") mn.dataset.u="suivis"; b.append(s,mn,el("span",{className:"mlab",textContent:r.name}),el("small",{className:"mlast",textContent:last})); if(extra) b.appendChild(extra);
+    const mn=el("b",{className:"mnum",textContent:num}); if(r.type==="mesures") mn.dataset.u=r.unite||""; else if(r.type!=="objectif"&&r.type!=="prix"&&r.type!=="monde") mn.dataset.u=r.journal?(+num>1?"pages":"page"):(+num>1?"éléments":"élément"); else if(r.type==="monde") mn.dataset.u="pays"; else if(r.type==="prix") mn.dataset.u="suivis"; b.append(s,mn,el("span",{className:"mlab",textContent:r.name}),el("small",{className:"mlast",textContent:last})); if(extra) b.appendChild(extra);
     b.onclick=()=>{ flushNotes(); sect="rub:"+r.id; kick(); renderPane(cats.get(c.id)); drawer.scrollTop=Math.max(0,pane.offsetTop-24); }; g.appendChild(b); });
   const nb=el("button",{className:"mtile it new"},el("b",{className:"mnum",textContent:"+"}),el("span",{className:"mlab",textContent:"Nouvelle rubrique"}),el("small",{className:"mlast",textContent:"Liste, journal, objectif ou carte du monde"}));
   nb.onclick=()=>{ sect="newrub"; kick(); renderPane(cats.get(c.id)); }; g.appendChild(nb);
@@ -4258,7 +4294,7 @@ function renderRub(c,only){ if(only==="rubs") only=null, c=Object.assign({},c,{_
       cb.onchange=()=>setRub(upd(q=>Object.assign({},q,{items:q.items.map(i=>i.id===k.id?Object.assign({},i,{done:cb.checked}):i)})));
       const rec=estRecettes(c,r), tx=rec?el("button",{type:"button",className:"txt recouvre",textContent:k.text}):el("span",{className:"txt",textContent:k.text}); if(rec){ tx.onclick=()=>ouvrirRecette(c.id,String(k.text).split(" : ")[0]); tx.setAttribute("aria-label","Ouvrir la recette "+k.text); }
       ul.appendChild(el("li",{className:k.done?"done":""},cb,tx,delBtn(()=>setRub(upd(q=>Object.assign({},q,{items:q.items.filter(i=>i.id!==k.id)})))))); });
-    const rm=el("button",{className:"rubdel",textContent:"Supprimer la rubrique"}); rm.onclick=()=>{ if(items.length&&!rm.dataset.sure){ rm.dataset.sure="1"; rm.textContent="Confirmer : supprimer avec ses "+items.length+" élément(s)"; return; } setRub(rub.filter(q=>q.id!==r.id)); };
+    const rm=el("button",{className:"rubdel",textContent:"Supprimer la rubrique"}); rm.onclick=()=>{ const nbs=items.length+(r.releves||[]).length+(r.suivis||[]).length; if(nbs&&!rm.dataset.sure){ rm.dataset.sure="1"; rm.textContent="Confirmer : supprimer avec ses "+nbs+" élément(s)"; return; } setRub(rub.filter(q=>q.id!==r.id)); };
     /* dans la liste, le nom est un bandeau qu'on touche pour ouvrir la rubrique seule ; on le renomme une fois ouverte */
     const tt=only?nm:el("div",{className:"rubname rubopen",textContent:r.name,tabIndex:0}); if(!only){ tt.setAttribute("role","button"); tt.setAttribute("aria-label","Ouvrir la rubrique "+r.name); tt.onkeydown=e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); tt.click(); } }; }
     const sy=el("span",{className:"rsym"}); sy.innerHTML=symSvg(r.sym||fam[ri%fam.length]);
@@ -4266,15 +4302,15 @@ function renderRub(c,only){ if(only==="rubs") only=null, c=Object.assign({},c,{_
     const cad=only==="rub:"+r.id&&estCadran(r); if(cad) pane.appendChild(cadranPage(c,r));
     if(only==="rub:"+r.id&&estAudio(r)) pane.appendChild(audioPage(c,r));
     if(only==="rub:"+r.id&&r.type==="news") pane.appendChild(newsPage(c,r));
-    const body=r.type==="news"?[]:r.type==="objectif"?rubObjectif(r,upd,setRub):r.type==="monde"?rubMonde(r,upd,setRub):r.type==="prix"?rubPrix(r,upd,setRub):[...prog,f,items.length?ul:none("Vide pour l'instant.")];
-    const rc=el("section",{className:"card rub t"+(ri%3)+(r.type==="objectif"?" obj":r.type==="monde"?" monde":r.type==="prix"?" prix":"")+(cad?" cdreg":"")},sy,tt,...body,rm); rc.dataset.k="rub:"+r.id; if(cad) rc.prepend(el("small",{className:"mono cdreg-t",textContent:"Réglages de l'objectif"})); pane.appendChild(rc); });
+    const body=r.type==="news"?[]:r.type==="objectif"?rubObjectif(r,upd,setRub):r.type==="monde"?rubMonde(r,upd,setRub):r.type==="prix"?rubPrix(r,upd,setRub):r.type==="mesures"?rubMesures(r,upd,setRub):[...prog,f,items.length?ul:none("Vide pour l'instant.")];
+    const rc=el("section",{className:"card rub t"+(ri%3)+(r.type==="objectif"?" obj":r.type==="monde"?" monde":r.type==="prix"?" prix":r.type==="mesures"?" mes":"")+(cad?" cdreg":"")},sy,tt,...body,rm); rc.dataset.k="rub:"+r.id; if(cad) rc.prepend(el("small",{className:"mono cdreg-t",textContent:"Réglages de l'objectif"})); pane.appendChild(rc); });
   const ni=el("input",{id:"fRubNew",placeholder:"Nom d'une nouvelle rubrique",maxLength:40}); ni.setAttribute("aria-label","Nouvelle rubrique");
-  const nty=el("select",{}); [["liste","Liste à cocher"],["journal","Journal daté"],["objectif","Objectif chiffré"],["prix","Suivi des prix"],["monde","Carte du monde"]].forEach(([v2,l])=>nty.appendChild(el("option",{value:v2,textContent:l}))); nty.setAttribute("aria-label","Type de rubrique");
+  const nty=el("select",{}); [["liste","Liste à cocher"],["journal","Journal daté"],["objectif","Objectif chiffré"],["prix","Suivi des prix"],["mesures","Suivi de mesures (courbe, photos, gestes)"],["monde","Carte du monde"]].forEach(([v2,l])=>nty.appendChild(el("option",{value:v2,textContent:l}))); nty.setAttribute("aria-label","Type de rubrique");
   const ncib=el("input",{type:"number",placeholder:"Objectif (ex. 1000)",className:"objin"}), nun=el("input",{placeholder:"Unité (€, km…)",maxLength:12,className:"objin"}); ncib.hidden=nun.hidden=true; ncib.setAttribute("aria-label","Objectif chiffré"); nun.setAttribute("aria-label","Unité");
-  nty.onchange=()=>{ ncib.hidden=nun.hidden=nty.value!=="objectif"; };
+  nty.onchange=()=>{ ncib.hidden=nun.hidden=nty.value!=="objectif"&&nty.value!=="mesures"; };
   const nf=el("form",{className:"row nrub"},ni,nty,ncib,nun,el("button",{className:"btn",type:"submit",textContent:"Créer"}));
   nf.onsubmit=e=>{e.preventDefault();const v=ni.value.trim();if(!v) return; const nid=uid(), t=nty.value, base={id:nid,name:v,items:[]};
-    if(t==="journal") base.journal=true; if(t==="objectif") Object.assign(base,{type:"objectif",cible:Math.max(1,+ncib.value||100),actuel:0,unite:nun.value.trim(),pas:Math.max(1,Math.round((+ncib.value||100)/20))}); if(t==="monde") Object.assign(base,{type:"monde",pays:[],reves:[]}); if(t==="prix") Object.assign(base,{type:"prix",suivis:[]});
+    if(t==="journal") base.journal=true; if(t==="objectif") Object.assign(base,{type:"objectif",cible:Math.max(1,+ncib.value||100),actuel:0,unite:nun.value.trim(),pas:Math.max(1,Math.round((+ncib.value||100)/20))}); if(t==="monde") Object.assign(base,{type:"monde",pays:[],reves:[]}); if(t==="prix") Object.assign(base,{type:"prix",suivis:[]}); if(t==="mesures") Object.assign(base,{type:"mesures",unite:nun.value.trim()||"cm",cible:+ncib.value>0?+ncib.value:null,releves:[],gestes:[],facteurs:[]});
     sect="rub:"+nid; setRub([...rub,base],t==="liste"||t==="journal"?"fRub_"+nid:null);};
   if(!only||only==="newrub") pane.appendChild(el("section",{className:"card rub new"},el("h3",{textContent:"+ Rubrique"}),help("Ajoute un sujet propre à cet espace : une liste, un journal, un objectif chiffré ou une carte du monde."),nf));
   if((only&&only!=="moi")||c._rubsOnly) return;
@@ -5525,6 +5561,93 @@ window.SUIVIS={ D:null, P:{}, msg:"", occupe:false, ajout:false, F:{cote:"moi",q
     r.classList.add("urg"); r.insertBefore(el("span",{className:"svbar",textContent:"⏳ "+t}),r.querySelector("em")); };
 }
 
+/* ===== suivi de mesures : une valeur notée de temps en temps (avec photo), la courbe, la vitesse par mois, l'avant / après,
+   les gestes de la semaine et ce qui aide ou freine. Rubrique {type:"mesures", libelle, unite, cible, releves, gestes, facteurs}. ===== */
+const MES={
+  tri:r=>(r.releves||[]).filter(x=>x&&x.d&&isFinite(+x.v)).slice().sort((a,b)=>a.d.localeCompare(b.d)),
+  jr:d=>new Date(d+"T12:00").getTime()/864e5,
+  dt:(d,o)=>new Date(d+"T12:00").toLocaleDateString("fr-FR",o||{day:"numeric",month:"short"}),
+  /* la pousse ne compte que les hausses : une baisse (coupe) n'efface pas ce qui a poussé */
+  stats(r){ const R=MES.tri(r), u=r.unite||"", s={R,u,n:R.length,last:R[R.length-1]||null,first:R[0]||null,pousse:0,coupe:0,vit:null,reste:null,quand:null};
+    for(let i=1;i<R.length;i++){ const dv=+R[i].v-(+R[i-1].v); if(dv>0) s.pousse+=dv; else s.coupe-=dv; }
+    if(R.length>1){ const j=MES.jr(s.last.d)-MES.jr(s.first.d); if(j>=14) s.vit=s.pousse/j*30.44; }
+    const cib=+r.cible||0; if(cib&&s.last){ s.reste=Math.max(0,cib-(+s.last.v)); if(s.reste>0&&s.vit>0){ const q=new Date(); q.setDate(q.getDate()+Math.round(s.reste/s.vit*30.44)); s.quand=q.toLocaleDateString("fr-FR",{month:"long",year:"numeric"}); } }
+    return s; },
+  /* la courbe suit le vrai temps ; les repères « aide » et « freine » sont des traits verticaux */
+  courbe(r,W,H){ W=W||300; H=H||110; const R=MES.tri(r), cib=+r.cible||0; if(!R.length) return "";
+    const V=R.map(x=>+x.v), lo0=Math.min(...V,cib||Infinity), hi0=Math.max(...V,cib||-Infinity), pad=(hi0-lo0)*.15||1, lo=lo0-pad, hi=hi0+pad;
+    const FD=(r.facteurs||[]).filter(f=>f.d&&f.sens).map(f=>MES.jr(f.d)), t0=MES.jr(R[0].d), t1=Math.max(t0+1,MES.jr(R[R.length-1].d),...FD), X=d=>R.length<2?W/2:8+(MES.jr(d)-t0)/(t1-t0)*(W-16), Y=v=>H-8-(v-lo)/(hi-lo)*(H-16);
+    const F=(r.facteurs||[]).filter(f=>f.d&&f.sens&&MES.jr(f.d)>=t0&&MES.jr(f.d)<=t1).map(f=>'<line x1="'+X(f.d).toFixed(1)+'" x2="'+X(f.d).toFixed(1)+'" y1="4" y2="'+(H-4)+'" class="fac '+(f.sens==="freine"?"fr":"ai")+'"/>').join("");
+    return '<svg viewBox="0 0 '+W+' '+H+'" class="spark mspark" aria-hidden="true">'+F+(cib?'<line x1="0" x2="'+W+'" y1="'+Y(cib).toFixed(1)+'" y2="'+Y(cib).toFixed(1)+'" class="cib"/>':"")
+      +(R.length>1?'<polyline points="'+R.map(x=>X(x.d).toFixed(1)+","+Y(+x.v).toFixed(1)).join(" ")+'" class="ligne"/>':"")
+      +R.map((x,i)=>'<circle cx="'+X(x.d).toFixed(1)+'" cy="'+Y(+x.v).toFixed(1)+'" r="'+(i===R.length-1?4.5:2.8)+'" class="'+(i===R.length-1?"der":"pt")+'"/>').join("")+'</svg>'; },
+  resume(s){ return s.vit!=null?"≈ "+fmtN(s.vit,s.u)+" par mois":s.n>1?"vitesse calculée après 2 semaines de mesures":s.n?"une mesure de plus pour voir la vitesse":"note ta première mesure"; },
+  jours7(){ const L=[]; for(let i=6;i>=0;i--){ const q=new Date(); q.setDate(q.getDate()-i); L.push(q.getFullYear()+"-"+String(q.getMonth()+1).padStart(2,"0")+"-"+String(q.getDate()).padStart(2,"0")); } return L; }
+};
+function rubMesures(r,upd,setRub){ const put=fn=>setRub(upd(q=>Object.assign({},q,fn(q)))), s=MES.stats(r), u=s.u, out=[], sec=(t,...k)=>el("div",{className:"mesec"},el("h4",{textContent:t}),...k);
+  /* 1. la pousse */
+  const haut=el("div",{className:"mestop"});
+  if(s.last){ haut.append(el("div",{className:"pnow"},el("b",{textContent:fmtN(+s.last.v,u)}),el("span",{className:"ptend bas",textContent:s.pousse?"+ "+fmtN(s.pousse,u)+" depuis le "+MES.dt(s.first.d,{day:"numeric",month:"long"}):"point de départ"})));
+    haut.append(el("p",{className:"mesvit",textContent:MES.resume(s)}));
+    if(s.reste!=null) haut.append(el("p",{className:"hstat",textContent:s.reste>0?"objectif "+fmtN(+r.cible,u)+" · encore "+fmtN(s.reste,u)+(s.quand?" · vers "+s.quand:""):"Objectif atteint : "+fmtN(+r.cible,u)+" !"}));
+    if(s.coupe) haut.append(el("p",{className:"hstat",textContent:"coupé "+fmtN(s.coupe,u)+" en tout (sans effacer la pousse)"}));
+    const sp=el("div",{className:"pspark"}); sp.innerHTML=MES.courbe(r); haut.append(sp);
+    if((r.facteurs||[]).some(f=>f.sens)) haut.append(el("p",{className:"meslg"},el("i",{className:"ai"}),"aide ",el("i",{className:"fr"}),"freine"+(r.cible?" · pointillés : objectif":""))); }
+  else haut.append(help("Mesure toujours au même endroit, avec le même mètre, une fois par mois par exemple : la courbe et la vitesse se calculent toutes seules."));
+  const iv=el("input",{type:"number",step:"0.1",min:"0",placeholder:"Mesure du jour"+(u?" ("+u+")":""),className:"objin"}), ifl=el("input",{type:"file",accept:"image/*"}), ino=el("input",{placeholder:"Note (facultatif)",maxLength:120});
+  iv.setAttribute("aria-label","Mesure du jour"); ino.setAttribute("aria-label","Note sur cette mesure"); ifl.setAttribute("aria-label","Photo de cette mesure");
+  const lph=el("label",{className:"btn ghost mesph"},"📷 Photo",ifl), etat=el("small",{className:"hstat"}); ifl.onchange=()=>{ etat.textContent=ifl.files[0]?"photo prête":""; };
+  const fm=el("form",{className:"mesform"},el("div",{className:"row"},iv,lph,el("button",{className:"btn",type:"submit",textContent:"Noter"})),el("div",{className:"row"},ino),etat);
+  fm.onsubmit=async e=>{ e.preventDefault(); const v=+iv.value; if(!(v>0)) return; const td=today(), f=ifl.files[0]; let ph="";
+    if(f){ etat.textContent="J'enregistre la photo…"; try{ ph=(await PH.garde(f)).ch; }catch(_){ etat.textContent="La photo n'a pas pu être enregistrée ; la mesure est notée sans elle."; } }
+    const was=s.reste>0; put(q=>({releves:[...(q.releves||[]).filter(x=>x.d!==td),{id:uid(),d:td,v,ph,note:ino.value.trim()}]}));
+    if(was&&v>=+r.cible){ const b=fm.getBoundingClientRect(); fete(b.left+b.width/2,b.top); if(window._petDire) window._petDire("<b>Objectif atteint !</b>"+fmtN(v,u)); } };
+  out.push(sec(r.libelle||"Mes mesures",haut,fm));
+  if(s.n){ const ul=el("ul",{className:"meslist"}); [...s.R].reverse().slice(0,12).forEach(x=>{ const li=el("li",{},el("small",{className:"mono",textContent:MES.dt(x.d,{day:"numeric",month:"short",year:"2-digit"})}),el("b",{textContent:fmtN(+x.v,u)}),el("span",{className:"mesnote",textContent:x.note||""}));
+      if(x.ph){ const im=el("img",{alt:"Photo du "+MES.dt(x.d),className:"mesmini"}); im.dataset.ph=x.ph; im.onclick=()=>voirPhoto(x.ph); li.appendChild(im); }
+      li.appendChild(delBtn(()=>put(q=>({releves:(q.releves||[]).filter(y=>!(y.d===x.d&&+y.v===+x.v))})))); ul.appendChild(li); });
+    out.push(el("details",{className:"mesdet"},el("summary",{textContent:"Toutes mes mesures ("+s.n+")"}),ul)); }
+  /* 2. avant / après */
+  const P=s.R.filter(x=>x.ph);
+  if(P.length){ const opt=(sel,i)=>{ P.forEach((x,k)=>sel.appendChild(el("option",{value:String(k),textContent:MES.dt(x.d,{day:"numeric",month:"short",year:"numeric"})+" · "+fmtN(+x.v,u),selected:k===i}))); return sel; };
+    const a=opt(el("select",{}),0), b=opt(el("select",{}),P.length-1), duo=el("div",{className:"mesduo"}); a.setAttribute("aria-label","Photo avant"); b.setAttribute("aria-label","Photo après");
+    const vue=()=>{ duo.textContent=""; [[a,"Avant"],[b,"Après"]].forEach(([sl,t])=>{ const x=P[+sl.value], im=el("img",{alt:t+" : "+MES.dt(x.d)}); im.dataset.ph=x.ph; im.onclick=()=>voirPhoto(x.ph); duo.appendChild(el("figure",{},im,el("figcaption",{textContent:t+" · "+MES.dt(x.d,{day:"numeric",month:"short",year:"numeric"})+" · "+fmtN(+x.v,u)}))); });
+      const d=(+P[+b.value].v)-(+P[+a.value].v); duo.appendChild(el("p",{className:"hstat mesdiff",textContent:d?(d>0?"+ ":"− ")+fmtN(Math.abs(d),u)+" entre les deux photos":"même mesure sur les deux photos"})); };
+    a.onchange=b.onchange=vue; vue(); out.push(sec("Avant / après",el("div",{className:"row"},a,b),duo)); }
+  else if(s.n) out.push(sec("Avant / après",help("Ajoute une photo avec une mesure (même endroit, même lumière) : tu pourras comparer deux dates côte à côte.")));
+  /* 3. les gestes de la semaine */
+  const J=MES.jours7(), td=today(), G=r.gestes||[], tab=el("div",{className:"mesgrille",style:"--n:"+J.length});
+  tab.appendChild(el("span",{})); J.forEach(d=>tab.appendChild(el("small",{className:"mono"+(d===td?" auj":""),textContent:new Date(d+"T12:00").toLocaleDateString("fr-FR",{weekday:"narrow"})})));
+  G.forEach(g=>{ const nb=J.filter(d=>(g.days||[]).includes(d)).length; tab.appendChild(el("span",{className:"mesg"},el("b",{textContent:g.nom}),el("small",{textContent:nb+" / 7"})));
+    J.forEach(d=>{ const on=(g.days||[]).includes(d), bt=el("button",{type:"button",className:"mescase"+(on?" on":"")+(d===td?" auj":""),textContent:on?"✓":""}); bt.setAttribute("aria-label",g.nom+" le "+MES.dt(d,{weekday:"long",day:"numeric"})); bt.setAttribute("aria-pressed",String(on));
+      bt.onclick=()=>put(q=>({gestes:(q.gestes||[]).map(y=>y.id!==g.id?y:Object.assign({},y,{days:on?(y.days||[]).filter(z=>z!==d):[...(y.days||[]),d].sort().slice(-400)}))})); tab.appendChild(bt); }); });
+  const ig=el("input",{placeholder:"Un geste à tenir",maxLength:40}); ig.setAttribute("aria-label","Nouveau geste");
+  const fg=el("form",{className:"row"},ig,el("button",{className:"btn",type:"submit",textContent:"Ajouter"})); fg.onsubmit=e=>{ e.preventDefault(); const v=ig.value.trim(); if(v) put(q=>({gestes:[...(q.gestes||[]),{id:uid(),nom:v,days:[]}]})); };
+  const fait=G.reduce((a,g)=>a+J.filter(d=>(g.days||[]).includes(d)).length,0), tot=G.length*7;
+  const gsup=G.length?el("details",{className:"mesdet"},el("summary",{textContent:"Retirer un geste"}),...G.map(g=>el("p",{className:"row"},el("span",{textContent:g.nom}),delBtn(()=>put(q=>({gestes:(q.gestes||[]).filter(y=>y.id!==g.id)})))))):"";
+  out.push(sec("Mes gestes de la semaine",G.length?tab:help("Ajoute les gestes que tu veux tenir : touche une case chaque jour où tu les fais."),G.length?el("p",{className:"hstat",textContent:fait+" sur "+tot+" cette semaine ("+Math.round(fait*100/Math.max(1,tot))+" %)"}):"",fg,gsup));
+  /* 4. ce qui aide, ce qui freine */
+  const ifa=el("input",{placeholder:"Ce que tu as changé ou remarqué",maxLength:120}), sel=el("select",{}); [["aide","Ça aide"],["freine","Ça freine"],["","À observer"]].forEach(([v,l])=>sel.appendChild(el("option",{value:v,textContent:l})));
+  ifa.setAttribute("aria-label","Ce que tu observes"); sel.setAttribute("aria-label","Effet");
+  const ff=el("form",{className:"row"},ifa,sel,el("button",{className:"btn",type:"submit",textContent:"Noter"})); ff.onsubmit=e=>{ e.preventDefault(); const v=ifa.value.trim(); if(v) put(q=>({facteurs:[{id:uid(),d:today(),text:v,sens:sel.value},...(q.facteurs||[])]})); };
+  const FA=r.facteurs||[], ulf=el("ul",{className:"mesfac"}); FA.slice(0,30).forEach(f=>ulf.appendChild(el("li",{},el("span",{className:"meschip "+(f.sens==="freine"?"fr":f.sens==="aide"?"ai":"ob"),textContent:f.sens==="freine"?"freine":f.sens==="aide"?"aide":"à observer"}),el("span",{textContent:f.text}),el("small",{className:"mono",textContent:MES.dt(f.d)}),delBtn(()=>put(q=>({facteurs:(q.facteurs||[]).filter(y=>y.id!==f.id)}))))));
+  out.push(sec("Ce qui aide, ce qui freine",ff,FA.length?ulf:help("Note ce qui change dans ta vie : ces repères s'affichent sur la courbe, pour voir ce qui accélère ou ralentit."),FA.length?help("Les traits sur la courbe montrent quand tu as noté chaque chose."):""));
+  /* réglages */
+  const il=el("input",{value:r.libelle||"",placeholder:"Ce que tu mesures",maxLength:40}), iu=el("input",{value:u,placeholder:"Unité",maxLength:8,className:"objin"}), ic=el("input",{type:"number",step:"any",value:r.cible?String(r.cible):"",placeholder:"Objectif",className:"objin"});
+  il.setAttribute("aria-label","Ce que tu mesures"); iu.setAttribute("aria-label","Unité"); ic.setAttribute("aria-label","Objectif");
+  const fr=el("form",{className:"row"},il,iu,ic,el("button",{className:"btn ghost",type:"submit",textContent:"Garder"})); fr.onsubmit=e=>{ e.preventDefault(); put(()=>({libelle:il.value.trim(),unite:iu.value.trim(),cible:+ic.value>0?+ic.value:null})); };
+  out.push(el("details",{className:"mesdet"},el("summary",{textContent:"Réglages (ce que je mesure, unité, objectif)"}),fr));
+  return out; }
+/* sur la vitrine de l'espace : la dernière mesure, la vitesse et la courbe ; on touche pour ouvrir la rubrique */
+WID.mesures=function(c,o){ const r=(c.rub||[]).find(q=>q.type==="mesures"&&(!o.r||q.name===o.r)); if(!r) return null; const s=MES.stats(r), b=vbox(o.t||r.name);
+  if(s.last){ b.append(el("p",{className:"vnum"},el("b",{textContent:fmtN(+s.last.v,s.u)}),el("span",{textContent:" · "+MES.resume(s)})));
+    if(s.n>1){ const sp=el("div",{className:"pspark"}); sp.innerHTML=MES.courbe(r,240,70); b.appendChild(sp); }
+    if(s.reste>0) b.appendChild(el("p",{className:"vvide",textContent:"encore "+fmtN(s.reste,s.u)+(s.quand?" · vers "+s.quand:"")})); }
+  else b.appendChild(el("p",{className:"vvide",textContent:o.vide||"Note ta première mesure : la courbe se dessinera toute seule."}));
+  const G=r.gestes||[], td=today(); if(G.length){ const ch=el("div",{className:"mesauj"}); G.forEach(g=>{ const on=(g.days||[]).includes(td), bt=el("button",{type:"button",className:"vchip",textContent:(on?"✓ ":"")+g.nom}); bt.setAttribute("aria-pressed",String(on));
+      bt.onclick=()=>majRub(c,r,q=>Object.assign({},q,{gestes:(q.gestes||[]).map(y=>y.id!==g.id?y:Object.assign({},y,{days:on?(y.days||[]).filter(z=>z!==td):[...(y.days||[]),td].sort().slice(-400)}))})); ch.appendChild(bt); }); b.append(el("small",{className:"mono",textContent:"Aujourd'hui"}),ch); }
+  const bt=el("button",{className:"vbtn",type:"button",textContent:s.n?"Noter une mesure":"Commencer"}); bt.onclick=()=>{ flushNotes(); sect="rub:"+r.id; kick(); renderPane(cats.get(c.id)); }; b.appendChild(bt); return b; };
+
 /* A8 : une icône qui ne charge pas laisse la place au logo de l'app, plus de carré blanc */
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&!i.dataset.repli&&(i.classList.contains("lgimg")||i.closest(".node,.ico"))){ i.dataset.repli="1"; i.src="icon-192.png"; i.classList.add("repli"); } },true);
 
@@ -6439,7 +6562,7 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=162; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=163; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
