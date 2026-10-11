@@ -1,7 +1,11 @@
 /**
  * Passerelle « Ma semaine » ⇄ Google Sheets « Tracking Planning » (Apps Script, à coller dans le tableau).
- * - GET  ?cle=…&jour=AAAA-MM-JJ  → la semaine qui contient ce jour, au format de meta/semaine de l'app.
+ * - POST {cle, lire:'AAAA-MM-JJ'}        → la semaine qui contient ce jour, au format de meta/semaine de l'app.
  * - POST {cle, saisies:[{id,j,d,f,c,t}]} → écrit chaque moment dans la bonne feuille (texte, couleur de la catégorie, cases fusionnées).
+ * - GET  ?cle=…&jour=AAAA-MM-JJ          → ancienne lecture (la clé passe dans l'adresse) : gardée seulement pour les appareils
+ *                                          pas encore mis à jour ; l'app utilise maintenant le POST.
+ * Après avoir collé cette version : Déployer → Gérer les déploiements → modifier → Version : « Nouvelle version » → Déployer
+ * (l'adresse /exec reste la même).
  * La clé n'est pas dans ce fichier : Paramètres du projet → Propriétés du script → CLE = (un mot de passe à toi).
  * Disposition lue sur S41 : heures en B5:B52 (00:00 → 23:30), lundi → dimanche en C:I, dates en C3:I3 (« 5/10 »), légende en B55:C64.
  */
@@ -22,6 +26,12 @@ function doGet(e) {
 function doPost(e) {
   var p = {}; try { p = JSON.parse(e.postData.contents); } catch (x) { return sortie({ erreur: 'json' }); }
   if (!cleOk(p.cle)) return sortie({ erreur: 'cle' });
+  if (p.lire) {
+    var jour = /^\d{4}-\d{2}-\d{2}$/.test(String(p.lire)) ? String(p.lire) : Utilities.formatDate(new Date(), 'Europe/Paris', 'yyyy-MM-dd');
+    var f = feuilleDuJour(jour);
+    if (!f) return sortie({ erreur: 'semaine_introuvable', jour: jour });
+    return sortie(lireSemaine(f.feuille, f.dates));
+  }
   var lock = LockService.getScriptLock(); lock.waitLock(20000);
   try { return sortie({ ok: true, res: (p.saisies || []).map(ecrire) }); } finally { lock.releaseLock(); }
 }

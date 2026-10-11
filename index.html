@@ -2,6 +2,8 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https: data: blob:; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f4eee4">
 <title>Ma carte de vie</title>
@@ -2083,6 +2085,10 @@ html.calme :is(.souris,.chatmot,.griffes){display:none}
 
 <script>
 (function(){
+(()=>{ const si=window.setInterval.bind(window), ci=window.clearInterval.bind(window), T=new Map(); let n=0; const lance=t=>{ t.real=si(t.fn,t.ms,...t.a); };
+  window.setInterval=function(fn,ms,...a){ if(typeof fn!=="function") return si(fn,ms,...a); const id=9e8+(++n), t={fn,ms,a,real:null}; T.set(id,t); if(!document.hidden) lance(t); return id; };
+  window.clearInterval=function(id){ const t=T.get(id); if(t){ if(t.real!=null) ci(t.real); T.delete(id); } else ci(id); };
+  document.addEventListener("visibilitychange",()=>T.forEach(t=>{ if(document.hidden){ if(t.real!=null){ ci(t.real); t.real=null; } } else if(t.real==null) lance(t); })); })();
 const PALETTE=["#0E2A6B","#002FA7","#002FA7","#3366CC","#2F7FB8","#3E95C9","#5B8FA8","#7FA7D9"];
 /* le tableau est monochrome : les anciennes couleurs s'affichent dans une nuance de bleu, sans toucher aux données */
 const soft=c=>{ if(PALETTE.some(p=>p.toLowerCase()===String(c||"").toLowerCase())) return c; const m=/^#?([0-9a-f]{6})$/i.exec(c||""); if(!m) return PALETTE[0];
@@ -3033,7 +3039,7 @@ function renderMurYoga(c){ const L=ICOLIB.lit().filter(x=>/^yoga\b/i.test(x.n));
     if(bouge){ f.style.left=l.toFixed(1)+"%"; f.style.top=t.toFixed(1)+"%"; } return bouge; };
   L.forEach((x,i)=>{ const q=pos[x.n]||{x:((i%cols)+.5)/cols*100+(rnd(i)-.5)*12,y:(Math.floor(i/cols)+.5)/rows*100+(rnd(i+7)-.5)*8}, t=14+rnd(i+3)*8;
     const f=el("button",{type:"button",className:"ymf"}); f.style.left=q.x+"%"; f.style.top=q.y+"%"; f.style.width=t+"%"; f.style.setProperty("--r",((rnd(i+5)-.5)*16).toFixed(1)+"deg"); f.style.animationDelay=(-rnd(i+9)*6).toFixed(1)+"s";
-    f.setAttribute("aria-label",x.n); f.innerHTML='<img data-ph="'+(x.p||x.v).slice(2)+'" alt="">';
+    f.setAttribute("aria-label",x.n); f.innerHTML='<img data-ph="'+escH(String(x.p||x.v||"").slice(2))+'" alt="">';
     let d=null; f.onpointerdown=e=>{ d={x0:e.clientX,y0:e.clientY,l:parseFloat(f.style.left),t:parseFloat(f.style.top),m:false}; f.setPointerCapture(e.pointerId); };
     f.onpointermove=e=>{ if(!d) return; const r=mur.getBoundingClientRect(), dx=e.clientX-d.x0, dy=e.clientY-d.y0; if(!d.m&&Math.hypot(dx,dy)<7) return; d.m=true; f.classList.add("tire");
       f.style.left=Math.max(0,Math.min(100,d.l+dx/r.width*100))+"%"; f.style.top=Math.max(0,Math.min(100,d.t+dy/r.height*100))+"%"; };
@@ -3239,7 +3245,7 @@ function potSvg(cat,v,ci){ const H={3:.86,2:.5,1:.16}[v]||.86, T=["#c9d6f0","#00
   if(K==="barquette"){ const n={3:3,2:2,1:1}[v]||3; rempl=Array.from({length:n},(_,i)=>'<ellipse cx="'+(12+i*8)+'" cy="'+(39-i%2)+'" rx="7" ry="4" fill="'+T+'" stroke="#002FA7" stroke-width="1.8"/>').join(""); }
   return '<svg viewBox="0 0 40 58" aria-hidden="true"><defs><clipPath id="'+id+'"><path d="'+f[1]+'"/></clipPath></defs><path d="'+f[0]+'" fill="#FBF8F1"/>'+rempl+'<path d="'+f[0]+'" '+o+'/>'+f[4]+'</svg>'; }
 /* lecture du texte d'une photo sans IA (ticket de caisse, étiquettes, liste écrite) : Tesseract, chargé seulement quand on s'en sert */
-const OCR_URL={js:"https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js",worker:"https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/worker.min.js",core:"https://cdn.jsdelivr.net/npm/tesseract.js-core@5.1.1",lang:"https://cdn.jsdelivr.net/npm/@tesseract.js-data/fra@1.0.0/4.0.0_best_int"};
+const OCR_B=new URL("vendor/tesseract/",location.href).href, OCR_URL={js:OCR_B+"tesseract.min.js",worker:OCR_B+"worker.min.js",core:OCR_B+"core",lang:OCR_B+"lang"};
 let ocrP=null, plEtape="";
 const ocrCharge=()=>ocrP||(ocrP=new Promise((ok,ko)=>{ if(window.Tesseract) return ok(window.Tesseract); const s=document.createElement("script"); s.src=OCR_URL.js; s.onload=()=>window.Tesseract?ok(window.Tesseract):ko({code:"ocr_net"}); s.onerror=()=>{ ocrP=null; ko({code:"ocr_net"}); }; document.head.appendChild(s); }));
 const PL_MOTS=[["Fruits et légumes",/pomme|poire|banane|orange|citron|tomate|salade|carotte|courgette|oignon|ail|échalote|poivron|aubergine|légume|fruit|avocat|fraise|raisin|kiwi|mangue|champignon|épinard|chou|brocoli|poireau|concombre|patate|pomme de terre|herbe|persil|basilic|coriandre|menthe/i],["Frais",/lait|yaourt|yogourt|fromage|beurre|crème|creme|œuf|oeuf|emmental|comté|mozza|parmesan|chèvre|jambon|lardon|skyr|kéfir/i],["Viandes et poissons",/poulet|boeuf|bœuf|porc|veau|agneau|dinde|steak|haché|saumon|thon|cabillaud|crevette|poisson|saucisse|merguez|filet/i],["Surgelés",/surgel|glace|frozen/i],["Féculents",/pâte|pates|riz|semoule|quinoa|farine|pain|lentille|pois chiche|haricot|boulgour|nouille|céréale|flocon|avoine/i],["Conserves",/conserve|boîte|boite|bocal|sauce tomate|coulis|concentré/i],["Épices et condiments",/sel|poivre|épice|curry|paprika|cumin|moutarde|vinaigre|huile|sauce|mayonnaise|ketchup|bouillon|herbes de provence/i],["Sucré",/sucre|chocolat|biscuit|gâteau|confiture|miel|bonbon|céréales|compote|cacao|nutella/i],["Boissons",/eau|jus|soda|café|cafe|thé|the |vin|bière|biere|sirop|coca|limonade/i]];
@@ -3731,7 +3737,7 @@ const AUD={ db:null,
   async met(k,b){ const db=await this.ouvre(); return new Promise((ok,ko)=>{ const t=db.transaction("a","readwrite"); t.objectStore("a").put(b,k); t.oncomplete=()=>ok(); t.onerror=()=>ko(t.error); }); },
   async prend(k){ try{ const db=await this.ouvre(); return await new Promise(ok=>{ const q=db.transaction("a").objectStore("a").get(k); q.onsuccess=()=>ok(q.result||null); q.onerror=()=>ok(null); }); }catch(_){ return null; } },
   async ote(k){ try{ const db=await this.ouvre(); db.transaction("a","readwrite").objectStore("a").delete(k); }catch(_){} },
-  cfg(){ try{ return JSON.parse(localStorage.getItem("carte-de-vie-sync")||"null"); }catch(_){ return null; } },
+  cfg(){ try{ const c=JSON.parse(localStorage.getItem("carte-de-vie-sync")||"null"); return c&&repoOk(c.repo)?c:null; }catch(_){ return null; } },
   hd(c,raw){ return {Authorization:"Bearer "+c.token,Accept:raw?"application/vnd.github.raw":"application/vnd.github+json"}; },
   async envoie(ch,b){ const c=this.cfg(); if(!c||!c.repo) return false; try{ const b64=await new Promise(ok=>{ const fr=new FileReader(); fr.onload=()=>ok(String(fr.result).split(",")[1]||""); fr.readAsDataURL(b); });
       const q=await fetch("https://api.github.com/repos/"+c.repo+"/contents/"+ch,{method:"PUT",headers:this.hd(c),body:JSON.stringify({message:"Audio ajouté depuis l'application",content:b64})}); return q.ok; }catch(_){ return false; } },
@@ -3754,7 +3760,7 @@ const FOND={ K:"carte-de-vie-fonds", lit(){ try{ return Object.assign({list:[],c
   rend(){ const box=document.getElementById("fondSet"); if(!box) return; const o=this.lit(); box.textContent="";
     const bt=(k,lab,html)=>{ const b=el("button",{type:"button"}); b.dataset.k=k; b.setAttribute("aria-pressed",String(o.choix===k)); b.setAttribute("aria-label",lab); b.title=lab; if(html) b.innerHTML=html; else b.textContent=lab; b.onclick=()=>{ const n=this.lit(); n.choix=k; this.ecrit(n); this.rend(); this.applique(); }; box.appendChild(b); return b; };
     bt("","Uni"); if(o.list.length>1) bt("hasard","Au hasard");
-    o.list.forEach((ch,i)=>{ const b=bt(ch,"Image "+(i+1),/^https:/.test(ch)?'<img src="'+escH(ch.replace("/736x/","/236x/"))+'" alt="" referrerpolicy="no-referrer">':'<img data-ph="'+ch+'" alt="">'); b.className="fondmini";
+    o.list.forEach((ch,i)=>{ const b=bt(ch,"Image "+(i+1),/^https:/.test(ch)?'<img src="'+escH(ch.replace("/736x/","/236x/"))+'" alt="" referrerpolicy="no-referrer">':'<img data-ph="'+escH(ch)+'" alt="">'); b.className="fondmini";
       const x=el("span",{className:"fondx",textContent:"×"}); x.setAttribute("role","button"); x.setAttribute("aria-label","Retirer cette image"); x.onclick=e=>{ e.stopPropagation(); const n=this.lit(); n.list=n.list.filter(q=>q!==ch); if(n.choix===ch) n.choix=""; this.ecrit(n); this.rend(); this.applique(); }; b.appendChild(x); });
     photosCharge(box);
     const t=document.getElementById("fondTaille"); if(t){ t.textContent=""; [["entiere","Image entière"],["remplir","Remplir l'écran"]].forEach(([k,l])=>{ const b=el("button",{type:"button",textContent:l}); b.setAttribute("aria-pressed",String(o.taille===k)); b.onclick=()=>{ const n=this.lit(); n.taille=k; this.ecrit(n); this.rend(); this.applique(); }; t.appendChild(b); }); t.hidden=!o.list.length; } },
@@ -5653,7 +5659,8 @@ const SEM_POURQUOI={"SOMMEIL":"7 à 9 h par nuit","TRAVAIL/CARRIERE":"avancer sa
 /* passerelle Apps Script avec le tableau (adresse et clé gardées sur l'appareil seulement) */
 const PASS={ K:"carte-de-vie-passerelle", lit(){ try{ return JSON.parse(localStorage.getItem(this.K)||"null")||{}; }catch(_){ return {}; } }, ecrit(o){ try{ localStorage.setItem(this.K,JSON.stringify(o)); }catch(_){} },
   ok(){ const o=this.lit(); return /^https:\/\/script\.google(usercontent)?\.com\//.test(o.url||"")&&!!o.cle; },
-  async lire(jour){ const o=this.lit(); const r=await fetch(o.url+(o.url.includes("?")?"&":"?")+"cle="+encodeURIComponent(o.cle)+"&jour="+encodeURIComponent(jour||today()),{cache:"no-store"}); const j=await r.json(); if(j.erreur) throw new Error(j.erreur); return j; },
+  async lire(jour){ const o=this.lit(), J=jour||today(); const r=await fetch(o.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({cle:o.cle,lire:J}),cache:"no-store"}); const j=await r.json(); if(j.erreur) throw new Error(j.erreur); if(Array.isArray(j.jours)) return j;
+    const r2=await fetch(o.url+(o.url.includes("?")?"&":"?")+"cle="+encodeURIComponent(o.cle)+"&jour="+encodeURIComponent(J),{cache:"no-store"}); const j2=await r2.json(); if(j2.erreur) throw new Error(j2.erreur); return j2; },
   async ecrire(L){ const o=this.lit(); const r=await fetch(o.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({cle:o.cle,saisies:L})}); const j=await r.json(); if(j.erreur) throw new Error(j.erreur); return j.res||[]; },
   async relire(force){ const o=this.lit(); if(!this.ok()||(!force&&Date.now()-(o.t||0)<10*60e3)) return false; o.t=Date.now(); this.ecrit(o);
     const S=await this.lire(today()); if(S&&Array.isArray(S.jours)){ SEMAINE=S; if(db) db.doc("meta/semaine").set(S).catch(()=>{}); return true; } return false; },
@@ -5814,11 +5821,13 @@ function fete(x,y){ burst(x,y); setTimeout(()=>burst(x-70,y-30),140); setTimeout
   const FACECHAT='<svg class="facesvg" viewBox="5 1.5 34 44.5" aria-hidden="true" fill="currentColor"><path class="tlf" d="M29.5 41c4.2-.4 6.6-3.6 5.8-8.6-.4-2.4.6-3.8 2-3.8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><g class="fbd"><path d="M14.2 35.2c0-5.4 3.6-9 7.8-9s7.8 3.6 7.8 9c0 4.6-3.4 7.4-7.8 7.4s-7.8-2.8-7.8-7.4z"/><path d="M12.6 18.8c0-2.4.8-4.6 2.1-6.2l-.6-6.2 4.9 3.6c1-.3 1.9-.4 3-.4s2 .1 3 .4l4.9-3.6-.6 6.2c1.3 1.6 2.1 3.8 2.1 6.2 0 5.2-4.2 8.6-9.4 8.6s-9.4-3.4-9.4-8.6z"/><g class="feyes"><circle cx="18.2" cy="18" r="2.3" fill="var(--surface)"/><circle cx="25.8" cy="18" r="2.3" fill="var(--surface)"/><circle cx="18.4" cy="18.3" r="1.35"/><circle cx="25.6" cy="18.3" r="1.35"/></g><path d="M21 21.6h2l-1 1.1z" fill="var(--surface)"/><path d="M13.4 21.4l-4-.6M13.4 22.8l-3.8.8M30.6 21.4l4-.6M30.6 22.8l3.8.8" stroke="currentColor" stroke-width=".4" stroke-linecap="round"/></g><rect class="fl1" x="16.6" y="39.4" width="4.2" height="5.8" rx="2.1"/><rect class="fl2" x="23.2" y="39.4" width="4.2" height="5.8" rx="2.1"/></svg>';
   const cat=el("div",{className:"cpn"}), ball=el("div",{className:"pelote"}), bulle=el("button",{className:"cpnBulle"});
   let animal="chat"; try{ const v=localStorage.getItem("animal"); animal=v==="chien"||v==="photo"?v:"chat"; }catch(_){}
-  let own=null; try{ own=JSON.parse(localStorage.getItem("animalImg")||"null"); }catch(_){}
+  const imgSure=u=>{ u=String(u||""); return /^data:image\/(png|jpe?g|webp|gif|svg\+xml);base64,[A-Za-z0-9+/=]+$/.test(u)||(/^[\w.\/-]+$/.test(u)&&!u.startsWith("//")&&!u.includes(".."))?u:""; };
+  const ownOk=o=>!!(o&&typeof o==="object"&&(o.parts&&typeof o.parts==="object"?imgSure(o.parts.body)&&o.parts.tail&&imgSure(o.parts.tail.src)&&Array.isArray(o.parts.legs)&&o.parts.legs.every(q=>q&&imgSure(q.src)):imgSure(o.src)));
+  let own=null; try{ own=JSON.parse(localStorage.getItem("animalImg")||"null"); }catch(_){} if(!ownOk(own)) own=null;
   const habille=()=>{ if(animal==="photo"&&!own) animal="chat"; cat.dataset.a=animal;
-    if(animal==="photo"&&own.parts){ const P=own.parts, pc=(q,cl)=>'<div class="pt '+cl+'" style="left:'+(q.x/P.w*100)+'%;top:'+(q.y/P.h*100)+'%;width:'+(q.w/P.w*100)+'%;height:'+(q.h/P.h*100)+'%;-webkit-mask-image:url('+q.src+');mask-image:url('+q.src+')"></div>';
-      cat.innerHTML='<div class="own2" style="aspect-ratio:'+P.w+'/'+P.h+'">'+pc(P.tail,"tl4")+P.legs.map((q,i)=>pc(q,"lg l"+(i+1))).join("")+pc({src:P.body,x:0,y:0,w:P.w,h:P.h},"bd4")+'</div>'+SVG.replace('<svg ','<svg class="boxsvg" '); }
-    else if(animal==="photo"){ cat.innerHTML='<div class="own" style="aspect-ratio:'+own.w+'/'+own.h+';-webkit-mask-image:url('+own.src+');mask-image:url('+own.src+')"></div>'+SVG.replace('<svg ','<svg class="boxsvg" '); }
+    if(animal==="photo"&&own.parts){ const P=own.parts, pc=(q,cl)=>{ const u=imgSure(q.src); return '<div class="pt '+cl+'" style="left:'+(+q.x/P.w*100||0)+'%;top:'+(+q.y/P.h*100||0)+'%;width:'+(+q.w/P.w*100||0)+'%;height:'+(+q.h/P.h*100||0)+'%;-webkit-mask-image:url(&quot;'+u+'&quot;);mask-image:url(&quot;'+u+'&quot;)"></div>'; };
+      cat.innerHTML='<div class="own2" style="aspect-ratio:'+(+P.w||1)+'/'+(+P.h||1)+'">'+pc(P.tail,"tl4")+P.legs.map((q,i)=>pc(q,"lg l"+(i+1))).join("")+pc({src:P.body,x:0,y:0,w:P.w,h:P.h},"bd4")+'</div>'+SVG.replace('<svg ','<svg class="boxsvg" '); }
+    else if(animal==="photo"){ cat.innerHTML='<div class="own" style="aspect-ratio:'+(+own.w||1)+'/'+(+own.h||1)+';-webkit-mask-image:url(&quot;'+imgSure(own.src)+'&quot;);mask-image:url(&quot;'+imgSure(own.src)+'&quot;)"></div>'+SVG.replace('<svg ','<svg class="boxsvg" '); }
     else cat.innerHTML=animal==="chien"?DOG:SVG+DOSCHAT+FACECHAT; ball.innerHTML=animal==="chien"?BALL:YARN; cat.setAttribute("aria-label",animal==="chien"?"Le chien":"Le chat"); }; habille(); cat.hidden=ball.hidden=bulle.hidden=true; ball.setAttribute("aria-label","La balle");
   document.body.append(ball,cat,bulle);
   /* le chat vit dans la page ouverte (item, Moi…) : il défile avec son contenu, jamais collé à l'écran */
@@ -5842,9 +5851,11 @@ function fete(x,y){ burst(x,y); setTimeout(()=>burst(x-70,y-30),140); setTimeout
       for(const d of (c.dates||[])) if(d.date>=td&&d.date<=lim) out.push({c,key:d.date,text:d.text||"Rendez-vous",quand:d.date===td?"aujourd'hui":"le "+fmtDate(d.date,d.time)});
       for(const k of (c.tasks||[])) if(!k.done&&k.due&&k.due<=lim) out.push({c,key:k.due,text:k.text,quand:k.due<td?"en retard":k.due===td?"aujourd'hui":"pour le "+fmtDate(k.due)}); }
     return out.sort((a,b)=>a.key.localeCompare(b.key)); }
-  function dire(html,urg,forId){ if(hote()) return; bulle.innerHTML=html; bulle.classList.toggle("urg",!!urg); bulleFor=forId||null; bulle.hidden=false;
+  function dire(html,urg,forId){ if(hote()) return; bulleTxt(html); bulle.classList.toggle("urg",!!urg); bulleFor=forId||null; bulle.hidden=false;
     const bw=bulle.offsetWidth, bh=bulle.offsetHeight; bulle.style.left=Math.max(8,Math.min(innerWidth-bw-8,C.x-bw/2))+"px"; bulle.style.top=Math.max(8,C.y-H()*ps-bh-8)+"px"; }
   const tais=()=>{ bulle.hidden=true; bulleFor=null; };
+  const bulleTxt=h=>{ h=String(h??""); bulle.textContent=""; bulle._msg=h; const m=/^<b>([\s\S]*?)<\/b>([\s\S]*)$/.exec(h); if(m){ const b=document.createElement("b"); b.textContent=m[1]; bulle.appendChild(b); h=m[2]; }
+    h.split("<br>").forEach((t,i)=>{ if(i) bulle.appendChild(document.createElement("br")); bulle.appendChild(document.createTextNode(t)); }); };
   bulle.onclick=()=>{ const id=bulleFor; tais(); if(id&&cats.has(id)) open(id); };
   async function jouer(id){ const dir=Math.random()<.5?-1:1; let bx=Math.max(30,Math.min(innerWidth-30,C.x+dir*W()*.62)), by=C.y-14; ball.style.transform=`translate(${bx-15}px,${by-15}px)`; ball.hidden=false;
     cat.style.setProperty("--dir",dir); pose("joue"); await wait(1400); if(id!==run) return;
@@ -6011,8 +6022,8 @@ function fete(x,y){ burst(x,y); setTimeout(()=>burst(x-70,y-30),140); setTimeout
   /* l'image et le choix sont aussi gardés dans les données privées, pour tous les appareils */
   const loge=()=>{ const o=!!hote(); cat.style.visibility=ball.style.visibility=o?"hidden":""; if(o) tais(); };
   const moLoge=new MutationObserver(()=>setTimeout(loge,60)); document.querySelectorAll("aside.page").forEach(q=>moLoge.observe(q,{attributes:true,attributeFilter:["hidden"]})); loge();
-  window._compagnon=d=>{ if(d&&d.img&&d.img.src&&(!own||own.src!==d.img.src)){ own=d.img; try{ localStorage.setItem("animalImg",JSON.stringify(own)); }catch(_){} } if(d&&d.animal&&d.animal!==animal) setAnimal(d.animal,true); else if(animal==="photo") habille(); };
-  window._petGo=()=>{ vuUrg=0; start(); }; window._petDire=h=>{ if(on&&!cat.hidden){ dire(h); setTimeout(()=>{ if(bulle.innerHTML.includes(h.slice(3,12))) tais(); },4500); } }; window._petUrg=urgences; })();
+  window._compagnon=d=>{ if(d&&ownOk(d.img)&&(!own||own.src!==d.img.src)){ own=d.img; try{ localStorage.setItem("animalImg",JSON.stringify(own)); }catch(_){} } if(d&&d.animal&&d.animal!==animal) setAnimal(d.animal,true); else if(animal==="photo") habille(); };
+  window._petGo=()=>{ vuUrg=0; start(); }; window._petDire=h=>{ if(on&&!cat.hidden){ dire(h); setTimeout(()=>{ if(bulle._msg===h) tais(); },4500); } }; window._petUrg=urgences; })();
 stackMq.addEventListener("change",()=>quandLibre("ecran",()=>{ renderBoard(); placeMoi(); }));
 /* ---- Premier lancement ---- */
 const TPL=[["Revenus",[["Travail","travail"],["Projet","projet"],["Side business","etincelle"],["Formation","livre"],["Freelance","mallette"],["Recherche d'emploi","cible"],["Reconversion","boussole"],["Vente en ligne","penderie"],["Mon entreprise","fusee"]]],
@@ -6067,25 +6078,32 @@ function mergeDoc(r,l){ if(!r) return l; if(!l) return r; if(r._del||l._del){ co
   const out={}, f={}, X=new Set([...(r._x||[]),...(l._x||[])].map(String)); new Set([...Object.keys(r),...Object.keys(l)]).forEach(k=>{ if(META(k)) return; const tr=ftime(r,k), tl=ftime(l,k); const src=tr>=tl?r:l, aut=src===r?l:r; if(k in src){ out[k]=Array.isArray(src[k])&&Array.isArray(aut[k])?fusionListe(src[k],aut[k],X):src[k]; f[k]=Math.max(tr,tl); } });
   out._m=Math.max(r._m||0,l._m||0); out._f=f; if(X.size) out._x=[...X].slice(-1500); return out; }
 const fieldsNow=(x,old,now)=>{ const f=Object.assign({},(old&&old._f)||{}); Object.keys(x).forEach(k=>{ if(!META(k)) f[k]=now; }); return f; };
+function repoOk(r){ return /^[\w.-]+\/[\w.-]+$/.test(String(r||"")); }
 const appV=()=>{ try{ return APP_V; }catch(_){ return 0; } };
 const versionTropVieille=data=>{ const min=+(((data||{})["meta/app"])||{}).min||0, v=appV(); return !!(v&&min>v); };
 function localDb(){ const KEY="carte-de-vie-v1", CKEY="carte-de-vie-sync"; let store={}; try{ store=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(_){ store={}; }
   const subs=[], clone=o=>JSON.parse(JSON.stringify(o)), live=k=>store[k]&&!store[k]._del;
-  const persist=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(store)); }catch(_){ $("saved").textContent="Stockage de l'appareil plein ou bloqué."; } };
+  let persistT=null; const persistNow=()=>{ clearTimeout(persistT); persistT=null; try{ localStorage.setItem(KEY,JSON.stringify(store)); }catch(_){ $("saved").textContent="Stockage de l'appareil plein ou bloqué."; } };
+  const persist=()=>{ clearTimeout(persistT); if(document.hidden) return persistNow(); persistT=setTimeout(persistNow,800); };
+  addEventListener("pagehide",()=>{ if(persistT) persistNow(); }); addEventListener("beforeunload",()=>{ if(persistT) persistNow(); }); document.addEventListener("visibilitychange",()=>{ if(document.hidden&&persistT) persistNow(); });
   const notify=()=>subs.slice().forEach(f=>f());
-  const save=()=>{ persist(); notify(); api.dirty=true; api.queue(); };
+  let gen=0; const save=()=>{ persist(); notify(); gen++; api.dirty=true; api.queue(); };
   const doc=path=>({ id:path.split("/").pop(), path,
     set:d=>{ const now=Date.now(), old=store[path]; store[path]=Object.assign(clone(d),{_m:now,_f:fieldsNow(d,null,now),_x:tombes(old,d)}); save(); return Promise.resolve(); },
     update:d=>{ if(!live(path)) return Promise.reject({code:"invalid_argument"}); const now=Date.now(); store[path]=Object.assign({},store[path],clone(d),{_m:now,_f:fieldsNow(d,store[path],now),_x:tombes(store[path],d)}); save(); return Promise.resolve(); },
     delete:()=>{ store[path]={_del:true,_m:Date.now()}; save(); return Promise.resolve(); },
     onSnapshot:f=>{ let vu, deja=false; const fire=()=>{ const cur=store[path]; if(deja&&cur===vu) return; deja=true; vu=cur; f({id:path.split("/").pop(),exists:!!live(path),data:()=>store[path]}); }; subs.push(fire); setTimeout(fire,0); return ()=>{}; } });
   /* --- synchronisation avec un fichier carte.json dans un dépôt GitHub privé --- */
-  let cfg=null; try{ cfg=JSON.parse(localStorage.getItem(CKEY)||"null"); }catch(_){}
+  let cfg=null; try{ cfg=JSON.parse(localStorage.getItem(CKEY)||"null"); }catch(_){} if(cfg&&!repoOk(cfg.repo)) cfg=null;
   const b64e=t=>btoa(unescape(encodeURIComponent(t))), b64d=t=>decodeURIComponent(escape(atob(String(t||"").replace(/\s/g,""))));
   const url=()=>"https://api.github.com/repos/"+cfg.repo+"/contents/carte.json", hdr=()=>({Authorization:"Bearer "+cfg.token,Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"});
-  const pull=()=>fetch(url()+"?t="+Date.now(),{headers:hdr(),cache:"no-store"}).then(r=>{ if(r.status===404) return {data:null,sha:null}; if(!r.ok) throw {status:r.status}; return r.json().then(j=>{ /* au-delà de 1 Mo, GitHub ne renvoie pas le contenu : on lit alors le fichier brut */ if(!j.content&&j.size>0) return fetch(url()+"?t="+Date.now(),{headers:Object.assign(hdr(),{Accept:"application/vnd.github.raw"}),cache:"no-store"}).then(r2=>{ if(!r2.ok) throw {status:r2.status}; return r2.text(); }).then(t=>({data:JSON.parse(t)||{},sha:j.sha}));
-      let d={}; try{ d=JSON.parse(b64d(j.content))||{}; }catch(_){ throw {status:"lecture"}; } return {data:d,sha:j.sha}; }); });
-  const push=(sha)=>fetch(url(),{method:"PUT",headers:hdr(),body:JSON.stringify(Object.assign({message:"Carte mise à jour depuis l'application",content:b64e(JSON.stringify(store,null,1))},sha?{sha}:{}))}).then(r=>{ if(!r.ok) throw {status:r.status}; });
+  let der=null; /* dernière version lue en ligne {repo,etag,data,sha}, en mémoire seulement */
+  const pull=()=>{ const prec=der&&der.repo===cfg.repo&&der.etag?der:null, h=hdr(); if(prec) h["If-None-Match"]=prec.etag;
+    return fetch(url(),{headers:h,cache:"no-store"}).then(r=>{ if(r.status===304&&prec) return {data:api.dirty?clone(prec.data):null,sha:prec.sha,inchange:true}; der=null;
+      if(r.status===404) return {data:null,sha:null}; if(!r.ok) throw {status:r.status}; const etag=r.headers.get("ETag"), garde=o=>{ if(etag&&o.data) der={repo:cfg.repo,etag,data:o.data,sha:o.sha}; return o; };
+      return r.json().then(j=>{ /* au-delà de 1 Mo, GitHub ne renvoie pas le contenu : on lit alors le fichier brut */ if(!j.content&&j.size>0) return fetch(url(),{headers:Object.assign(hdr(),{Accept:"application/vnd.github.raw"}),cache:"no-store"}).then(r2=>{ if(!r2.ok) throw {status:r2.status}; return r2.text(); }).then(t=>garde({data:JSON.parse(t)||{},sha:j.sha}));
+      let d={}; try{ d=JSON.parse(b64d(j.content))||{}; }catch(_){ throw {status:"lecture"}; } return garde({data:d,sha:j.sha}); }); }); };
+  const push=(sha)=>fetch(url(),{method:"PUT",headers:hdr(),body:JSON.stringify(Object.assign({message:"Carte mise à jour depuis l'application",content:b64e(JSON.stringify(store,null,1))},sha?{sha}:{}))}).then(r=>{ if(!r.ok) throw {status:r.status}; der=null; });
   const merge=(remote)=>{ let changedLocal=false, needPush=false; const out={};
     new Set([...Object.keys(remote),...Object.keys(store)]).forEach(k=>{ const r=remote[k], l=store[k], m=mergeDoc(r,l), js=JSON.stringify(m); out[k]=m; if(js!==JSON.stringify(l)) changedLocal=true; if(js!==JSON.stringify(r)) needPush=true; });
     store=out; return {changedLocal,needPush}; };
@@ -6095,15 +6113,15 @@ function localDb(){ const KEY="carte-de-vie-v1", CKEY="carte-de-vie-sync"; let s
     dump:()=>JSON.stringify(store,null,1), load:o=>{ const now=Date.now(); Object.keys(store).forEach(k=>{ if(!(k in o)) o[k]={_del:true,_m:now}; }); Object.keys(o).forEach(k=>{ o[k]._m=now; }); store=o; save(); },
     hasLocal:()=>Object.keys(store).some(live),
     queue:()=>{ if(!cfg) return; clearTimeout(timer); timer=setTimeout(()=>api.sync(),2500); },
-    sync:()=>{ if(!cfg) return Promise.resolve("off"); if(busy){ again=true; return Promise.resolve("busy"); } busy=true; say("Synchronisation…");
-      return pull().then(({data,sha})=>{ const avant=data?JSON.stringify(data).length:0, m=merge(data||{}); if(m.changedLocal){ persist(); notify(); }
+    sync:()=>{ if(!cfg) return Promise.resolve("off"); if(busy){ again=true; return Promise.resolve("busy"); } busy=true; say("Synchronisation…"); const g0=gen;
+      return pull().then(({data,sha,inchange})=>{ if(inchange&&!data) return; const avant=data?JSON.stringify(data).length:0, m=merge(data||{}); if(m.changedLocal){ persist(); notify(); }
           /* protection de la carte : une version de l'app plus ancienne que celle déjà utilisée n'écrit rien ; et jamais d'envoi qui ferait fondre la carte */
           if(versionTropVieille(data)) throw {status:"version"}; if(avant>200000&&JSON.stringify(store).length<avant*0.6) throw {status:"retrait"};
           if(m.needPush||data===null) return push(sha).then(()=>{ const am=+((store["meta/app"]||{}).min)||0; if(appV()>am) setTimeout(()=>doc("meta/app").set({min:appV()}),0); }); })
-        .then(()=>{ api.dirty=false; api.synced=true; if(window._autoArr) setTimeout(window._autoArr,0); say("Synchronisé à "+new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})); return "ok"; },
+        .then(()=>{ if(gen===g0) api.dirty=false; api.synced=true; if(window._autoArr) setTimeout(window._autoArr,0); say("Synchronisé à "+new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})); return "ok"; },
               e=>{ const st=e&&e.status; if(st==="version"||st==="retrait"){ say(st==="version"?"Une version plus récente de l'app a déjà été utilisée : ferme complètement l'app et rouvre-la. En attendant, rien n'est envoyé, pour protéger ta carte.":"Envoi bloqué : il aurait effacé une partie de ta carte. Ferme et rouvre l'app, puis réessaie."); return st; } if(st===409||st===422){ again=true; return "retry"; } say(st===401||st===403?"Clé d'accès refusée : vérifie-la dans Synchro.":st===404?"Dépôt introuvable : vérifie son nom dans Synchro.":"Hors ligne : les modifications partiront au retour du réseau."); return "err:"+(st||"net"); })
         .then(res=>{ busy=false; if(again){ again=false; api.queue(); } return res; }); },
-    connect:(repo,token,keep)=>{ cfg={repo,token}; return pull().then(({data})=>{ const remoteHas=data&&Object.keys(data).some(k=>!data[k]._del);
+    connect:(repo,token,keep)=>{ if(!repoOk(repo)) return Promise.reject({status:404}); cfg={repo,token}; der=null; return pull().then(({data})=>{ const remoteHas=data&&Object.keys(data).some(k=>!data[k]._del);
         if(remoteHas&&api.hasLocal()&&!keep){ cfg=null; return "choose"; }
         if(keep==="device"){ const now=Date.now(); Object.keys(store).forEach(k=>{ store[k]._m=now; }); } if(keep==="online"){ store={}; }
         try{ localStorage.setItem(CKEY,JSON.stringify(cfg)); }catch(_){} return api.sync(); },e=>{ cfg=null; throw e; }); },
@@ -6113,7 +6131,7 @@ function localDb(){ const KEY="carte-de-vie-v1", CKEY="carte-de-vie-sync"; let s
   setTimeout(()=>api.sync(),300); setInterval(()=>{ if(document.visibilityState==="visible") api.sync(); },60000); document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") api.sync(); }); addEventListener("online",()=>api.sync());
   return api; }
 /* --- dans Claude : les données restent dans la base de la page, la synchro GitHub et l'IA s'ajoutent --- */
-function claudeDb(d){ const CKEY="carte-de-vie-sync"; let cfg=null; try{ cfg=JSON.parse(localStorage.getItem(CKEY)||"null"); }catch(_){}
+function claudeDb(d){ const CKEY="carte-de-vie-sync"; let cfg=null; try{ cfg=JSON.parse(localStorage.getItem(CKEY)||"null"); }catch(_){} if(cfg&&!repoOk(cfg.repo)) cfg=null;
   const store={}, live=k=>store[k]&&!store[k]._del, stamp=(x,k)=>{ const now=Date.now(); return Object.assign({},x,{_m:now,_f:fieldsNow(x,k?store[k]:null,now),_x:tombes(k?store[k]:null,x)}); };
   ["meta/moi","meta/layout","meta/feedback","meta/compagnon","meta/suggestions","meta/base","meta/notes","meta/cockpit","meta/cockpit_masques","meta/fonds","meta/icones","meta/semaine","meta/journees","meta/app","meta/energie","meta/revues","meta/trajectoire","meta/memoire","meta/propositions","meta/suivi"].forEach(k=>d.doc(k).onSnapshot(s=>{ if(s.exists) store[k]=s.data(); else delete store[k]; },()=>{}));
   d.collection("espaces").onSnapshot(s=>{ Object.keys(store).forEach(k=>{ if(k.startsWith("espaces/")) delete store[k]; }); s.docs.forEach(x=>{ store["espaces/"+x.id]=x.data(); }); },()=>{});
@@ -6123,7 +6141,7 @@ function claudeDb(d){ const CKEY="carte-de-vie-sync"; let cfg=null; try{ cfg=JSO
     onSnapshot:(f,e)=>r.onSnapshot(s=>{ const v=s.exists?s.data():undefined; f({id:s.id,exists:!!(v&&!v._del),data:()=>v}); },e) }; };
   const b64e=t=>btoa(unescape(encodeURIComponent(t))), b64d=t=>decodeURIComponent(escape(atob(String(t||"").replace(/\s/g,""))));
   const url=()=>"https://api.github.com/repos/"+cfg.repo+"/contents/carte.json", hdr=()=>({Authorization:"Bearer "+cfg.token,Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"});
-  const pull=()=>fetch(url()+"?t="+Date.now(),{headers:hdr(),cache:"no-store"}).then(r=>{ if(r.status===404) return {data:null,sha:null}; if(!r.ok) throw {status:r.status}; return r.json().then(j=>{ if(!j.content&&j.size>0) return fetch(url()+"?t="+Date.now(),{headers:Object.assign(hdr(),{Accept:"application/vnd.github.raw"}),cache:"no-store"}).then(r2=>{ if(!r2.ok) throw {status:r2.status}; return r2.text(); }).then(t=>({data:JSON.parse(t)||{},sha:j.sha}));
+  const pull=()=>fetch(url(),{headers:hdr(),cache:"no-store"}).then(r=>{ if(r.status===404) return {data:null,sha:null}; if(!r.ok) throw {status:r.status}; return r.json().then(j=>{ if(!j.content&&j.size>0) return fetch(url(),{headers:Object.assign(hdr(),{Accept:"application/vnd.github.raw"}),cache:"no-store"}).then(r2=>{ if(!r2.ok) throw {status:r2.status}; return r2.text(); }).then(t=>({data:JSON.parse(t)||{},sha:j.sha}));
       let o={}; try{ o=JSON.parse(b64d(j.content))||{}; }catch(_){ throw {status:"lecture"}; } return {data:o,sha:j.sha}; }); });
   const push=(sha,out)=>fetch(url(),{method:"PUT",headers:hdr(),body:JSON.stringify(Object.assign({message:"Carte mise à jour depuis Claude",content:b64e(JSON.stringify(out,null,1))},sha?{sha}:{}))}).then(r=>{ if(!r.ok) throw {status:r.status}; });
   const merge=remote=>{ let needPush=false; const out={}, ops=[];
@@ -6143,7 +6161,7 @@ function claudeDb(d){ const CKEY="carte-de-vie-sync"; let cfg=null; try{ cfg=JSO
         .then(()=>{ api.dirty=false; api.synced=true; if(window._autoArr) setTimeout(window._autoArr,0); say("Synchronisé à "+new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})); return "ok"; },
               e=>{ const st=e&&e.status; if(st==="version"||st==="retrait"){ say(st==="version"?"Une version plus récente de l'app a déjà été utilisée : ferme complètement l'app et rouvre-la. En attendant, rien n'est envoyé, pour protéger ta carte.":"Envoi bloqué : il aurait effacé une partie de ta carte. Ferme et rouvre l'app, puis réessaie."); return st; } if(st===409||st===422){ again=true; return "retry"; } say(st===401||st===403?"Clé d'accès refusée : vérifie-la dans Synchro.":st===404?"Dépôt introuvable : vérifie son nom dans Synchro.":"GitHub injoignable depuis Claude pour le moment. Tes modifications restent enregistrées ici."); return "err:"+(st||"net"); })
         .then(res=>{ busy=false; if(again){ again=false; api.queue(); } return res; }); },
-    connect:(repo,token,keep)=>{ cfg={repo,token}; return pull().then(({data})=>{ const remoteHas=data&&Object.keys(data).some(k=>!data[k]._del);
+    connect:(repo,token,keep)=>{ if(!repoOk(repo)) return Promise.reject({status:404}); cfg={repo,token}; return pull().then(({data})=>{ const remoteHas=data&&Object.keys(data).some(k=>!data[k]._del);
         if(remoteHas&&api.hasLocal()&&!keep){ cfg=null; return "choose"; }
         const now=Date.now(); let ops=[];
         if(keep==="device") ops=Object.keys(store).map(k=>{ store[k]=Object.assign({},store[k],{_m:now}); return d.doc(k).set(store[k]); });
@@ -6252,17 +6270,32 @@ function start(){
 }
 /* compléments personnels : un module gardé dans le dépôt de données de la propriétaire, jamais dans ce code public.
    Il n'est lu que pour un dépôt de son compte, avec sa clé ; ailleurs l'app reste générique. */
-const PERSO_K="carte-de-vie-perso";
+const PERSO_K="carte-de-vie-perso", PERSO_SHA="carte-de-vie-perso-sha";
 function persoEval(t){ try{ eval(t); return true; }catch(err){ console.warn("module perso",err); return false; } }
 /* propriétaire : un dépôt de son compte, reconnu par empreinte (le nom du compte n'est pas écrit ici) */
 function estProprio(r){ const o=String(r||"").split("/")[0].toLowerCase(); let h1=0xdeadbeef, h2=0x41c6ce57; for(let i=0;i<o.length;i++){ const ch=o.charCodeAt(i); h1=Math.imul(h1^ch,2654435761); h2=Math.imul(h2^ch,1597334677); }
   h1=Math.imul(h1^(h1>>>16),2246822507); h1^=Math.imul(h2^(h2>>>13),3266489909); h2=Math.imul(h2^(h2>>>16),2246822507); h2^=Math.imul(h1^(h1>>>13),3266489909);
   return String(r||"").includes("/") && (4294967296*(2097151&h2)+(h1>>>0)).toString(36)==="h7637qhg6a"; }
-function persoOk(){ const c=AUD.cfg(); return !!(c&&c.repo&&c.token&&estProprio(c.repo)); }
-{ let t=null; try{ t=persoOk()?localStorage.getItem(PERSO_K):null; }catch(_){} if(t) persoEval(t); }
-start();
-if(persoOk()) setTimeout(async()=>{ const b=await AUD.recupere("perso/module.js","text/plain"); if(!b) return; const t=await b.text(); let avant=null; try{ avant=localStorage.getItem(PERSO_K); }catch(_){}
-  if(!t||t===avant) return; try{ localStorage.setItem(PERSO_K,t); }catch(_){} if(persoEval(t)&&loaded){ renderBoard(); if(openId&&!drawer.hidden) renderPane(cats.get(openId)); } },400);
+function persoOk(){ const c=AUD.cfg(); return !!(c&&c.repo&&c.token&&repoOk(c.repo)&&estProprio(c.repo)); }
+/* le module gardé sur l'appareil n'est exécuté que s'il est la version en ligne (même empreinte « sha » que le fichier du dépôt) ;
+   hors ligne (ou GitHub injoignable), on garde la dernière version reçue ; clé refusée ou fichier absent : rien n'est exécuté */
+const persoTexte=b=>{ try{ return new TextDecoder().decode(Uint8Array.from(atob(String(b||"").replace(/\s/g,"")),x=>x.charCodeAt(0))); }catch(_){ return ""; } };
+async function persoEnLigne(){ const c=AUD.cfg(); if(!c||navigator.onLine===false) return null; const ac=typeof AbortController==="function"?new AbortController():null, tm=setTimeout(()=>{ if(ac) ac.abort(); },2500);
+  try{ const r=await fetch("https://api.github.com/repos/"+c.repo+"/contents/perso/module.js",{headers:AUD.hd(c),cache:"no-store",signal:ac?ac.signal:undefined});
+    if(r.status===401||r.status===404) return {refus:r.status}; if(!r.ok) return null; const j=await r.json(); return {sha:String(j.sha||""),texte:j.content?persoTexte(j.content):""}; }
+  catch(_){ return null; } finally{ clearTimeout(tm); } }
+const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.setItem(PERSO_SHA,sha); }catch(_){} };
+(async()=>{ let brut=null;
+  if(persoOk()){ let t=null, s0=null; try{ t=localStorage.getItem(PERSO_K); s0=localStorage.getItem(PERSO_SHA); }catch(_){}
+    const L=await persoEnLigne();
+    if(!L){ if(t) persoEval(t); }
+    else if(L.sha&&L.sha===s0&&t) persoEval(t);
+    else if(L.sha&&L.texte){ persoGarde(L.texte,L.sha); persoEval(L.texte); }
+    else if(L.sha) brut=L.sha; }
+  start();
+  /* fichier trop gros pour être renvoyé avec ses métadonnées : lu en brut après le démarrage */
+  if(brut){ const b=await AUD.recupere("perso/module.js","text/plain"); const tx=b?await b.text():""; if(tx){ persoGarde(tx,brut); if(persoEval(tx)&&loaded){ renderBoard(); if(openId&&!drawer.hidden) renderPane(cats.get(openId)); } } }
+})();
 })();
 
 </script>
@@ -6280,7 +6313,7 @@ if(persoOk()) setTimeout(async()=>{ const b=await AUD.recupere("perso/module.js"
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=160; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=161; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
