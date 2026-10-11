@@ -834,6 +834,13 @@ svg.ldec{filter:url(#cut)}
 .nnote .nact .ncl{background:var(--ink);color:var(--surface,#FBF8F1)}
 .nclaude{display:flex;flex-direction:column;gap:2px;margin:8px 0 2px;padding:8px 10px;border-radius:12px;background:#c9d6f0;color:#002FA7;font-size:.85rem}
 .avisf{display:flex;flex-direction:column;gap:6px;margin-top:8px}.avisf textarea{font:inherit;font-size:.9rem;border:1.5px solid #c9d6f0;border-radius:12px;padding:8px 10px;resize:vertical;min-height:52px;background:#fff;color:#002FA7;width:100%;box-sizing:border-box}
+#soirPage,#memPersoPage{--c:var(--ink);background:var(--bg)!important;z-index:60}
+#soirPage .card h3,#memPersoPage .card h3{background:var(--surface)}
+.soirc textarea,.soirc input{font:inherit;width:100%;box-sizing:border-box;border:1.5px solid #c9d6f0;border-radius:12px;padding:9px 11px;background:#fff;color:#002FA7;margin:4px 0}
+.soirt{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #c9d6f0}.soirt span{min-width:0;overflow-wrap:anywhere}.soirt.ok b{text-decoration:line-through;opacity:.7}.soirt.rep b{opacity:.7}
+.soirh{display:flex;gap:8px;margin:6px 0}.soirh button{flex:1;min-height:44px;border-radius:12px;border:1.5px solid #c9d6f0;background:#fff;color:#002FA7;font:700 1.05rem inherit;cursor:pointer}.soirh button.on{background:#002FA7;color:#fff;border-color:#002FA7}
+.soird{display:grid;grid-template-columns:28px minmax(0,1fr);gap:8px;align-items:start;margin:8px 0}.soird>b{width:28px;height:28px;border-radius:50%;background:#002FA7;color:#fff;display:grid;place-items:center;margin-top:8px}
+.soirok{width:100%;min-height:48px;margin-top:6px}.memr{padding:8px 10px;border-radius:12px;background:#EEF3FF;margin:6px 0;overflow-wrap:anywhere}.memr p{margin:2px 0 0}.memr[role=button]{cursor:pointer}
 .nclaude b{font-size:.85rem}.nclaude.e-faite{background:#002FA7;color:#FBF8F1}.nclaude.e-a_preciser{border:2px dashed #002FA7;background:none}.nnote .nact button{font:inherit;font-size:.8rem;border:1px solid var(--ink);background:none;color:var(--ink);border-radius:999px;padding:2px 10px;cursor:pointer}.nnote textarea{width:100%;box-sizing:border-box;min-height:120px;margin-top:6px}.nsrc{font-size:.7rem;border-radius:999px;padding:1px 8px;background:var(--pale);margin-left:6px}#noteTitre,#noteCherche,.nnote input{font:inherit;color:var(--fg);background:color-mix(in srgb,var(--bg) 70%,var(--surface));border:1.5px solid var(--ink);border-radius:999px;padding:10px 16px;width:100%;box-sizing:border-box;margin-bottom:8px}.nnote .nt small{white-space:nowrap}.notesimp{cursor:pointer}#notesAide ol{margin:6px 0;padding-left:20px}#notesAide li{margin:4px 0}
 /* ---- rubriques : chacune son objet, sa forme, sa couleur (grille en mosaïque) ---- */
 #pane .rgrid{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(170px,44%),1fr));gap:14px;grid-auto-flow:dense;margin:6px 0 18px}
@@ -5082,6 +5089,67 @@ $("agClose").onclick=()=>{ $("agPage").hidden=true; };
   const oRB=renderBoard; renderBoard=function(){ const r=oRB.apply(this,arguments); court(); marque(); return r; }; court(); marque();
   const oRD=renderDrawer; renderDrawer=function(){ const r=oRD.apply(this,arguments); marque(); return r; }; }
 /* un menu sur le côté droit : il s'ouvre quand on passe la souris (ou d'un toucher sur téléphone) ; « + Noter » y vit désormais */
+const PAGEX=(id,titre)=>{ let p=$(id); if(!p){ p=el("aside",{className:"page",id}); p.hidden=true; p.setAttribute("aria-label",titre); document.body.appendChild(p);
+    document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!p.hidden){ p.hidden=true; e.stopImmediatePropagation(); } },true); }
+  p.textContent=""; const inn=el("div",{className:"page-in"}), b=el("button",{className:"btn ghost",textContent:"← Ma carte"}); b.onclick=()=>{ p.hidden=true; }; inn.append(el("div",{},b),el("h2",{textContent:titre})); p.appendChild(inn); p.hidden=false; p.scrollTop=0; return inn; };
+const jourDecale=(j,n)=>{ const d=new Date(j+"T12:00:00"); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); };
+const SOIR={ docs:{}, sub:false,
+  ecoute(){ if(this.sub||!db) return; this.sub=true; db.collection("soir").onSnapshot(s=>{ const o={}; s.docs.forEach(x=>{ o[x.id]=x.data(); }); this.docs=o; }); },
+  taches(){ const j=today(), L=[]; [...cats.values()].forEach(c=>(c.tasks||[]).forEach(t=>{ if(!t||!t.text) return;
+      if(!t.done&&t.due&&t.due<=j) L.push({c,t,etat:"afaire"}); else if(t.done&&String(t.fait||"").slice(0,10)===j) L.push({c,t,etat:"fait"}); })); return L; },
+  majTache(c,id,o){ const cur=cats.get(c.id); write(c.id,{tasks:(cur.tasks||[]).map(t=>t.id===id?Object.assign({},t,o):t)}); },
+  ouvre(){ this.ecoute(); const j=today(), d=this.docs[j]||{}, hier=this.docs[jourDecale(j,-1)]||{}, inn=PAGEX("soirPage","Ferme ta journée");
+    inn.appendChild(el("p",{className:"help",textContent:new Date(j+"T12:00:00").toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})+" · une minute pour faire le point et préparer demain."}));
+    if((hier.demain||[]).length){ const s=el("section",{className:"card soirc"},el("h3",{textContent:"Ce que tu avais prévu pour aujourd'hui"})); hier.demain.forEach(x=>s.appendChild(el("p",{},el("b",{textContent:x.texte}),x.geste?el("small",{textContent:" · premier geste : "+x.geste}):""))); inn.appendChild(s); }
+    const T=this.taches(), st=el("section",{className:"card soirc"},el("h3",{textContent:"Fait ou reporté"}));
+    if(!T.length) st.appendChild(help("Aucune tâche prévue pour aujourd'hui dans tes espaces."));
+    const demain=jourDecale(j,1);
+    T.forEach(({c,t,etat})=>{ const li=el("div",{className:"soirt"+(etat==="fait"?" ok":"")},el("span",{},el("b",{textContent:t.text}),el("small",{textContent:" · "+(c.name||"")})));
+      if(etat==="afaire"){ const f=el("button",{type:"button",className:"btn",textContent:"✓ Fait"}), r=el("button",{type:"button",className:"btn ghost",textContent:"→ Demain"});
+        f.onclick=()=>{ this.majTache(c,t.id,{done:true,fait:new Date().toISOString()}); li.classList.add("ok"); f.remove(); r.remove(); };
+        r.onclick=()=>{ this.majTache(c,t.id,{due:demain}); li.classList.add("rep"); f.remove(); r.remove(); li.appendChild(el("small",{textContent:" → demain"})); };
+        li.append(el("div",{className:"bact"},f,r)); } else li.appendChild(el("small",{textContent:" ✓"}));
+      st.appendChild(li); }); inn.appendChild(st);
+    const sc=el("section",{className:"card soirc"},el("h3",{textContent:"Qu'est-ce qui a compté aujourd'hui ?"})), ta=el("textarea",{rows:3,maxLength:1500,value:d.compte||"",placeholder:"Une chose, même petite…"}); ta.setAttribute("aria-label","Ce qui a compté aujourd'hui"); sc.appendChild(ta); inn.appendChild(sc);
+    let hu=d.humeur||0; const sh=el("section",{className:"card soirc"},el("h3",{textContent:"Ton humeur"})), hb=el("div",{className:"soirh"});
+    [1,2,3,4,5].forEach(n=>{ const b=el("button",{type:"button",textContent:String(n),className:hu===n?"on":""}); b.setAttribute("aria-label","Humeur "+n+" sur 5"); b.setAttribute("aria-pressed",String(hu===n)); b.onclick=()=>{ hu=n; [...hb.children].forEach((x,k)=>{ x.classList.toggle("on",k+1===n); x.setAttribute("aria-pressed",String(k+1===n)); }); }; hb.appendChild(b); });
+    sh.append(hb,el("small",{className:"mut",textContent:"1 = difficile · 5 = très bien"})); inn.appendChild(sh);
+    const sd=el("section",{className:"card soirc"},el("h3",{textContent:"Demain : 3 priorités"}),help("Une seule grosse, et pour chacune un premier geste de moins de 5 minutes.")), lignes=[];
+    for(let k=0;k<3;k++){ const x=(d.demain||[])[k]||{}, a=el("input",{maxLength:140,value:x.texte||"",placeholder:k===0?"La grosse priorité":"Priorité "+(k+1)}), g=el("input",{maxLength:140,value:x.geste||"",placeholder:"Premier geste (moins de 5 min)"});
+      a.setAttribute("aria-label","Priorité "+(k+1)); g.setAttribute("aria-label","Premier geste de la priorité "+(k+1)); lignes.push([a,g]); sd.appendChild(el("div",{className:"soird"},el("b",{textContent:String(k+1)}),el("div",{},a,g))); }
+    inn.appendChild(sd);
+    const ok=el("button",{type:"button",className:"btn soirok",textContent:d.t?"Mettre à jour ma journée":"Fermer ma journée"}), msg=el("p",{className:"help"});
+    ok.onclick=()=>{ const T2=this.taches(); const v={humeur:hu||null,compte:ta.value.trim(),demain:lignes.map(([a,g])=>({texte:a.value.trim(),geste:g.value.trim()})).filter(x=>x.texte),
+        fait:T2.filter(x=>x.etat==="fait").map(x=>x.t.text).slice(0,30),reporte:[...cats.values()].flatMap(c=>(c.tasks||[]).filter(t=>!t.done&&t.due===demain).map(t=>t.text)).slice(0,30),t:new Date().toISOString(),source:"app"};
+      if(db) db.doc("soir/"+j).set(v).catch(()=>{}); this.docs[j]=v; fetel(ok); msg.textContent="Journée fermée ✓ Tes 3 priorités t'attendront demain."; ok.textContent="Mettre à jour ma journée"; };
+    inn.append(ok,msg); } };
+const MEMP={ L:[], notes:[], sub:false,
+  ecoute(){ if(this.sub||!db) return; this.sub=true; db.collection("memoire").onSnapshot(s=>{ this.L=s.docs.map(x=>Object.assign({id:x.id},x.data())).filter(x=>x.texte).sort((a,b)=>String(b.t).localeCompare(String(a.t))); if(this.liste) this.rend(); });
+    db.doc("meta/notes").onSnapshot(x=>{ this.notes=(x.exists&&x.data().liste)||[]; },()=>{}); SOIR.ecoute(); },
+  /* « qu'est-ce que je sais sur… ? » : souvenirs, notes, soirées, espaces (nom, notes, rubriques, tâches, idées) ; jamais inventé, seulement retrouvé */
+  cherche(q){ const mots=plNorm(q).split(/\s+/).filter(m=>m.length>1); if(!mots.length) return []; const R=[], ok=t=>{ const n=plNorm(t||""); return mots.every(m=>n.includes(m)); };
+    this.L.forEach(m=>{ if(ok(m.texte)) R.push({src:"Souvenir",quand:m.t,texte:m.texte}); });
+    this.notes.forEach(n=>{ const t=[n.titre,n.texte].filter(Boolean).join(" — "); if(ok(t)) R.push({src:"Note",quand:n.t,texte:t}); });
+    Object.entries(SOIR.docs).forEach(([j,d])=>{ const t=[d.compte,...(d.demain||[]).map(x=>x.texte)].filter(Boolean).join(" · "); if(ok(t)) R.push({src:"Soirée du "+j.split("-").reverse().join("/"),quand:j,texte:t}); });
+    [...cats.values()].forEach(c=>{ const it=[[c.name,c.notes].filter(Boolean).join(" — "),...(c.rub||[]).flatMap(r=>[r.name,...(r.items||[]).map(i=>i.text)]),...(c.tasks||[]).map(t=>t.text),...(c.ideas||[]).map(i=>i.text||i)].filter(x=>typeof x==="string"&&x);
+      if(ok(c.name)) R.push({src:"Espace",c,texte:c.name+(c.notes?" — "+c.notes:"")});
+      it.slice(1).forEach(t=>{ if(ok(t)||(ok((c.name||"")+" "+t)&&!ok(c.name))) R.push({src:c.name,c,texte:t}); }); });
+    return R.slice(0,40); },
+  ouvre(){ this.ecoute(); const inn=PAGEX("memPersoPage","Ma mémoire perso");
+    inn.appendChild(el("p",{className:"help",textContent:"Ce que tu veux retenir, et une recherche dans toute ta carte. L'assistant Telegram pourra lire et compléter cette mémoire."}));
+    const sq=el("section",{className:"card soirc"},el("h3",{textContent:"Qu'est-ce que je sais sur… ?"})), q=el("input",{type:"search",placeholder:"Un mot, une personne, un projet…"}), res=el("div",{className:"memres"});
+    q.setAttribute("aria-label","Chercher dans ma mémoire"); q.oninput=()=>{ res.textContent=""; const v=q.value.trim(); if(v.length<2) return; const R=this.cherche(v);
+      if(!R.length){ res.appendChild(help("Rien de trouvé pour « "+v+" ». Je ne l'invente pas : retiens-le ci-dessous si tu veux le garder.")); return; }
+      R.forEach(r=>{ const b=el("div",{className:"memr"},el("small",{className:"mono",textContent:r.src}),el("p",{textContent:r.texte.slice(0,300)})); if(r.c){ b.tabIndex=0; b.setAttribute("role","button"); b.onclick=()=>open(r.c.id); } res.appendChild(b); }); };
+    sq.append(q,res); inn.appendChild(sq);
+    const sa=el("section",{className:"card soirc"},el("h3",{textContent:"Retenir quelque chose"})), ta=el("textarea",{rows:3,maxLength:2000,placeholder:"Ex. : le code de la porte du local vélo est dans la note « immeuble » ; mon restaurant préféré dans le quartier…"}), ok=el("button",{type:"button",className:"btn",textContent:"Retenir"});
+    ta.setAttribute("aria-label","Ce que je veux retenir"); ok.onclick=()=>{ const t=ta.value.trim(); if(!t) return; const m={texte:t.slice(0,2000),t:new Date().toISOString(),source:"app"}; if(db) db.collection("memoire").doc().set(m).catch(()=>{}); this.L=[Object.assign({id:"tmp"+Date.now()},m),...this.L]; ta.value=""; fetel(ok); this.rend(); };
+    sa.append(ta,ok); inn.appendChild(sa);
+    this.liste=el("section",{className:"card soirc"}); inn.appendChild(this.liste); this.rend(); },
+  rend(){ const s=this.liste; if(!s) return; s.textContent=""; s.appendChild(el("h3",{textContent:this.L.length?"Mes souvenirs · "+this.L.length:"Mes souvenirs"}));
+    if(!this.L.length){ s.appendChild(help("Rien encore. Ce que tu retiens ici (ou que tu dis à l'assistant Telegram) apparaîtra là.")); return; }
+    this.L.slice(0,50).forEach(m=>{ const d=el("button",{type:"button",className:"btn ghost",textContent:"Oublier"}); d.onclick=()=>{ if(!confirm("Oublier ce souvenir ?")) return; if(db&&!String(m.id).startsWith("tmp")) db.doc("memoire/"+m.id).delete().catch(()=>{}); this.L=this.L.filter(x=>x!==m); this.rend(); };
+      s.appendChild(el("div",{className:"memr"},el("small",{className:"mono",textContent:new Date(m.t).toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})+(m.source==="telegram"?" · Telegram":"")}),el("p",{textContent:m.texte}),el("div",{className:"bact"},d))); }); } };
 { const fab=$("noterFab"), rail=el("nav",{className:"v3rail"}); rail.setAttribute("aria-label","Raccourcis");
   const tir=el("button",{type:"button",className:"v3tir",textContent:"✎"}); tir.setAttribute("aria-label","Ouvrir les raccourcis : noter, mes notes, à valider"); tir.setAttribute("aria-expanded","false");
   const box=el("div",{className:"v3railIn"}), item=(ic,t,fn,cls)=>{ const b=el("button",{type:"button",className:cls||""},el("i",{textContent:ic}),el("span",{textContent:t})); b.onclick=()=>{ ferme(); fn(); }; box.appendChild(b); return b; };
@@ -5093,6 +5161,8 @@ $("agClose").onclick=()=>{ $("agPage").hidden=true; };
   const atr=()=>[...cats.values()].find(x=>/^(a traiter|notes)$/.test(plNorm(x.name||""))||x.forme==="bulle");
   item("!","Urgences",()=>{ const c=[...cats.values()].find(x=>/^(a traiter|notes)$/.test(plNorm(x.name||""))||x.forme==="bulle"); if(c) open(c.id); });
   item("✦","Mon chemin",()=>V3.ouvreChemin(),"r-proprio");
+  item("☾","Ferme ta journée",()=>SOIR.ouvre());
+  item("◎","Ma mémoire perso",()=>MEMP.ouvre());
   if($("sugBtn")) item("✎","Mes idées pour l'app",()=>$("sugBtn").click(),"r-proprio");
   rail.append(tir,box); document.body.appendChild(rail);
   /* « À traiter » n'apparaît que si cet espace existe */
@@ -6079,7 +6149,7 @@ if(persoOk()) setTimeout(async()=>{ const b=await AUD.recupere("perso/module.js"
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=158; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=159; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
