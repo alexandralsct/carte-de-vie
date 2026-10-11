@@ -830,7 +830,11 @@ svg.ldec{filter:url(#cut)}
 .board.stack .ia.notesb{position:relative;left:auto!important;top:auto!important;transform:none;width:20%;align-self:center;margin:calc(-20% - 22px) 34% 0 0;z-index:3}
 #drawer.simple .heroL,#drawer.simple #gauge,#drawer.simple .prio,#drawer.simple .grp,#drawer.simple .sw,#drawer.simple #delZone{display:none!important}#drawer.simple .hero{min-height:0;grid-template-columns:1fr}.urg .items li{font-size:1.02rem}.urgfin summary{cursor:pointer;font-weight:600;opacity:.7;margin-top:10px}
 .hauttel{display:flex;flex-direction:column;align-items:flex-start;gap:8px}.hauttel .hrow{display:flex!important;flex-direction:row!important;gap:10px;align-items:center;flex-wrap:nowrap;width:auto!important}.hauttel{width:auto!important}.hauttel #setBtn{margin:0}
-.notesouv{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.nnote{border:1.5px solid var(--ink);border-radius:16px;padding:12px 14px;margin:10px 0;background:var(--surface)}.nnote .nt{display:flex;gap:8px;align-items:baseline;justify-content:space-between}.nnote b{font-size:1.02rem}.nnote small{opacity:.65;font-size:.75rem}.nnote p{margin:6px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}.nnote.ouvert p{display:block}.nnote .nact{display:flex;gap:6px;margin-top:8px}.nnote .nact button{font:inherit;font-size:.8rem;border:1px solid var(--ink);background:none;color:var(--ink);border-radius:999px;padding:2px 10px;cursor:pointer}.nnote textarea{width:100%;box-sizing:border-box;min-height:120px;margin-top:6px}.nsrc{font-size:.7rem;border-radius:999px;padding:1px 8px;background:var(--pale);margin-left:6px}#noteTitre,#noteCherche,.nnote input{font:inherit;color:var(--fg);background:color-mix(in srgb,var(--bg) 70%,var(--surface));border:1.5px solid var(--ink);border-radius:999px;padding:10px 16px;width:100%;box-sizing:border-box;margin-bottom:8px}.nnote .nt small{white-space:nowrap}.notesimp{cursor:pointer}#notesAide ol{margin:6px 0;padding-left:20px}#notesAide li{margin:4px 0}
+.notesouv{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.nnote{border:1.5px solid var(--ink);border-radius:16px;padding:12px 14px;margin:10px 0;background:var(--surface)}.nnote .nt{display:flex;gap:8px;align-items:baseline;justify-content:space-between}.nnote b{font-size:1.02rem}.nnote small{opacity:.65;font-size:.75rem}.nnote p{margin:6px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}.nnote.ouvert p{display:block}.nnote .nact{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.nnote .nact .ncl{background:var(--ink);color:var(--surface,#FBF8F1)}
+.nclaude{display:flex;flex-direction:column;gap:2px;margin:8px 0 2px;padding:8px 10px;border-radius:12px;background:#c9d6f0;color:#002FA7;font-size:.85rem}
+.avisf{display:flex;flex-direction:column;gap:6px;margin-top:8px}.avisf textarea{font:inherit;font-size:.9rem;border:1.5px solid #c9d6f0;border-radius:12px;padding:8px 10px;resize:vertical;min-height:52px;background:#fff;color:#002FA7;width:100%;box-sizing:border-box}
+.nclaude b{font-size:.85rem}.nclaude.e-faite{background:#002FA7;color:#FBF8F1}.nclaude.e-a_preciser{border:2px dashed #002FA7;background:none}.nnote .nact button{font:inherit;font-size:.8rem;border:1px solid var(--ink);background:none;color:var(--ink);border-radius:999px;padding:2px 10px;cursor:pointer}.nnote textarea{width:100%;box-sizing:border-box;min-height:120px;margin-top:6px}.nsrc{font-size:.7rem;border-radius:999px;padding:1px 8px;background:var(--pale);margin-left:6px}#noteTitre,#noteCherche,.nnote input{font:inherit;color:var(--fg);background:color-mix(in srgb,var(--bg) 70%,var(--surface));border:1.5px solid var(--ink);border-radius:999px;padding:10px 16px;width:100%;box-sizing:border-box;margin-bottom:8px}.nnote .nt small{white-space:nowrap}.notesimp{cursor:pointer}#notesAide ol{margin:6px 0;padding-left:20px}#notesAide li{margin:4px 0}
 /* ---- rubriques : chacune son objet, sa forme, sa couleur (grille en mosaïque) ---- */
 #pane .rgrid{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(170px,44%),1fr));gap:14px;grid-auto-flow:dense;margin:6px 0 18px}
 .rcard{--rb:#FBF8F1;--rt:#002FA7;position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0;min-height:196px;padding:14px;border:0;border-radius:22px;background:var(--rb);color:var(--rt);font:inherit;text-align:left;cursor:pointer;overflow:hidden;transition:translate .18s,box-shadow .18s}
@@ -2427,7 +2431,7 @@ const NOTES_P=[["apple","Apple Notes"],["keep","Google Keep"],["notion","Notion"
     const r=src.getBoundingClientRect(); menu.hidden=false; menu.style.left=Math.max(8,Math.min(innerWidth-menu.offsetWidth-8,r.left+scrollX))+"px"; menu.style.top=(r.bottom+scrollY+6)+"px"; };
   rend(); })();
 /* ---- Mes notes dans l'app : écrites ici, importées (.txt) ou reçues par « Partager » (Samsung Notes, Keep…), synchronisées comme le reste ---- */
-(function(){ const pg=$("notesPage"); let L=[], pret=false, ouv=new Set();
+(function(){ const pg=$("notesPage"); let L=[], pret=false, ouv=new Set(), CN={};
   /* une note partagée depuis une autre appli arrive par l'adresse : ?titre=…&texte=…&lien=… */
   let partage=null; try{ const q=new URLSearchParams(location.search), t=q.get("titre")||"", x=q.get("texte")||"", u=q.get("lien")||""; if(t||x||u){ partage={titre:t,texte:[x,u].filter(Boolean).join("\n")}; ["titre","texte","lien"].forEach(k=>q.delete(k)); history.replaceState(history.state,"",location.pathname+(q.toString()?"?"+q:"")); } }catch(_){}
   const save=n=>{ L=n; if(db) db.doc("meta/notes").set({liste:n}).catch(()=>{}); rend(); };
@@ -2446,7 +2450,13 @@ const NOTES_P=[["apple","Apple Notes"],["keep","Google Keep"],["notion","Notion"
         ok.onclick=()=>save(L.map(x=>x.id===n.id?Object.assign({},x,{titre:ti.value.trim(),texte:ta.value.trim(),m:new Date().toISOString()}):x)); an.onclick=rend; };
       cp.onclick=()=>{ try{ navigator.clipboard.writeText([n.titre,n.texte].filter(Boolean).join("\n\n")); cp.textContent="Copiée ✓"; }catch(_){} };
       del.onclick=()=>{ if(confirm("Supprimer cette note ?")) save(L.filter(x=>x.id!==n.id)); };
-      c.appendChild(el("div",{className:"nact"},ed,cp,del)); box.appendChild(c); });
+      const act=el("div",{className:"nact"},ed,cp,del);
+      if(document.documentElement.classList.contains("proprio")){ const dem=n.claude&&n.claude.etat==="demandee"?n.claude:null, suivi=dem&&CN[n.id]&&String(CN[n.id].t||"")>=String(dem.t||"")?CN[n.id]:null, et=suivi?suivi.etat:(dem?"demandee":"");
+        const LIB={demandee:"Confiée à Claude · en attente",en_cours:"Claude y travaille",faite:"Faite par Claude ✓",a_preciser:"Claude a une question"};
+        if(et){ const z=el("div",{className:"nclaude e-"+et},el("b",{textContent:LIB[et]||et})); if(suivi&&suivi.note) z.appendChild(el("span",{textContent:suivi.note})); c.insertBefore(z,c.children[1]||null); }
+        const tx=!et||et==="faite"?"Confier à Claude":et==="a_preciser"?"Renvoyer à Claude":et==="demandee"?"Annuler l'envoi":"";
+        if(tx){ const cl=el("button",{type:"button",className:"ncl",textContent:tx}); cl.onclick=()=>{ const t=new Date().toISOString(); save(L.map(x=>{ if(x.id!==n.id) return x; const y=Object.assign({},x); if(et==="demandee") delete y.claude; else y.claude={etat:"demandee",t}; return y; })); }; act.appendChild(cl); } }
+      c.appendChild(act); box.appendChild(c); });
     const A=window._notesApps, o=$("notesOuv"); o.textContent=""; if(A) A.liste().forEach(k=>{ const b=el("button",{type:"button",className:"btn ghost",textContent:"Ouvrir "+A.nom(k)}); b.onclick=()=>A.ouvre(k); o.appendChild(b); });
     const ch=el("button",{type:"button",className:"btn ghost",textContent:"Choisir mes applis de notes"}); ch.onclick=()=>{ pg.hidden=true; $("setPage").hidden=false; setTimeout(()=>{ const r=$("notesRow"); if(r){ r.scrollIntoView({block:"center"}); r.classList.add("flash"); } },150); }; o.appendChild(ch); };
   $("notesAide").innerHTML='<p class="help">Samsung ne laisse aucune autre appli lire tes notes : c\'est toi qui les envoies, une par une ou plusieurs d\'un coup. Elles sont ensuite gardées ici et synchronisées avec ton Mac.</p><ol><li>Dans <b>Samsung Notes</b>, ouvre la note (ou appuie longuement pour en sélectionner plusieurs).</li><li>Touche <b>Partager</b> (⋮ puis Partager), choisis <b>Texte</b>.</li><li>Dans la liste des applis, touche <b>Ma carte de vie</b> (ou « Carte de vie »).</li><li>La carte s\'ouvre et la note apparaît ici, marquée « partagée ».</li></ol><p class="help">Ma carte n\'est pas dans la liste ? Supprime l\'icône de l\'écran d\'accueil, rouvre l\'adresse de l\'app dans <b>Chrome</b> puis ⋮ → <b>Installer l\'application</b> : c\'est cette installation qui l\'ajoute au menu Partager. Autre solution : dans Samsung Notes, ⋮ → Enregistrer en tant que fichier → <b>Fichier texte</b>, puis « Importer des fichiers texte » ci-dessus.</p>';
@@ -2455,6 +2465,7 @@ const NOTES_P=[["apple","Apple Notes"],["keep","Google Keep"],["notion","Notion"
   $("noteCherche").oninput=rend;
   $("notesClose").onclick=()=>{ pg.hidden=true; };
   window._ouvreNotes=()=>{ document.querySelectorAll("aside.page").forEach(x=>{ if(x!==pg) x.hidden=true; }); pg.hidden=false; pg.scrollTop=0; rend(); };
+  window._claudeNotes=d=>{ CN=(d&&d.etats)||{}; if(!pg.hidden) rend(); };
   window._notes=d=>{ L=(d&&d.liste)||[]; pret=true; if(partage){ const P=partage; partage=null; ajoute(P.titre,P.texte,"partage"); window._ouvreNotes(); } else if(!pg.hidden&&!pg.contains(document.activeElement)) rend(); };
 })();
 /* retours des testeurs : formulaire Google (envoi sans compte) → feuille Google publiée en CSV, lue par l'app de la propriétaire */
@@ -3023,7 +3034,7 @@ function seance(c,P,i0,seul){ let i=i0, rest=0, tm=null, pause=false; const ov=e
   rest=P.p[i][1]; rend(); if(!seul) tic(); }
 /* Cuisine : le garde-manger, une bibliothèque de tous mes ingrédients, mise à jour à la main ou en photo */
 const PL_TICKET="Ticket de caisse", PL_LIEUX=["Placard","Frigo","Congélateur"], PL_CAT=["Fruits et légumes","Frais","Viandes et poissons","Féculents","Conserves","Épices et condiments","Sucré","Boissons","Surgelés","Autres"], PL_NIV=["","Presque fini","À moitié","Plein"];
-let plEdit=null, plLieu="", plQ="", plScan=null, plBusy=false, plErr="", plRec=null;
+let AVIS_OFFRES=[], plEdit=null, plLieu="", plQ="", plScan=null, plBusy=false, plErr="", plRec=null;
 const plNorm=t=>String(t||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/s\b/g,"").trim();
 /* « Mes livres » : recherche par mots-clés dans l'index des recettes de ses livres de cuisine (recettes/index_livres.json du dépôt
    des données, construit par Claude à partir du dossier Drive Cuisine), gardé sur l'appareil et relu toutes les 6 h */
@@ -4845,7 +4856,14 @@ const V2={
         if(e.detail){ let dt=String(e.detail).replace(/https?:\/\/\S+/g,"").replace(/score\s*\d+\s*·?/i,"").replace(/\s*·\s*·\s*/g," · ").replace(/^\s*·\s*|\s*·\s*$/g,"").trim(); if(dt){ const up=(dt.match(/[A-ZÀ-Ý]/g)||[]).length, lo=(dt.match(/[a-zà-ÿ]/g)||[]).length; if(up>lo) dt=dt.charAt(0)+dt.slice(1).toLowerCase(); li.appendChild(el("p",{className:"mut",textContent:dt.slice(0,140)})); } }
         const act=el("div",{className:"bact"}); if(/^https?:\/\//.test(e.lien||"")) act.appendChild(el("a",{className:"btn",href:e.lien,target:"_blank",rel:"noopener",textContent:/CAND/.test(src)?"Ouvrir et envoyer ↗":"Ouvrir ↗"}));
         const g=el("button",{type:"button",className:"btn ghost",textContent:"Je m'en occupe"}); g.title="Elle part dans tes notes, à faire"; g.onclick=()=>{ fetel(g); masque(e,true); };
-        const n=el("button",{type:"button",className:"btn ghost",textContent:"Non merci"}); n.onclick=()=>masque(e,false); act.append(g,n); li.appendChild(act); sec.appendChild(li); });
+        const n=el("button",{type:"button",className:"btn ghost",textContent:"Non merci"}); n.onclick=()=>masque(e,false); act.append(g,n);
+        if(/^(JOB|EMPLOI|CAND)$/.test(src)){ const pa=el("button",{type:"button",className:"btn ghost",textContent:"Pas appropriée"}); pa.onclick=()=>{ if(li.querySelector(".avisf")) return;
+            const f=el("div",{className:"avisf"}), ta=el("textarea",{rows:2,maxLength:400,placeholder:"Pourquoi ? (ex. trop loin, logiciel que je n'utilise pas, CDD trop court, pas assez créatif…)"}); ta.setAttribute("aria-label","Pourquoi cette offre n'est pas appropriée");
+            const ok=el("button",{type:"button",className:"btn",textContent:"Envoyer"}), an=el("button",{type:"button",className:"btn ghost",textContent:"Annuler"});
+            ok.onclick=()=>{ const r=ta.value.trim(); if(!r){ ta.focus(); return; } const av={id:uid(),t:new Date().toISOString(),source:src,objet:String(e.objet||"").slice(0,200),lien:/^https?:\/\//.test(e.lien||"")?e.lien:"",detail:String(e.detail||"").slice(0,300),raison:r.slice(0,400)};
+              AVIS_OFFRES=[av,...AVIS_OFFRES].slice(0,300); if(db) db.doc("meta/avis_offres").set({liste:AVIS_OFFRES}).catch(()=>{}); fetel(ok); masque(e,false); };
+            an.onclick=()=>f.remove(); f.append(ta,el("div",{className:"bact"},ok,an)); li.appendChild(f); ta.focus(); }; act.appendChild(pa); }
+        li.appendChild(act); sec.appendChild(li); });
       if(E.length>5&&!tout){ const b=el("button",{type:"button",className:"btn ghost",textContent:"Voir les "+(E.length-5)+" autres"}); b.onclick=()=>{ this["_tout"+src]=true; ESSAI.ouvreVal(true); }; sec.appendChild(b); }
       z.appendChild(sec); }); }
 };
@@ -6015,7 +6033,7 @@ function start(){
     db.doc("meta/energie").onSnapshot(x=>PILOTE.energie(x.exists?x.data():null),()=>{}); db.doc("meta/revues").onSnapshot(x=>PILOTE.revues(x.exists?x.data():null),()=>{}); db.doc("meta/trajectoire").onSnapshot(x=>ESSAI.trajectoire(x.exists?x.data():null),()=>{}); db.doc("meta/memoire").onSnapshot(x=>ESSAI.memoire(x.exists?x.data():null),()=>{}); db.doc("meta/propositions").onSnapshot(x=>ESSAI.propositions(x.exists?x.data():null),()=>{});
     db.doc("meta/fonds").onSnapshot(x=>FOND.recoit(x.exists?x.data():null),()=>{});
     db.doc("meta/suggestions").onSnapshot(x=>{ if(window._suggestions) window._suggestions(x.exists?x.data():null); },()=>{});
-    db.doc("meta/notes").onSnapshot(x=>{ if(window._notes) window._notes(x.exists?x.data():null); },()=>{}); db.doc("meta/cockpit").onSnapshot(x=>{ cockpit=x.exists?x.data():null; },()=>{}); db.doc("meta/cockpit_masques").onSnapshot(x=>{ ckMasques=(x.exists&&Array.isArray(x.data().ids))?x.data().ids:[]; ckCoches=(x.exists&&Array.isArray(x.data().coches))?x.data().coches:[]; },()=>{}); db.doc("meta/echanges").onSnapshot(x=>{ echanges=(x.exists&&Array.isArray(x.data().liste))?x.data().liste:[]; },()=>{});
+    db.doc("meta/notes").onSnapshot(x=>{ if(window._notes) window._notes(x.exists?x.data():null); },()=>{}); db.doc("meta/claude_notes").onSnapshot(x=>{ if(window._claudeNotes) window._claudeNotes(x.exists?x.data():null); },()=>{}); db.doc("meta/avis_offres").onSnapshot(x=>{ AVIS_OFFRES=(x.exists&&Array.isArray(x.data().liste))?x.data().liste:[]; },()=>{}); db.doc("meta/cockpit").onSnapshot(x=>{ cockpit=x.exists?x.data():null; },()=>{}); db.doc("meta/cockpit_masques").onSnapshot(x=>{ ckMasques=(x.exists&&Array.isArray(x.data().ids))?x.data().ids:[]; ckCoches=(x.exists&&Array.isArray(x.data().coches))?x.data().coches:[]; },()=>{}); db.doc("meta/echanges").onSnapshot(x=>{ echanges=(x.exists&&Array.isArray(x.data().liste))?x.data().liste:[]; },()=>{});
     db.doc("meta/moi").onSnapshot(x=>{ if(x.exists){ const d=x.data(); moi={besoins:d.besoins||[],aspirations:d.aspirations||[],envies:d.envies||[],reves:d.reves||[],cent:d.cent||[],look:d.look||{}}; if(!moiPage.hidden&&!moiPage.contains(document.activeElement)) renderMoi(); renderIa(); } },()=>{});
     let rangeSeen=null; const autoArr=()=>{ if(rangeSeen===false&&loaded&&cats.size&&(!db.cfg()||db.synced)){ rangeSeen=true; arrange(); } };
     db.doc("meta/rangement").onSnapshot(x=>{ if(rangeSeen===null) rangeSeen=!!x.exists; else if(x.exists) rangeSeen=true; autoArr(); },()=>{});
@@ -6057,7 +6075,7 @@ if(persoOk()) setTimeout(async()=>{ const b=await AUD.recupere("perso/module.js"
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=155; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=156; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
