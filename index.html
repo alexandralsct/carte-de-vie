@@ -2020,6 +2020,19 @@ html.lifeo,html.lifeo body{overflow:hidden}
 .racc{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--k1,#002FA7);border-radius:999px;background:var(--surface,#fff);color:var(--k1,#002FA7);font:600 .85rem var(--body,inherit);padding:7px 13px;cursor:pointer;box-shadow:2px 2px 0 var(--k2,#c9d6f0)}
 .racc i{font-style:normal;font-size:1rem;line-height:1}
 .racc:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--k2,#c9d6f0)}
+.bande .raccs.pcarres{order:0;gap:10px}
+.pcarres .pcarre{width:70px;height:70px;min-height:0!important;padding:6px 4px!important;border:1.5px solid var(--k2,#c9d6f0)!important;box-shadow:none!important;border-radius:14px;display:grid;align-content:center;justify-items:center;text-align:center;gap:2px}
+.pcarres .pcarre b{font-size:1.15rem!important;line-height:1}
+.pcarres .pcarre small{font-size:9.5px!important;line-height:1.15;letter-spacing:.3px}
+.pcarres .pcarre span{display:none}
+.bande .pchemin{grid-column:1/-1;align-content:center}
+.top3a .lifeb{border-radius:50%;padding:0!important;width:44px;min-width:44px}.top3a .lifeb svg{width:22px;height:22px}
+.top3a .v3chem{display:none!important}
+.setgrp{border-top:1.5px solid var(--k2,#c9d6f0);margin:0}.setgrp>summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 2px;font:700 1.1rem var(--display,inherit);color:var(--k1,#002FA7)}
+.setgrp>summary::-webkit-details-marker{display:none}.setgrp>summary::after{content:"+";font-size:1.3rem}.setgrp[open]>summary::after{content:"–"}
+.setgrp>summary small{display:block;font:400 .78rem var(--body,inherit);color:var(--muted,#5a6a90);margin-top:2px}
+.setgrp ul.setlist{margin:0 0 12px}
+
 </style>
 <script>
 /* version test : ?test=1 → données à part (préfixe « test: » sur tout le stockage local), jamais celles de la carte principale */
@@ -5056,18 +5069,18 @@ const V2={
     const nA=a.rdv+a.taches; puce("Aujourd'hui",nA?String(nA):"✓",[a.rdv?a.rdv+" rendez-vous":"",a.taches?a.taches+" à faire":"",a.habTot?(a.habTot-a.hab)+"/"+a.habTot+" habitudes":""].filter(Boolean).join(" · ")||"rien d'urgent",()=>this.ouvreAuj(),nA>0);
     puce("À valider",n?String(n):"✓",n?"à décider, les plus utiles d'abord":"tout est fait",()=>ESSAI.ouvreVal(),n>0);
     puce("Ma semaine",P.length?fait+"/"+P.length:"→",P.length?"priorités faites":"revue et priorités",()=>ESSAI.ouvreTraj());
-    /* raccourcis (sortis du menu de droite, qui ne garde que les notes) */
-    const R=el("div",{className:"raccs"}), rac=(ic,t,fn,cls)=>{ const b=el("button",{type:"button",className:"racc"+(cls?" "+cls:"")},el("i",{textContent:ic}),el("span",{textContent:t})); b.onclick=fn; R.appendChild(b); };
-    rac("☾","Ferme ta journée",()=>SOIR.ouvre());
-    rac("◎","Ma mémoire",()=>MEMP.ouvre());
-    rac("◉","Mon suivi",()=>SUIVI.ouvre());
-    rac("◷","Rappels",()=>{ if(!("Notification" in window)) alert("Les rappels ne sont pas pris en charge sur cet appareil.");
-      else if(Notification.permission==="granted") alert("Rappels actifs : « Ton énergie aujourd'hui ? » à 20 h et « Ferme ta journée » à 21 h, seulement si ce n'est pas déjà fait.");
-      else if(Notification.permission==="denied") alert("Les notifications sont bloquées pour l'app : autorise-les dans les réglages du téléphone (Applications → Ma carte de vie → Notifications), puis rouvre l'app.");
-      else RAPPELS.active(); });
-    rac("✉","LIFE",()=>LIFEP.ouvre());
-    rac("✦","Mon chemin",()=>V3.ouvreChemin(),"r-proprio");
-    z.appendChild(R); },
+    /* version 184 : Ferme ta journée, Mon suivi et Rappels en vrais carrés ; Mon chemin deux fois plus large, au-dessus de l'Atelier */
+    const td=today(), soirFait=!!(window.SOIR&&SOIR.docs&&SOIR.docs[td]&&SOIR.docs[td].t), nS=(()=>{ try{ return SUIVI.ouverts().length; }catch(_){ return 0; } })();
+    const perm=("Notification" in window)?Notification.permission:"non";
+    const PC=el("div",{className:"raccs pcarres"}); z.appendChild(PC);
+    const car=(lab,ic,sous,fn,cls)=>{ const b=el("button",{type:"button",className:"puce2 pcarre"+(cls?" "+cls:"")},el("b",{textContent:ic}),el("small",{textContent:lab}),el("span",{textContent:sous})); b.title=lab+" · "+sous; b.onclick=fn; (cls&&/pchemin/.test(cls)?z:PC).appendChild(b); return b; };
+    car("Ferme ta journée","☾",soirFait?"faite ✓":"une minute ce soir",()=>SOIR.ouvre());
+    car("Mon suivi","◉",nS?nS+" sujet"+(nS>1?"s":"")+" ouvert"+(nS>1?"s":""):"mes sujets en cours",()=>SUIVI.ouvre());
+    car("Rappels","◷",perm==="granted"?"actifs · 20 h, 21 h":perm==="denied"?"bloqués":perm==="non"?"indisponibles":"à activer",()=>{ if(perm==="non") alert("Les rappels ne sont pas pris en charge sur cet appareil.");
+      else if(perm==="granted") alert("Rappels actifs : « Ton énergie aujourd'hui ? » à 20 h et « Ferme ta journée » à 21 h, seulement si ce n'est pas déjà fait.");
+      else if(perm==="denied") alert("Les notifications sont bloquées pour l'app : autorise-les dans les réglages du téléphone (Applications → Ma carte de vie → Notifications), puis rouvre l'app.");
+      else { RAPPELS.active(); setTimeout(()=>this.bande(),1500); } });
+    car("Mon chemin","✦","d'où je viens, où je vais",()=>V3.ouvreChemin(),"pchemin r-proprio"); },
   ouvreAuj(){ const pg=$("aujPage"), z=$("aujIn"); pg.hidden=false; pg.scrollTop=0;
     this.range();
     PILOTE.rend(); },
@@ -6147,6 +6160,32 @@ const LIFEP={ ouvre(){ let z=$("lifeP"); if(!z){ z=el("div",{id:"lifeP",classNam
   ferme(){ const z=$("lifeP"); if(z) z.hidden=true; document.documentElement.classList.remove("lifeo"); if(location.hash==="#life") try{ history.replaceState(null,"",location.pathname+location.search); }catch(_){} } };
 if(location.hash==="#life") setTimeout(()=>LIFEP.ouvre(),300);
 window.addEventListener("hashchange",()=>{ if(location.hash==="#life") LIFEP.ouvre(); });
+/* ===== Version 184 : bulle LIFE tout en haut à droite (après Réglages) ===== */
+{ const pose=()=>{ const a=document.querySelector(".top3a"); if(!a){ setTimeout(pose,300); return; } if(a.querySelector(".lifeb")) return;
+    const b=el("button",{type:"button",className:"btn ghost lifeb",title:"LIFE"}); b.setAttribute("aria-label","LIFE, ma messagerie");
+    b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/></svg>';
+    b.onclick=()=>LIFEP.ouvre(); a.appendChild(b); }; pose(); }
+/* la bulle IA près de Moi devient « Ma mémoire » : même place, même aspect, même mouvement */
+{ const mem=()=>{ const b=$("iaBtn"); if(!b) return; b.hidden=false; b.classList.remove("new"); const t=b.querySelector("b"), s=$("iaSub"); if(t) t.textContent="◎"; if(s) s.textContent="ma mémoire";
+    b.setAttribute("aria-label","Ma mémoire"); b.title="Ma mémoire"; };
+  const oI=renderIa; renderIa=function(){ const r=oI.apply(this,arguments); mem(); return r; }; mem();
+  document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("#iaBtn"); if(!b) return; e.preventDefault(); e.stopImmediatePropagation(); MEMP.ouvre(); },true); }
+/* Réglages simplifiés : les lignes rangées en groupes repliables */
+{ const G=[["Apparence","police, thème, icônes, fond, compagnon",/^(Typographie|Thème|Couleur des icônes|Icônes|Mes icônes|Fond de l'app|Mouvements|Compagnon)$/],
+    ["Au quotidien","notes, rappels, rangement",/^(Mes notes|Rappel des trackers|Ranger la carte)$/],
+    ["Données et connexions","synchronisation, IA, sauvegardes",/^(Synchronisation|Intelligence artificielle|Exporter|Importer|Modifier les réglages de base)$/],
+    ["Mon avis","dire ce qui va ou pas",/^(Donner mon avis)$/]];
+  const range=()=>{ const ul=document.querySelector("#setPage ul.setlist"); if(!ul||ul.dataset.grp) return; ul.dataset.grp="1"; const li=[...ul.children]; let der=null;
+    G.forEach(([t,sous,re])=>{ const L=li.filter(x=>re.test(((x.querySelector("b")||{}).textContent||"").trim())); if(!L.length) return;
+      const d=el("details",{className:"setgrp"}), u=el("ul",{className:"setlist"}); d.append(el("summary",{},el("span",{},document.createTextNode(t),el("small",{textContent:sous}))),u); L.forEach(x=>u.appendChild(x)); ul.before(d); der=d; });
+    if(!ul.children.length) ul.hidden=true; else if(der){ const d=el("details",{className:"setgrp"}); d.append(el("summary",{},el("span",{},document.createTextNode("Autres"))),ul); der.after(d); } };
+  range(); }
+/* LIFE ouverte dans la carte : le clavier réduit la page au lieu de la pousser vers le haut (rien ne dépasse de l'écran) */
+{ const vp=document.querySelector('meta[name="viewport"]'), base=vp?vp.getAttribute("content"):"";
+  const oO=LIFEP.ouvre.bind(LIFEP), oF=LIFEP.ferme.bind(LIFEP);
+  LIFEP.ouvre=function(){ if(vp&&!/interactive-widget/.test(base)) vp.setAttribute("content",base+", interactive-widget=resizes-content"); return oO(); };
+  LIFEP.ferme=function(){ if(vp) vp.setAttribute("content",base); return oF(); }; }
+
 /* A8 : une icône qui ne charge pas laisse la place au logo de l'app, plus de carré blanc */
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&!i.dataset.repli&&(i.classList.contains("lgimg")||i.closest(".node,.ico"))){ i.dataset.repli="1"; i.src="icon-192.png"; i.classList.add("repli"); } },true);
 
@@ -7061,7 +7100,7 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=183; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=184; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
