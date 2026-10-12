@@ -2025,15 +2025,27 @@ html.lifeo,html.lifeo body{overflow:hidden}
 .pcarres .pcarre b{font-size:1.15rem!important;line-height:1}
 .pcarres .pcarre small{font-size:9.5px!important;line-height:1.15;letter-spacing:.3px}
 .pcarres .pcarre span{display:none}
-.bande .pchemin{grid-column:1/-1;align-content:center}
+.pcarres{flex-wrap:nowrap!important}
+.pcarres .pcarre.pchemin{flex:1;width:auto;min-width:0;justify-items:start;text-align:left;padding:8px 12px!important;border:1.5px solid var(--k2,#c9d6f0)!important}
+.pcarres .pcarre.pchemin small{font-size:11px!important}.pcarres .pcarre.pchemin span{display:block;font-size:.72rem}
+.bande .atpuce{display:none!important}
+.outilsb{margin:14px 0 0;padding:14px 14px 18px;border:1.5px dashed var(--k2,#c9d6f0);border-radius:22px;position:relative}
+.outilsb>span{position:absolute;top:-13px;left:18px;background:var(--k1,#002FA7);color:#fdfaf4;border-radius:999px;padding:3px 12px;font:600 .8rem var(--mono,monospace);letter-spacing:1.5px;text-transform:uppercase}
+.outilsb .ogrid{display:flex;flex-wrap:wrap;gap:12px;padding-top:6px}
+.outilsb .otile{all:unset;box-sizing:border-box;cursor:pointer;width:100px;height:100px;border:2px solid var(--k1,#002FA7);border-radius:16px;background:var(--surface,#fff);box-shadow:4px 4px 0 var(--k2,#c9d6f0);display:grid;place-items:center;align-content:center;gap:6px;color:var(--k1,#002FA7);text-align:center}
+.outilsb .otile svg{width:42px;height:42px}
+.outilsb .otile b{font:700 .72rem var(--body,inherit);letter-spacing:.5px;text-transform:uppercase}
+.outilsb .otile:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--k2,#c9d6f0)}
 .top3a .lifeb{border-radius:50%;padding:0!important;width:44px;min-width:44px}.top3a .lifeb svg{width:22px;height:22px}
 .top3a .v3chem{display:none!important}
 .setgrp{border-top:1.5px solid var(--k2,#c9d6f0);margin:0}.setgrp>summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 2px;font:700 1.1rem var(--display,inherit);color:var(--k1,#002FA7)}
 .setgrp>summary::-webkit-details-marker{display:none}.setgrp>summary::after{content:"+";font-size:1.3rem}.setgrp[open]>summary::after{content:"–"}
 .setgrp>summary small{display:block;font:400 .78rem var(--body,inherit);color:var(--muted,#5a6a90);margin-top:2px}
 .setgrp ul.setlist{margin:0 0 12px}
-.bande .atpuce{grid-column:auto!important;display:grid!important;gap:2px!important;align-content:start!important;padding:8px 10px!important;min-height:58px!important}
-.bande .atpuce em{display:none}
+.outilsb .otout{display:flex!important;align-items:center;gap:10px;width:100%;max-width:420px;min-height:0!important;padding:10px 14px!important;border:2px solid var(--k1,#002FA7)!important;box-shadow:4px 4px 0 var(--k2,#c9d6f0)!important;border-radius:14px}
+.outilsb .otout small{font:600 .72rem var(--mono,monospace);letter-spacing:1.5px;text-transform:uppercase}.outilsb .otout b{font-size:1.2rem}.outilsb .otout span{flex:1;font-size:.78rem}.outilsb .otout em{font-style:normal}
+.outilsb .otout,.outilsb .otout *{color:var(--nt,var(--k1,#002FA7))!important}.outilsb .otout{background:var(--surface)!important}
+html body .outilsb button.otout.otout small{color:#002FA7!important}:root[data-theme="sombre"] body .outilsb button.otout.otout small{color:#a9bfff!important}
 
 </style>
 <script>
@@ -5075,14 +5087,14 @@ const V2={
     const td=today(), soirFait=!!(window.SOIR&&SOIR.docs&&SOIR.docs[td]&&SOIR.docs[td].t), nS=(()=>{ try{ return SUIVI.ouverts().length; }catch(_){ return 0; } })();
     const perm=("Notification" in window)?Notification.permission:"non";
     const PC=el("div",{className:"raccs pcarres"}); z.appendChild(PC);
-    const car=(lab,ic,sous,fn,cls)=>{ const b=el("button",{type:"button",className:"puce2 pcarre"+(cls?" "+cls:"")},el("b",{textContent:ic}),el("small",{textContent:lab}),el("span",{textContent:sous})); b.title=lab+" · "+sous; b.onclick=fn; (cls&&/pchemin/.test(cls)?z:PC).appendChild(b); return b; };
+    const car=(lab,ic,sous,fn,cls)=>{ const b=el("button",{type:"button",className:"puce2 pcarre"+(cls?" "+cls:"")},el("b",{textContent:ic}),el("small",{textContent:lab}),el("span",{textContent:sous})); b.title=lab+" · "+sous; b.onclick=fn; PC.appendChild(b); return b; };
     car("Ferme ta journée","☾",soirFait?"faite ✓":"une minute ce soir",()=>SOIR.ouvre());
     car("Mon suivi","◉",nS?nS+" sujet"+(nS>1?"s":"")+" ouvert"+(nS>1?"s":""):"mes sujets en cours",()=>SUIVI.ouvre());
     car("Rappels","◷",perm==="granted"?"actifs · 20 h, 21 h":perm==="denied"?"bloqués":perm==="non"?"indisponibles":"à activer",()=>{ if(perm==="non") alert("Les rappels ne sont pas pris en charge sur cet appareil.");
       else if(perm==="granted") alert("Rappels actifs : « Ton énergie aujourd'hui ? » à 20 h et « Ferme ta journée » à 21 h, seulement si ce n'est pas déjà fait.");
       else if(perm==="denied") alert("Les notifications sont bloquées pour l'app : autorise-les dans les réglages du téléphone (Applications → Ma carte de vie → Notifications), puis rouvre l'app.");
       else { RAPPELS.active(); setTimeout(()=>this.bande(),1500); } });
-    car("Mon chemin","✦","d'où je viens, où je vais",()=>V3.ouvreChemin(),"pchemin r-proprio"); },
+    const ch=car("Mon chemin","✦","d'où je viens, où je vais",()=>V3.ouvreChemin(),"pchemin r-proprio"); PC.prepend(ch); },
   ouvreAuj(){ const pg=$("aujPage"), z=$("aujIn"); pg.hidden=false; pg.scrollTop=0;
     this.range();
     PILOTE.rend(); },
@@ -6189,6 +6201,12 @@ window.addEventListener("hashchange",()=>{ if(location.hash==="#life") LIFEP.ouv
   LIFEP.ferme=function(){ if(vp) vp.setAttribute("content",base); return oF(); }; }
 /* l'Atelier (Craft) devient une tuile comme les autres ; les petits carrés passent en dessous */
 { const oB=V2.bande.bind(V2); V2.bande=function(){ const r=oB.apply(this,arguments), z=$("bande"), pc=z&&z.querySelector(".pcarres"); if(pc) z.appendChild(pc); return r; }; }
+/* catégorie « Outils » sous la carte : la tuile Atelier (Craft) y est rangée, elle n'est plus en haut */
+{ const pose=()=>{ const sc=document.querySelector(".scroller"); if(!sc||document.querySelector(".outilsb")) return;
+    const t=el("button",{type:"button",className:"puce2 atpuce otout"},el("small",{textContent:"Atelier"}),el("b",{textContent:"🎨"}),el("span",{textContent:"créer une image · outils Craft"}),el("em",{textContent:"→"}));
+    t.setAttribute("aria-label","Atelier : créer une image, outils Craft"); t.onclick=()=>ATELIER.ouvre();
+    const z=el("section",{className:"outilsb"},el("span",{textContent:"Outils"}),el("div",{className:"ogrid"},t)); z.setAttribute("aria-label","Outils"); sc.after(z); };
+  const oI=renderIa; renderIa=function(){ const r=oI.apply(this,arguments); try{ pose(); }catch(_){} return r; }; setTimeout(pose,800); }
 
 /* A8 : une icône qui ne charge pas laisse la place au logo de l'app, plus de carré blanc */
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&!i.dataset.repli&&(i.classList.contains("lgimg")||i.closest(".node,.ico"))){ i.dataset.repli="1"; i.src="icon-192.png"; i.classList.add("repli"); } },true);
