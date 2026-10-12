@@ -6094,7 +6094,8 @@ const FORMS={ K:"formAvis", occupe:"", msg:{},
 }
 
 
-
+/* ===== Version 180 : « Clé du lien » (menu) : la clé n'est jamais affichée. On peut la coller, la copier (pour LIFE, le système,
+   un autre appareil), en créer une neuve (aléatoire, copiée aussitôt) ou l'oublier sur cet appareil. ===== */
 const CLEF={
   neuve(){ const a=new Uint8Array(24); crypto.getRandomValues(a); return [...a].map(x=>x.toString(16).padStart(2,"0")).join(""); },
   garde(v){ try{ localStorage.setItem(LIEN_CLE,v); return true; }catch(_){ return false; } },
@@ -6105,12 +6106,12 @@ const CLEF={
     d.appendChild(el("h3",{textContent:"🔑 Clé du lien"}));
     d.appendChild(el("p",{className:"help",textContent:cle?"Une clé est enregistrée sur cet appareil (••••••••). Elle n'est jamais affichée.":"Aucune clé sur cet appareil. Colle celle que tu as copiée, ou crées-en une neuve."}));
     const B=(t,fn,cls)=>{ const b=el("button",{type:"button",className:"btn"+(cls?" "+cls:""),textContent:t}); b.onclick=fn; return b; }, z=el("div",{className:"clebt"});
-    if(cle) z.appendChild(B("Copier la clé",async()=>this.rend(await this.copie(cle)?"Clé copiée ✓ — colle-la où il faut (LIFE, n8n…).":"Copie refusée par le navigateur.")));
+    if(cle) z.appendChild(B("Copier la clé",async()=>this.rend(await this.copie(cle)?"Clé copiée ✓ — colle-la où il faut.":"Copie refusée par le navigateur.")));
     z.appendChild(B(cle?"Remplacer par la clé copiée":"Coller la clé copiée",async()=>{ let v=""; try{ v=(await navigator.clipboard.readText()||"").trim(); }catch(_){}
       if(!v){ this.saisie(); return; } if(/\s/.test(v)||v.length<12){ this.rend("Le presse-papiers ne contient pas une clé (au moins 12 caractères, sans espace)."); return; }
       this.rend(this.garde(v)?"Clé enregistrée sur cet appareil ✓":"Enregistrement impossible sur cet appareil."); },"ghost"));
-    z.appendChild(B("Créer une clé neuve",async()=>{ if(cle&&!confirm("Remplacer la clé de cet appareil par une neuve ? Il faudra aussi la mettre dans n8n (« Lien app ») et sur tes autres appareils.")) return;
-      const v=this.neuve(); this.garde(v); this.rend(await this.copie(v)?"Clé neuve créée et copiée ✓ — colle-la maintenant dans n8n → Credentials → « Lien app » (Value), puis dans LIFE.":"Clé neuve enregistrée, mais la copie est refusée : utilise « Copier la clé »."); },"ghost"));
+    z.appendChild(B("Créer une clé neuve",async()=>{ if(cle&&!confirm("Remplacer la clé de cet appareil par une neuve ? Il faudra aussi la mettre dans ton système d'automatisation et sur tes autres appareils.")) return;
+      const v=this.neuve(); this.garde(v); this.rend(await this.copie(v)?"Clé neuve créée et copiée ✓ — colle-la maintenant dans ton système d'automatisation, puis dans tes autres apps.":"Clé neuve enregistrée, mais la copie est refusée : utilise « Copier la clé »."); },"ghost"));
     if(cle) z.appendChild(B("Oublier sur cet appareil",()=>{ if(!confirm("Oublier la clé sur cet appareil ?")) return; try{ localStorage.removeItem(LIEN_CLE); }catch(_){} this.rend("Clé oubliée sur cet appareil."); },"ghost"));
     d.appendChild(z); if(this.zs) d.appendChild(this.zs);
     if(msg) d.appendChild(el("p",{className:"clemsg",textContent:msg}));
@@ -7042,7 +7043,7 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=181; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=182; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
