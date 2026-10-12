@@ -1925,6 +1925,8 @@ html.calme :is(.souris,.chatmot,.griffes){display:none}
 .flist li p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}.flist li .del{position:absolute;right:0;top:0}
 .flist small{color:inherit;opacity:.7}
 
+.arbre svg *{transform-box:view-box}
+.v3rubs small{color:inherit;opacity:.75}
 </style>
 <script>
 /* version test : ?test=1 → données à part (préfixe « test: » sur tout le stockage local), jamais celles de la carte principale */
@@ -5030,7 +5032,16 @@ const V3={
     const ic=el("div",{className:"v3ic"}), slot=el("div",{className:"v3mv"}); f.append(hd,el("small",{className:"mono",textContent:"Icône"}),ic,slot); const he=pi.querySelector(".hero"); if(he) he.after(f); else pi.appendChild(f); return f; },
   ouvreFeuille(){ const c=cats.get(openId); if(!c) return; const f=this.feuille(); if(!f) return; f.querySelector(".v3st").textContent="Modifier « "+c.name+" »";
     const slot=f.querySelector(".v3mv"); ["sw","prio"].forEach(id=>{ const n=$(id); if(n&&n.parentNode!==slot) slot.appendChild(n); }); const g=document.querySelector("#drawer .hero-t>label.grp"); if(g) slot.appendChild(g); const dz=$("delZone"); if(dz&&dz.parentNode!==slot) slot.appendChild(dz);
-    this.icones(c); this.rubsFeuille(c); f.dataset.id=String(c.id); f.hidden=false; const he=document.querySelector("#drawer .hero"); if(he&&f.previousElementSibling!==he) he.after(f); $("drawer").scrollTo({top:0,behavior:"smooth"}); },
+    this.icones(c); this.rubsFeuille(c); this.pagesFeuille(c); f.dataset.id=String(c.id); f.hidden=false; const he=document.querySelector("#drawer .hero"); if(he&&f.previousElementSibling!==he) he.after(f); $("drawer").scrollTo({top:0,behavior:"smooth"}); },
+  pagesFeuille(c){ const f=document.querySelector(".v3sheet"); if(!f||!c) return; let z=f.querySelector(".v3pages"); if(!z){ z=el("div",{className:"v3rubs v3pages"}); const r=f.querySelector(".v3rubs:not(.v3pages)"); if(r) r.before(z); else f.appendChild(z); }
+    const CH=((c.disp||{}).cachees)||[], vus=[...document.querySelectorAll("#pane .rpnav .rpt")].map(x=>x.textContent.trim()).filter(Boolean).slice(1);
+    const N=[...vus.filter(n=>!CH.includes(n)),...CH]; z.textContent=""; z.appendChild(el("small",{className:"mono",textContent:"Pages de l'espace"}));
+    if(!N.length){ z.appendChild(el("p",{className:"help",textContent:"Aucune autre page que la première."})); return; }
+    const met=L=>{ const cur=cats.get(c.id); if(!cur) return; write(c.id,{disp:Object.assign({},cur.disp||{},{cachees:L})}); renderPane(cats.get(c.id)); setTimeout(()=>this.pagesFeuille(cats.get(c.id)),80); };
+    N.forEach(n=>{ const cach=CH.includes(n), b=el("button",{type:"button",className:"btn ghost v3rdel",textContent:cach?"Remettre":"Retirer"}); b.setAttribute("aria-label",(cach?"Remettre la page ":"Retirer la page ")+n);
+      b.onclick=()=>met(cach?CH.filter(x=>x!==n):[...CH,n]);
+      z.appendChild(el("div",{className:"v3rrow"},el("span",{className:"v3rn",textContent:n}),el("small",{className:"mono",textContent:cach?"retirée":"visible"}),b)); });
+    z.appendChild(el("p",{className:"help",textContent:"Une page retirée garde son contenu : tu peux la remettre ici à tout moment."})); },
   rubsFeuille(c){ const f=document.querySelector(".v3sheet"); if(!f||!c) return; let z=f.querySelector(".v3rubs"); if(!z){ z=el("div",{className:"v3rubs"}); f.appendChild(z); }
     const dz=$("delZone"); if(dz&&dz.parentNode&&f.contains(dz)&&z.nextSibling!==dz) dz.parentNode.insertBefore(z,dz);
     z.textContent=""; const R=c.rub||[]; z.appendChild(el("small",{className:"mono",textContent:"Rubriques ("+R.length+")"}));
@@ -5135,7 +5146,7 @@ function closeDrawerV3(){ const b=$("closeBtn"); if(b) b.click(); }
     oT(H.length!==(this.tr.histo||[]).length?Object.assign({},p,{histo:H.slice(-200)}):p); };
   /* « Où j'en suis » en première page de l'espace, les rubriques ensuite au glisser */
   /* plus de page « Où j'en suis » : l'espace s'ouvre sur ses rubriques, et la dernière page est toujours « Moi » */
-  const oC=classeur; classeur=function(cle,P){ try{ if(!oC.collecte&&Array.isArray(P)&&cats.get(cle)&&P.length&&P[0].nom===(cats.get(cle).name||"")) P=[Object.assign({},P[0],{nom:"L'essentiel"}),...P.slice(1)].map(p=>p.nom==="Mes rubriques"?Object.assign({},p,{nom:"Rubriques"}):p); if(!oC.collecte&&!ranger&&sect==="rubs"&&Array.isArray(P)&&cats.get(cle)&&P.length&&!P.some(p=>p.v3moi)){ const ph=el("div",{className:"v3moiPg"}); P=[...P,{nom:"Ce qu'il m'apporte",el:ph,v3moi:true}]; } }catch(_){} return oC.call(this,cle,P); };
+  const oC=classeur; classeur=function(cle,P){ try{ if(!oC.collecte&&Array.isArray(P)&&cats.get(cle)&&P.length&&P[0].nom===(cats.get(cle).name||"")) P=[Object.assign({},P[0],{nom:"L'essentiel"}),...P.slice(1)].map(p=>p.nom==="Mes rubriques"?Object.assign({},p,{nom:"Rubriques"}):p); if(!oC.collecte&&!ranger&&sect==="rubs"&&Array.isArray(P)&&cats.get(cle)&&P.length&&!P.some(p=>p.v3moi)){ const ph=el("div",{className:"v3moiPg"}); P=[...P,{nom:"Ce qu'il m'apporte",el:ph,v3moi:true}]; } { const cc=cats.get(cle), CH=((cc&&cc.disp)||{}).cachees||[]; if(!oC.collecte&&CH.length&&Array.isArray(P)&&P.length>1) P=P.filter((p,i)=>i===0||!CH.includes(p.nom)); } }catch(_){} return oC.call(this,cle,P); };
   Object.defineProperty(classeur,"collecte",{get:()=>oC.collecte,set:v=>{ oC.collecte=v; },configurable:true});
   V2.pasPane=function(c){ V3.crayon(); const p=$("pane"); if(!p||!c) return; { const g=$("gauge"); if(g) g.classList.toggle("v3vide",/rien/i.test(g.textContent)||!(c.tasks||[]).length&&/^\s*0\s*%/.test(g.textContent)); } V3.remplitMoi(c); if(sect==="rubs"&&!p.querySelector(".v3band")){ const bd=V3.bandeau(c); if(bd) p.insertBefore(bd,p.firstChild); } };
   /* Aujourd'hui */
@@ -6630,7 +6641,7 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=165; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=166; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;

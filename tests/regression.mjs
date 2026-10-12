@@ -88,11 +88,19 @@ const tuile = (p, rid) => p.evaluate(rid => { const t = document.querySelector('
   /* 4 bis. supprimer une rubrique depuis « ✎ Modifier » (vaut pour tous les espaces, même sur mesure) : second appui pour confirmer */
   await item(p, 'Lecture'); await p.waitForTimeout(500);
   await p.evaluate(() => { const m = [...document.querySelectorAll('#drawer button')].find(x => /Modifier/.test(x.textContent) && x.offsetParent); if (m) m.click(); }); await p.waitForTimeout(500);
-  const nb0 = await p.evaluate(() => [...document.querySelectorAll('.v3rdel')].filter(x => x.offsetParent).length);
+  const nb0 = await p.evaluate(() => [...document.querySelectorAll('.v3rubs:not(.v3pages) .v3rdel')].filter(x => x.offsetParent).length);
   await p.evaluate(() => { const d = [...document.querySelectorAll('.v3rubs .v3rrow')].find(x => /À lire/.test(x.textContent)); d.querySelector('.v3rdel').click(); }); await p.waitForTimeout(300);
   const conf = await p.evaluate(() => { const d = [...document.querySelectorAll('.v3rubs .v3rrow')].find(x => /À lire/.test(x.textContent)); const b = d.querySelector('.v3rdel'); const t = b.textContent; b.click(); return t; }); await p.waitForTimeout(1200);
   const rest = await p.evaluate(() => JSON.parse(localStorage.getItem('carte-de-vie-v1'))['espaces/lecture'].rub.map(r => r.name).join('|'));
   ok(nb0 === 3 && /Confirmer \(perd 2 éléments\)/.test(conf) && !/À lire/.test(rest), 'supprimer une rubrique depuis « Modifier » (' + nb0 + ' rubriques, « ' + conf + ' », reste : ' + rest + ')');
+  /* 4 ter. retirer puis remettre une page de l'espace (« Pages de l'espace » dans « ✎ Modifier ») */
+  const ong = () => p.evaluate(() => [...document.querySelectorAll('#pane .rpnav .rpt')].map(x => x.textContent.trim()));
+  const o0 = await ong(), cible = o0[o0.length - 1];
+  const bascule = n => p.evaluate(n => { const r = [...document.querySelectorAll('.v3pages .v3rrow')].find(x => x.querySelector('.v3rn').textContent === n); if (r) r.querySelector('button').click(); return !!r; }, n);
+  ok(await bascule(cible), 'page « ' + cible + ' » listée dans « Pages de l\'espace »'); await p.waitForTimeout(1300);
+  const o1 = await ong(), dsp = await p.evaluate(() => (JSON.parse(localStorage.getItem('carte-de-vie-v1'))['espaces/lecture'].disp || {}).cachees);
+  ok(!o1.includes(cible) && o1.length === o0.length - 1 && JSON.stringify(dsp) === JSON.stringify([cible]), 'page retirée : ' + o1.join(' | '));
+  await bascule(cible); await p.waitForTimeout(1300); ok((await ong()).includes(cible), 'page remise');
   await ferme(p); await p.waitForTimeout(300);
   /* 5. Cuisine (module personnel seulement) : recette → ingrédients */
   if (noms.includes('Cuisine')) { await item(p, 'Cuisine'); await p.waitForTimeout(600); const i = await rub(p, 'courses'); await p.waitForTimeout(800);
