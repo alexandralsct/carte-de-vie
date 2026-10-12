@@ -2015,6 +2015,11 @@ html.calme :is(.souris,.chatmot,.griffes){display:none}
 .lifep{position:fixed;inset:0;z-index:9999;background:var(--bg,#f6ecdc);display:flex;flex-direction:column}.lifep[hidden]{display:none}
 .lifep iframe{flex:1;border:0;width:100%}.lifep .lifex{align-self:flex-start;margin:calc(env(safe-area-inset-top) + 6px) 10px 4px}
 html.lifeo,html.lifeo body{overflow:hidden}
+:root[data-theme] body #bande>div.raccs.raccs,html body #bande>div.raccs,#bande .raccs,#bande>.raccs:not(.fort){border:0!important;background:none!important;box-shadow:none!important;padding:0!important;min-height:0!important}
+.raccs{order:99;grid-column:1/-1;flex-basis:100%;display:flex;flex-wrap:wrap;gap:8px}
+.racc{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--k1,#002FA7);border-radius:999px;background:var(--surface,#fff);color:var(--k1,#002FA7);font:600 .85rem var(--body,inherit);padding:7px 13px;cursor:pointer;box-shadow:2px 2px 0 var(--k2,#c9d6f0)}
+.racc i{font-style:normal;font-size:1rem;line-height:1}
+.racc:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--k2,#c9d6f0)}
 </style>
 <script>
 /* version test : ?test=1 → données à part (préfixe « test: » sur tout le stockage local), jamais celles de la carte principale */
@@ -2053,7 +2058,7 @@ html.lifeo,html.lifeo body{overflow:hidden}
 <div class="wrap">
   <header>
     <div>
-      <span class="hautg"><button class="btn ghost" id="setBtn">⚙ Réglages</button><button class="btn ghost" id="cleBtn" title="Clé du lien (copier, coller, créer)" aria-label="Clé du lien">🔑 Clé</button><button class="btn ghost" id="notesBtn3" title="Ouvrir mes notes">✍ Mes notes</button></span>
+      <span class="hautg"><button class="btn ghost" id="setBtn">⚙ Réglages</button><button class="btn ghost" id="notesBtn3" title="Ouvrir mes notes">✍ Mes notes</button></span>
       <h1>Ma carte de vie</h1>
       <p class="motto">Travailler par item</p><p class="hint" id="impMsg"></p><p class="hint" id="syncMsg" role="status"></p><p class="nosync" id="noSync" hidden>⚠ Cette carte n'est pas reliée à GitHub : ce que tu écris ici reste sur cet appareil. <button type="button" id="noSyncGo">Relier</button></p>
     </div>
@@ -5050,7 +5055,19 @@ const V2={
     const puce=(lab,val,sous,fn,fort)=>{ const b=el("button",{type:"button",className:"puce2"+(fort?" fort":"")},el("small",{textContent:lab}),el("b",{textContent:val}),el("span",{textContent:sous})); b.onclick=fn; z.appendChild(b); };
     const nA=a.rdv+a.taches; puce("Aujourd'hui",nA?String(nA):"✓",[a.rdv?a.rdv+" rendez-vous":"",a.taches?a.taches+" à faire":"",a.habTot?(a.habTot-a.hab)+"/"+a.habTot+" habitudes":""].filter(Boolean).join(" · ")||"rien d'urgent",()=>this.ouvreAuj(),nA>0);
     puce("À valider",n?String(n):"✓",n?"à décider, les plus utiles d'abord":"tout est fait",()=>ESSAI.ouvreVal(),n>0);
-    puce("Ma semaine",P.length?fait+"/"+P.length:"→",P.length?"priorités faites":"revue et priorités",()=>ESSAI.ouvreTraj()); },
+    puce("Ma semaine",P.length?fait+"/"+P.length:"→",P.length?"priorités faites":"revue et priorités",()=>ESSAI.ouvreTraj());
+    /* raccourcis (sortis du menu de droite, qui ne garde que les notes) */
+    const R=el("div",{className:"raccs"}), rac=(ic,t,fn,cls)=>{ const b=el("button",{type:"button",className:"racc"+(cls?" "+cls:"")},el("i",{textContent:ic}),el("span",{textContent:t})); b.onclick=fn; R.appendChild(b); };
+    rac("☾","Ferme ta journée",()=>SOIR.ouvre());
+    rac("◎","Ma mémoire",()=>MEMP.ouvre());
+    rac("◉","Mon suivi",()=>SUIVI.ouvre());
+    rac("◷","Rappels",()=>{ if(!("Notification" in window)) alert("Les rappels ne sont pas pris en charge sur cet appareil.");
+      else if(Notification.permission==="granted") alert("Rappels actifs : « Ton énergie aujourd'hui ? » à 20 h et « Ferme ta journée » à 21 h, seulement si ce n'est pas déjà fait.");
+      else if(Notification.permission==="denied") alert("Les notifications sont bloquées pour l'app : autorise-les dans les réglages du téléphone (Applications → Ma carte de vie → Notifications), puis rouvre l'app.");
+      else RAPPELS.active(); });
+    rac("✉","LIFE",()=>LIFEP.ouvre());
+    rac("✦","Mon chemin",()=>V3.ouvreChemin(),"r-proprio");
+    z.appendChild(R); },
   ouvreAuj(){ const pg=$("aujPage"), z=$("aujIn"); pg.hidden=false; pg.scrollTop=0;
     this.range();
     PILOTE.rend(); },
@@ -5410,6 +5427,7 @@ const MEMP={ L:[], notes:[], sub:false,
   if("Notification" in window&&Notification.permission!=="granted") item("🔔",Notification.permission==="denied"?"Rappels bloqués (réglages du téléphone)":"Activer les rappels (énergie 20 h, journée 21 h)",()=>{ if(Notification.permission==="denied") alert("Les notifications sont bloquées pour l'app : autorise-les dans les réglages du téléphone (Applications → Ma carte de vie → Notifications), puis rouvre l'app."); else RAPPELS.active(); });
   item("◎","Ma mémoire perso",()=>MEMP.ouvre());
   if($("sugBtn")) item("✎","Mes idées pour l'app",()=>$("sugBtn").click(),"r-proprio");
+  [...box.children].forEach(b=>{ const t=(b.querySelector("span")||{}).textContent||""; if(!/^(Noter|Notes|Urgences)$/.test(t)) b.remove(); });
   rail.append(tir,box); document.body.appendChild(rail);
   /* « À traiter » n'apparaît que si cet espace existe */
   const majRail=()=>{ const b=[...box.children].find(x=>/Urgences/.test(x.textContent)); if(b) b.hidden=!atr(); };
@@ -5602,7 +5620,7 @@ window.SUIVI={ L:[],
   const oV=ESSAI.ouvreVal.bind(ESSAI); ESSAI.ouvreVal=function(a){ oV(a); const z=$("valIn"), h=z.querySelector(".hero"), n=SUIVI.ouverts().length;
     if(h&&!z.querySelector(".slien")){ const b=el("button",{type:"button",className:"btn ghost slien",textContent:"Mon suivi"+(n?" · "+n+" ouvert"+(n>1?"s":""):"")+" →"}); b.onclick=()=>{ $("valPage").hidden=true; SUIVI.ouvre(); }; h.after(b); } };
   /* dans le menu de droite */
-  const rb=document.querySelector(".v3railIn"); if(rb){ const b=el("button",{type:"button"},el("i",{textContent:"◎"}),el("span",{textContent:"Mon suivi"})); b.onclick=()=>{ const r=document.querySelector(".v3rail"); if(r) r.classList.remove("on"); SUIVI.ouvre(); };
+  const rb=null; if(rb){ const b=el("button",{type:"button"},el("i",{textContent:"◎"}),el("span",{textContent:"Mon suivi"})); b.onclick=()=>{ const r=document.querySelector(".v3rail"); if(r) r.classList.remove("on"); SUIVI.ouvre(); };
     const av=[...rb.children].find(x=>/À valider/.test(x.textContent)); if(av) av.after(b); else rb.appendChild(b); } }
 
 /* ===== Suivis (engagements) : en tête de « Mon suivi » =====
@@ -7043,7 +7061,7 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=182; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=183; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
