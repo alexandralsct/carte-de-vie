@@ -1981,12 +1981,20 @@ html.calme :is(.souris,.chatmot,.griffes){display:none}
 .chreco{background:#c9d6f0;border-radius:16px;padding:10px 14px;display:flex;flex-direction:column;gap:6px;color:#002FA7}
 .chreco h4{margin:0;font-size:.95rem}.chreco.chia{background:#fff;border:2px solid #002FA7}
 .chli{display:flex;flex-direction:column;gap:4px;align-items:flex-start}.chli p{margin:0;font-size:.88rem;overflow-wrap:anywhere}
+.chprof input{font:inherit;padding:8px 10px;border-radius:10px;border:1.5px solid #c9d6f0;color:#002FA7;background:#fff;min-width:0;width:100%;box-sizing:border-box}
 
 .moicr{margin-top:8px}
 .node .nvb{position:absolute;top:-8px;right:-8px;min-width:24px;height:24px;padding:0 6px;box-sizing:border-box;border-radius:999px;background:#002FA7;color:#fff;border:2px solid #fff;font:800 .78rem/1 system-ui,sans-serif;display:grid;place-items:center;z-index:3;box-shadow:0 2px 6px rgba(0,0,0,.25)}
 .node.anv .urg,html:not(.nu):not(.dedans) .node.anv .urg{right:auto;left:-7px}
 .vsug{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-top:1px solid var(--pale,#c9d6f0)}.vsug p{margin:0;overflow-wrap:anywhere}
 .node .urg,html:not(.nu):not(.dedans) .node .urg{background:#fff!important;color:#002FA7!important;border:2px solid #002FA7!important}
+.fsec{display:flex;flex-direction:column;gap:10px}
+.fcarte{display:flex;flex-direction:column;gap:6px;padding:12px 14px;border-radius:16px;background:#fff;border:1.5px solid #c9d6f0;color:#002FA7}
+.fcarte.suivie{border:2px solid #002FA7}
+.fcarte .ftit{font-size:1rem;line-height:1.25;overflow-wrap:anywhere}.fcarte p{margin:0;font-size:.88rem;overflow-wrap:anywhere}
+.fcarte .bact{display:flex;gap:8px;flex-wrap:wrap}.fok{font-weight:700;align-self:center}
+:root[data-theme="sombre"] .fcarte{background:var(--surface);color:var(--nt);border-color:var(--k1)}
+
 </style>
 <script>
 /* version test : ?test=1 → données à part (préfixe « test: » sur tout le stockage local), jamais celles de la carte principale */
@@ -2123,6 +2131,7 @@ html.calme :is(.souris,.chatmot,.griffes){display:none}
 <aside class="page" id="memPage" hidden aria-label="Ma mémoire"><div class="page-in"><div><button class="btn ghost" id="memClose">← Ma carte</button></div><div id="memIn"></div></div></aside>
 <aside class="page" id="suiviPage" hidden aria-label="Mon suivi"><div class="page-in"><div><button class="btn ghost" id="suiviClose">← Ma carte</button></div><div id="suiviIn"></div></div></aside>
 <aside class="page" id="atelierPage" hidden aria-label="Atelier"><div class="page-in"><div><button class="btn ghost" id="atelierClose">← Ma carte</button></div><div id="atelierIn"></div></div></aside>
+<aside class="page" id="formPage" hidden aria-label="Formation"><div class="page-in"><div><button class="btn ghost" id="formClose">← Ma carte</button></div><div id="formIn"></div></div></aside>
 <aside class="page" id="valPage" hidden aria-label="À valider"><div class="page-in"><div><button class="btn ghost" id="valClose">← Ma carte</button></div><div id="valIn"></div></div></aside>
 <aside class="page noterp" id="noterPage" hidden aria-label="Noter"><div class="page-in"><div><button class="btn ghost" id="noterClose">← Ma carte</button></div>
  <h2>Noter</h2><textarea id="noterTxt" rows="5" placeholder="Ce qui me passe par la tête. Une ligne = une chose."></textarea>
@@ -6011,6 +6020,50 @@ window.ATELIER={ D:null, onglet:"image", filtre:"tous", occupe:false, msg:{image
 
 
 
+/* ===== Tuile « Formation » (version 177) : les formations repérées par les assistants (événements FORMATION_REPEREE, posés par l'agent
+   du système dans meta/cockpit : liste « formations », ou à défaut dans les alertes), avec leur descriptif, et mon choix : je la suis,
+   plus tard, non. Le choix va dans meta/formations_choix (écrit par l'app seulement) ; « Je la suis » ajoute aussi une tâche dans
+   l'espace du travail s'il existe. Tout le texte reçu est posé avec textContent. ===== */
+let formChoix={};
+const FORMS={
+  cle:e=>String(e.id||((e.quand||e.horodatage||"")+"|"+(e.objet||""))),
+  liste(){ const C=cockpit||{}, vus=new Set(), L=[];
+    [...(C.formations||[]),...[...(C.alertes||[]),...(C.a_relire||[])].filter(e=>e&&/FORMATION/i.test(String(e.type||"")))].forEach(e=>{ if(!e||!(e.objet||e.titre)) return; const k=this.cle(e); if(vus.has(k)) return; vus.add(k); L.push(e); });
+    return L.sort((a,b)=>String(b.quand||b.horodatage||"").localeCompare(String(a.quand||a.horodatage||""))); },
+  etat(e){ return (formChoix[this.cle(e)]||{}).etat||""; },
+  aRegarder(){ return this.liste().filter(e=>!this.etat(e)||(this.etat(e)==="plus_tard"&&((formChoix[this.cle(e)]||{}).revoir||0)<=Date.now())); },
+  choisis(e,etat){ const k=this.cle(e), o={etat,t:new Date().toISOString()}; if(etat==="plus_tard") o.revoir=Date.now()+14*864e5; formChoix=Object.assign({},formChoix,{[k]:o});
+    if(db) db.doc("meta/formations_choix").set({choix:formChoix}).catch(()=>{});
+    if(etat==="suivre"){ const t=[...cats.values()].find(c=>/^(travail|mon metier|metier|carriere)/.test(plNorm(c.name||""))); if(t){ const cur=cats.get(t.id); write(t.id,{tasks:[...(cur.tasks||[]),{id:uid(),text:"Formation à suivre : "+String(e.objet||e.titre).slice(0,140),done:false,due:"",auto:true}]}); } }
+    this.rend(); if(window.V2&&V2.bande) V2.bande(); },
+  lien(e){ const m=String(e.lien||e.url||e.detail||"").match(/https:\/\/[^\s<>"')]+/); return m?m[0]:""; },
+  carte(e){ const et=this.etat(e), box=el("div",{className:"fcarte"+(et==="suivre"?" suivie":"")}), q=e.quand||e.horodatage;
+    box.appendChild(el("small",{className:"mono",textContent:[e.organisme,q?"repérée le "+new Date(String(q).replace(" ","T")).toLocaleDateString("fr-FR",{day:"numeric",month:"long"}):""].filter(Boolean).join(" · ")}));
+    box.appendChild(el("b",{className:"ftit",textContent:String(e.objet||e.titre)}));
+    const d=String(e.description||e.detail||"").replace(/https:\/\/\S+/g,"").trim(); if(d) box.appendChild(el("p",{textContent:d}));
+    const u=this.lien(e), acts=el("div",{className:"bact"});
+    if(u) acts.appendChild(el("a",{className:"btn ghost",href:u,target:"_blank",rel:"noopener",textContent:"Voir la formation ↗"}));
+    if(et!=="suivre"){ const s=el("button",{type:"button",className:"btn",textContent:"Je la suis"}); s.onclick=()=>{ fetel(s); this.choisis(e,"suivre"); }; acts.appendChild(s); }
+    else acts.appendChild(el("span",{className:"fok",textContent:"✓ Je la suis"}));
+    if(et!=="plus_tard"&&et!=="suivre"){ const p=el("button",{type:"button",className:"btn ghost",textContent:"Plus tard"}); p.onclick=()=>this.choisis(e,"plus_tard"); acts.appendChild(p); }
+    const n=el("button",{type:"button",className:"btn ghost",textContent:et==="suivre"?"Je ne la suis plus":"Non"}); n.onclick=()=>this.choisis(e,"non"); acts.appendChild(n);
+    box.appendChild(acts); return box; },
+  rend(){ const z=$("formIn"); if(!z) return; z.textContent=""; const L=this.liste(), A=this.aRegarder(), S=L.filter(e=>this.etat(e)==="suivre"), P=L.filter(e=>this.etat(e)==="plus_tard"&&!A.includes(e)), N=L.filter(e=>this.etat(e)==="non");
+    z.appendChild(el("div",{className:"hero"},el("div",{className:"hero-t"},el("h2",{textContent:"Formation"}),el("p",{className:"lead",textContent:"Les formations repérées par tes assistants. Lis le descriptif, puis choisis : tu la suis, plus tard, ou non."}))));
+    const sec=(t,X,vide)=>{ const s=el("section",{className:"card fsec"},el("h3",{textContent:t+(X.length?" · "+X.length:"")})); if(!X.length&&vide) s.appendChild(help(vide)); X.forEach(e=>s.appendChild(this.carte(e))); z.appendChild(s); };
+    sec("À regarder",A,L.length?"Tout est trié. Les prochaines formations repérées arriveront ici.":"Ton assistant Formation cherche chaque lundi : les formations qu'il repère arriveront ici.");
+    if(S.length) sec("Je les suis",S); if(P.length) sec("Plus tard",P);
+    if(N.length){ const d=el("details",{className:"card fsec"},el("summary",{textContent:"Écartées · "+N.length})); N.forEach(e=>d.appendChild(this.carte(e))); z.appendChild(d); } },
+  ouvre(){ const pg=$("formPage"); pg.hidden=false; pg.scrollTop=0; this.rend(); } };
+{ $("formClose").onclick=()=>{ $("formPage").hidden=true; };
+  document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("formPage").hidden){ $("formPage").hidden=true; e.stopImmediatePropagation(); } },true);
+  /* une ligne sur l'accueil, sous l'Atelier */
+  const oB=V2.bande.bind(V2); V2.bande=function(){ const r=oB.apply(this,arguments), z=$("bande"); if(z&&!z.hidden){ const v=z.querySelector(".fopuce"); if(v) v.remove(); const n=FORMS.aRegarder().length;
+      const b=el("button",{type:"button",className:"puce2 atpuce fopuce"+(n?" fort":"")},el("small",{textContent:"Formation"}),el("b",{textContent:n?String(n):"🎓"}),el("span",{textContent:n?(n>1?"formations à regarder":"formation à regarder"):"formations repérées par tes assistants"}),el("em",{textContent:"→"}));
+      b.setAttribute("aria-label","Formation : "+(n?n+" à regarder":"formations repérées par tes assistants")); b.onclick=()=>FORMS.ouvre(); z.appendChild(b); }
+    return r; };
+}
+
 /* A8 : une icône qui ne charge pas laisse la place au logo de l'app, plus de carré blanc */
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&!i.dataset.repli&&(i.classList.contains("lgimg")||i.closest(".node,.ico"))){ i.dataset.repli="1"; i.src="icon-192.png"; i.classList.add("repli"); } },true);
 
@@ -6745,7 +6798,7 @@ function localDb(){ const KEY="carte-de-vie-v1", CKEY="carte-de-vie-sync"; let s
 /* --- dans Claude : les données restent dans la base de la page, la synchro GitHub et l'IA s'ajoutent --- */
 function claudeDb(d){ const CKEY="carte-de-vie-sync"; let cfg=null; try{ cfg=JSON.parse(localStorage.getItem(CKEY)||"null"); }catch(_){} if(cfg&&!repoOk(cfg.repo)) cfg=null;
   const store={}, live=k=>store[k]&&!store[k]._del, stamp=(x,k)=>{ const now=Date.now(); return Object.assign({},x,{_m:now,_f:fieldsNow(x,k?store[k]:null,now),_x:tombes(k?store[k]:null,x)}); };
-  ["meta/moi","meta/layout","meta/feedback","meta/compagnon","meta/suggestions","meta/base","meta/notes","meta/cockpit","meta/cockpit_masques","meta/fonds","meta/icones","meta/semaine","meta/journees","meta/app","meta/energie","meta/revues","meta/trajectoire","meta/memoire","meta/propositions","meta/suivi","meta/suivis","meta/atelier"].forEach(k=>d.doc(k).onSnapshot(s=>{ if(s.exists) store[k]=s.data(); else delete store[k]; },()=>{}));
+  ["meta/moi","meta/layout","meta/feedback","meta/compagnon","meta/suggestions","meta/base","meta/notes","meta/cockpit","meta/cockpit_masques","meta/fonds","meta/icones","meta/semaine","meta/journees","meta/app","meta/energie","meta/revues","meta/trajectoire","meta/memoire","meta/propositions","meta/suivi","meta/suivis","meta/atelier","meta/formations_choix"].forEach(k=>d.doc(k).onSnapshot(s=>{ if(s.exists) store[k]=s.data(); else delete store[k]; },()=>{}));
   d.collection("espaces").onSnapshot(s=>{ Object.keys(store).forEach(k=>{ if(k.startsWith("espaces/")) delete store[k]; }); s.docs.forEach(x=>{ store["espaces/"+x.id]=x.data(); }); },()=>{});
   const after=p=>p.then(v=>{ api.dirty=true; api.queue(); return v; });
   const doc=path=>{ const r=d.doc(path); return { id:r.id, path,
@@ -6864,7 +6917,7 @@ function start(){
     db.doc("meta/energie").onSnapshot(x=>PILOTE.energie(x.exists?x.data():null),()=>{}); db.doc("meta/revues").onSnapshot(x=>PILOTE.revues(x.exists?x.data():null),()=>{}); db.doc("meta/trajectoire").onSnapshot(x=>ESSAI.trajectoire(x.exists?x.data():null),()=>{}); db.doc("meta/memoire").onSnapshot(x=>ESSAI.memoire(x.exists?x.data():null),()=>{}); db.doc("meta/propositions").onSnapshot(x=>ESSAI.propositions(x.exists?x.data():null),()=>{}); db.doc("meta/suivi").onSnapshot(x=>{ if(window.SUIVI) SUIVI.charge(x.exists?x.data():null); },()=>{}); db.doc("meta/suivis").onSnapshot(x=>{ if(window.SUIVIS) SUIVIS.charge(x.exists?x.data():null); },()=>{}); db.doc("meta/atelier").onSnapshot(x=>{ if(window.ATELIER) ATELIER.charge(x.exists?x.data():null); },()=>{});
     db.doc("meta/fonds").onSnapshot(x=>FOND.recoit(x.exists?x.data():null),()=>{});
     db.doc("meta/suggestions").onSnapshot(x=>{ if(window._suggestions) window._suggestions(x.exists?x.data():null); },()=>{});
-    db.doc("meta/notes").onSnapshot(x=>{ if(window._notes) window._notes(x.exists?x.data():null); },()=>{}); db.doc("meta/claude_notes").onSnapshot(x=>{ if(window._claudeNotes) window._claudeNotes(x.exists?x.data():null); },()=>{}); db.doc("meta/avis_offres").onSnapshot(x=>{ AVIS_OFFRES=(x.exists&&Array.isArray(x.data().liste))?x.data().liste:[]; },()=>{}); db.doc("meta/cockpit").onSnapshot(x=>{ cockpit=x.exists?x.data():null; },()=>{}); db.doc("meta/cockpit_masques").onSnapshot(x=>{ ckMasques=(x.exists&&Array.isArray(x.data().ids))?x.data().ids:[]; ckCoches=(x.exists&&Array.isArray(x.data().coches))?x.data().coches:[]; },()=>{}); db.doc("meta/echanges").onSnapshot(x=>{ echanges=(x.exists&&Array.isArray(x.data().liste))?x.data().liste:[]; },()=>{});
+    db.doc("meta/notes").onSnapshot(x=>{ if(window._notes) window._notes(x.exists?x.data():null); },()=>{}); db.doc("meta/claude_notes").onSnapshot(x=>{ if(window._claudeNotes) window._claudeNotes(x.exists?x.data():null); },()=>{}); db.doc("meta/avis_offres").onSnapshot(x=>{ AVIS_OFFRES=(x.exists&&Array.isArray(x.data().liste))?x.data().liste:[]; },()=>{}); db.doc("meta/cockpit").onSnapshot(x=>{ cockpit=x.exists?x.data():null; try{ if(loaded&&window.V2) V2.bande(); if(!$("formPage").hidden) FORMS.rend(); }catch(_){} },()=>{}); db.doc("meta/formations_choix").onSnapshot(x=>{ formChoix=(x.exists&&x.data().choix)||{}; try{ if(!$("formPage").hidden) FORMS.rend(); }catch(_){} },()=>{}); db.doc("meta/cockpit_masques").onSnapshot(x=>{ ckMasques=(x.exists&&Array.isArray(x.data().ids))?x.data().ids:[]; ckCoches=(x.exists&&Array.isArray(x.data().coches))?x.data().coches:[]; },()=>{}); db.doc("meta/echanges").onSnapshot(x=>{ echanges=(x.exists&&Array.isArray(x.data().liste))?x.data().liste:[]; },()=>{});
     db.doc("meta/moi").onSnapshot(x=>{ if(x.exists){ const d=x.data(); moi={besoins:d.besoins||[],aspirations:d.aspirations||[],envies:d.envies||[],reves:d.reves||[],cent:d.cent||[],look:d.look||{}}; if(!moiPage.hidden&&!moiPage.contains(document.activeElement)) renderMoi(); renderIa(); } },()=>{});
     let rangeSeen=null; const autoArr=()=>{ if(rangeSeen===false&&loaded&&cats.size&&(!db.cfg()||db.synced)){ rangeSeen=true; arrange(); } };
     db.doc("meta/rangement").onSnapshot(x=>{ if(rangeSeen===null) rangeSeen=!!x.exists; else if(x.exists) rangeSeen=true; autoArr(); },()=>{});
@@ -6919,13 +6972,13 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
     garde=()=>{ try{ for(let d=prof();d<2;d++) history.pushState({carte:1,d:d+1},""); }catch(_){} };
   /* Chrome ignore au bouton retour les entrées posées sans « vrai » geste : sur téléphone, le toucher ne compte qu'au moment où le doigt se lève (touchend, pointerup, click) — on pose donc les gardes là */
   ["pointerup","touchend","click","keydown"].forEach(t=>addEventListener(t,garde,{capture:true,passive:true})); addEventListener("pointerdown",e=>{ if(e.pointerType==="mouse") garde(); },true);
-  addEventListener("popstate",()=>{ let dessus=false; ["recPage","fbPage","relPage","moiPage","setPage","syncPage","sugPage","addPage","notesPage","revuePage","cherchePage","trajPage","memPage","valPage","suiviPage","atelierPage","noterPage","aujPage","cheminPage","agPage"].forEach(k=>{ const x=document.getElementById(k); if(x&&!x.hidden){ x.hidden=true; dessus=true; } });
+  addEventListener("popstate",()=>{ let dessus=false; ["recPage","fbPage","relPage","moiPage","setPage","syncPage","sugPage","addPage","notesPage","revuePage","cherchePage","trajPage","memPage","valPage","suiviPage","atelierPage","formPage","noterPage","aujPage","cheminPage","agPage"].forEach(k=>{ const x=document.getElementById(k); if(x&&!x.hidden){ x.hidden=true; dessus=true; } });
     document.querySelectorAll(".notesmenu").forEach(x=>{ if(!x.hidden){ x.hidden=true; dessus=true; } }); document.querySelectorAll(".prioChoix").forEach(x=>{ x.remove(); dessus=true; }); document.querySelectorAll(".phov").forEach(x=>{ x.remove(); dessus=true; });
     if(!dessus&&window._retourCarte) window._retourCarte(); setTimeout(garde,0); }); })();</script>
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=176; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=177; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
