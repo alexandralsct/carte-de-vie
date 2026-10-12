@@ -2003,6 +2003,7 @@ html.calme :is(.souris,.chatmot,.griffes){display:none}
 :root[data-theme="sombre"] .fproj{background:rgba(201,214,240,.18);color:var(--nt)}
 :root[data-theme="sombre"] .fcarte small,:root[data-theme="sombre"] .fcarte .help{color:var(--nt)!important;opacity:.85}
 
+.fodash{display:flex;flex-direction:column;gap:10px}
 </style>
 <script>
 /* version test : ?test=1 → données à part (préfixe « test: » sur tout le stockage local), jamais celles de la carte principale */
@@ -2552,7 +2553,7 @@ function attachDrag(node,id){
 /* nouveautés : identifiants déjà vus par espace, gardés sur l'appareil ; la première fois, tout compte comme vu */
 const NV={ K:"nvVus", m:null, lis(){ if(!this.m){ try{ this.m=JSON.parse(localStorage.getItem(this.K)||"{}")||{}; }catch(_){ this.m={}; } } return this.m; },
   ecris(){ try{ localStorage.setItem(this.K,JSON.stringify(this.m)); }catch(_){} },
-  ids(c){ const S=[]; ["tasks","ideas","dates","links","sugg"].forEach(k=>(c[k]||[]).forEach(x=>{ if(x&&x.id) S.push(x.id); })); (c.rub||[]).forEach(r=>{ (r.items||[]).forEach(x=>{ if(x&&x.id) S.push(x.id); }); (r.news||[]).forEach(x=>{ if(x&&x.id) S.push(x.id); }); }); return S; },
+  ids(c){ const S=FORMS.estEspace(c)?FORMS.liste().map(f=>"F:"+f.id):[]; ["tasks","ideas","dates","links","sugg"].forEach(k=>(c[k]||[]).forEach(x=>{ if(x&&x.id) S.push(x.id); })); (c.rub||[]).forEach(r=>{ (r.items||[]).forEach(x=>{ if(x&&x.id) S.push(x.id); }); (r.news||[]).forEach(x=>{ if(x&&x.id) S.push(x.id); }); }); return S; },
   n(c){ const M=this.lis(), I=this.ids(c); if(!M[c.id]){ M[c.id]=I; this.ecris(); return 0; } const V=new Set(M[c.id]); return I.filter(x=>!V.has(x)).length; },
   vu(id){ const c=cats.get(id); if(!c) return; const M=this.lis(); M[id]=this.ids(c); this.ecris(); } };
 function open(id){ NV.vu(id); flushNotes(); if(openId!==id){ sect="rubs"; ranger=false; } openId=id; kick(); drawer.hidden=false; drawer.scrollTop=0; resetDel(); $("saved").textContent=""; renderDrawer(true); renderBoard(); }
@@ -4082,7 +4083,7 @@ function classeur(cle,P){ if(classeur.collecte){ const z=el("section",{className
   return box; }
 /* tout l'onglet Rubriques en pages, juste sous « Rubriques · Outils de l'espace · IA et moi » : le nom de l'item (sa vitrine), ce qu'il y a à faire, ses tableaux, puis ses groupes de rubriques */
 const TODO_SIMPLE=new Set([]), NPO=new Set([]), NOTE_NOM={};
-const NOMTB={chdash:"Mes recommandations",prdash:"Programmes",pldash:"Garde-manger",gdash:"Mes soins",sdash:"Mes projets",vint:"Mes ventes"};
+const NOMTB={fodash:"Formations pour toi",chdash:"Mes recommandations",prdash:"Programmes",pldash:"Garde-manger",gdash:"Mes soins",sdash:"Mes projets",vint:"Mes ventes"};
 function enPages(c){ const K=[...pane.children].filter(x=>!x.matches(".tabbar,.dots")); if(!K.length) return; const nomI=c.name||"Mon espace", nomT=todoDe(c)||"À faire", aTodo=K.some(x=>x.matches(".card.todo:not(.courses)"));
   const P=[], une=(nom,cle)=>{ let q=P.find(z=>z.cle===cle); if(!q){ q={nom,cle,els:[]}; P.push(q); } return q; }, neuve=(nom,els)=>{ const m=P.find(z=>z.nom===nom); if(m){ m.els.push(...els); return m; } const q={nom,cle:"p"+P.length,els}; P.push(q); return q; }; let der=null;
   K.forEach(x=>{
@@ -4461,7 +4462,7 @@ function renderPane(c){ paneT=performance.now(); paneSig=sigCat(c); { const ici=
   pane.textContent=""; artSeq=0; pane.classList.toggle("ptrack",c.type==="habitudes"); drawer.classList.toggle("simple",c.forme==="bulle"); if(c.forme==="bulle"){ renderUrgences(c); if((c.ass||[]).includes("LIFE")) renderCockpit(); return; } const rub=c.rub||[];
   if(!sect||(sect.startsWith("rub:")&&!rub.some(r=>"rub:"+r.id===sect))) sect="rubs";
   drawer.classList.toggle("detail",!TABN.some(x=>x[0]===sect));
-  if(sect==="rubs"){ if(c.type==="habitudes"){ renderNiveau(c); renderHabits(c); renderNoteRapide(c); const ht=pane.querySelector(".htab"), d=pane.querySelector(".dots"); if(ht&&d){ d.after(ht); const he=pane.querySelector(".hedit"); if(he) ht.after(he); } enPages(c); } else { classeur.collecte=true; try{ const SM=SURMESURE[c.id]; if(SM){ renderVitrine(c,!SIG_GARDE[c.id]); SM(c); paginerTableau(c); } else renderVitrine(c); if(c.id==="sport"){ renderProgrammes(c); renderSurMesure(c); renderCourse(c); renderMurYoga(c); } if(c.id==="cuisine"){ renderPlacard(c); renderLivres(c); } if(CROCHETS.apres[c.id]) CROCHETS.apres[c.id](c); if(c.id==="journal") renderCarnets(c); const td_=todoDe(c); if(estCuisine(c)) renderCourses(c); if(td_){ if(CROCHETS.todo[c.id]) CROCHETS.todo[c.id](c); else if(c.id==="cheveux") renderSoins(c); else { const keep=tab, nt=(c.tasks||[]).filter(k=>!k.done).length; tab="tasks"; target=el("section",{className:"card todo"},el("h3",{textContent:td_})); target.dataset.k="tasks"; pane.appendChild(target); renderOne(c); tab=keep; } } renderNoteRapide(c); renderNiveau(c); if(!SM) renderRubTiles(c); else { const T=plNorm(pane.textContent), N=(c.rub||[]).filter(r=>(SM.tuiles||[]).includes(r.name)||(!["news","objectif"].includes(r.type)&&(r.items||[]).length&&!T.includes(plNorm(r.name)))).map(r=>r.name); if(N.length) renderRubTiles(c,(c.rub||[]).map(r=>r.name).filter(n=>!N.includes(n))); } } finally{ classeur.collecte=false; } enPages(c); } return; }
+  if(sect==="rubs"){ if(c.type==="habitudes"){ renderNiveau(c); renderHabits(c); renderNoteRapide(c); const ht=pane.querySelector(".htab"), d=pane.querySelector(".dots"); if(ht&&d){ d.after(ht); const he=pane.querySelector(".hedit"); if(he) ht.after(he); } enPages(c); } else { classeur.collecte=true; try{ const SM=SURMESURE[c.id]; if(SM){ renderVitrine(c,!SIG_GARDE[c.id]); SM(c); paginerTableau(c); } else renderVitrine(c); if(c.id==="sport"){ renderProgrammes(c); renderSurMesure(c); renderCourse(c); renderMurYoga(c); } if(c.id==="cuisine"){ renderPlacard(c); renderLivres(c); } if(FORMS.estEspace(c)) FORMS.dansEspace(c); if(CROCHETS.apres[c.id]) CROCHETS.apres[c.id](c); if(c.id==="journal") renderCarnets(c); const td_=todoDe(c); if(estCuisine(c)) renderCourses(c); if(td_){ if(CROCHETS.todo[c.id]) CROCHETS.todo[c.id](c); else if(c.id==="cheveux") renderSoins(c); else { const keep=tab, nt=(c.tasks||[]).filter(k=>!k.done).length; tab="tasks"; target=el("section",{className:"card todo"},el("h3",{textContent:td_})); target.dataset.k="tasks"; pane.appendChild(target); renderOne(c); tab=keep; } } renderNoteRapide(c); renderNiveau(c); if(!SM) renderRubTiles(c); else { const T=plNorm(pane.textContent), N=(c.rub||[]).filter(r=>(SM.tuiles||[]).includes(r.name)||(!["news","objectif"].includes(r.type)&&(r.items||[]).length&&!T.includes(plNorm(r.name)))).map(r=>r.name); if(N.length) renderRubTiles(c,(c.rub||[]).map(r=>r.name).filter(n=>!N.includes(n))); } } finally{ classeur.collecte=false; } enPages(c); } return; }
   if(sect==="outils"){ const keep=tab, nt=(c.tasks||[]).filter(k=>!k.done).length; for(const [k,label] of outilsDe(c)){ tab=k; target=el("section",{className:"card"+(k==="tasks"?" todo":"")},el("h3",{textContent:k==="tasks"&&nt?label+" · "+nt:label})); target.dataset.k=k; pane.appendChild(target); renderOne(c); } tab=keep; const DOS=["#BCD0F5","#c9d6f0","#c9d6f0","#6C8FE0","#c9d6f0","#E3EAF8"], DSYM={recap:"graphique",ideas:"ampoule",dates:"calendrier",links:"boussole",rel:"spirale",log:"plume"};
     if(c.type!=="habitudes") [...pane.querySelectorAll("section.card[data-k]")].forEach((x,i)=>{ x.classList.add("dossier"); x.style.setProperty("--tab",DOS[i%DOS.length]); const h=x.querySelector("h3"), ic=el("span",{className:"dico"}); ic.innerHTML=symSvg(DSYM[x.dataset.k]||"star"); if(h) h.prepend(ic); }); addOpen(); return; }
   if(sect==="iamoi"){ if((c.ass||[]).includes("LIFE")) renderCockpit(); if(c.type!=="habitudes") renderQuiz(c); renderAssistants(c); renderSugg(c); renderRub(c,"moi"); addOpen(); return; }
@@ -5037,7 +5038,7 @@ const V2={
     const P=ESSAI&&PILOTE.prios?PILOTE.prios():[], fait=P.filter(x=>x.done).length;
     const puce=(lab,val,sous,fn,fort)=>{ const b=el("button",{type:"button",className:"puce2"+(fort?" fort":"")},el("small",{textContent:lab}),el("b",{textContent:val}),el("span",{textContent:sous})); b.onclick=fn; z.appendChild(b); };
     const nA=a.rdv+a.taches; puce("Aujourd'hui",nA?String(nA):"✓",[a.rdv?a.rdv+" rendez-vous":"",a.taches?a.taches+" à faire":"",a.habTot?(a.habTot-a.hab)+"/"+a.habTot+" habitudes":""].filter(Boolean).join(" · ")||"rien d'urgent",()=>this.ouvreAuj(),nA>0);
-    puce("À valider",n?(n>99?"99+":String(n)):"✓",n?"à décider, les plus utiles d'abord":"tout est fait",()=>ESSAI.ouvreVal(),n>0);
+    puce("À valider",n?String(n):"✓",n?"à décider, les plus utiles d'abord":"tout est fait",()=>ESSAI.ouvreVal(),n>0);
     puce("Ma semaine",P.length?fait+"/"+P.length:"→",P.length?"priorités faites":"revue et priorités",()=>ESSAI.ouvreTraj()); },
   ouvreAuj(){ const pg=$("aujPage"), z=$("aujIn"); pg.hidden=false; pg.scrollTop=0;
     this.range();
@@ -6065,15 +6066,20 @@ const FORMS={ K:"formAvis", occupe:"", msg:{},
   rend(){ const z=$("formIn"); if(!z) return; z.textContent=""; const L=this.liste(), m=formData&&formData._f&&formData._f.liste;
     z.appendChild(el("div",{className:"hero"},el("div",{className:"hero-t"},el("h2",{textContent:"Formations pour toi"}),el("p",{className:"lead",textContent:m?"Dernier passage le "+new Date(+m).toLocaleDateString("fr-FR",{day:"numeric",month:"long"})+".":"Repérées par tes assistants selon tes projets."}))));
     const s=el("section",{className:"card fsec"}); if(!L.length) s.appendChild(help("Rien de nouveau cette semaine — prochain tour lundi.")); L.forEach(f=>s.appendChild(this.carte(f))); z.appendChild(s); },
-  ouvre(){ const pg=$("formPage"); pg.hidden=false; pg.scrollTop=0; this.rend(); } };
+  /* l'espace « Formation » de la carte affiche la liste en tête, dans son propre onglet */
+  espace(){ return [...cats.values()].find(c=>this.estEspace(c)); },
+  estEspace:c=>!!c&&/^formations?$/.test(plNorm(c.name||"")),
+  dansEspace(c){ const w=el("section",{className:"bdash fodash"}), m=formData&&formData._f&&formData._f.liste, L=this.liste();
+    w.appendChild(el("div",{className:"plh"},el("h3",{className:"vt",textContent:"Formations pour toi"}),el("small",{className:"mono",textContent:m?"passage du "+new Date(+m).toLocaleDateString("fr-FR",{day:"numeric",month:"short"}):""})));
+    if(!L.length) w.appendChild(help("Rien de nouveau cette semaine — prochain tour lundi."));
+    L.forEach(f=>w.appendChild(this.carte(f))); pane.appendChild(w); },
+  ouvre(){ const c=this.espace(); if(c){ open(c.id); return; } const pg=$("formPage"); pg.hidden=false; pg.scrollTop=0; this.rend(); } };
 { $("formClose").onclick=()=>{ $("formPage").hidden=true; };
   document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("formPage").hidden){ $("formPage").hidden=true; e.stopImmediatePropagation(); } },true);
-  /* une ligne sur l'accueil, sous l'Atelier */
-  const oB=V2.bande.bind(V2); V2.bande=function(){ const r=oB.apply(this,arguments), z=$("bande"); if(z&&!z.hidden){ const v=z.querySelector(".fopuce"); if(v) v.remove(); const n=FORMS.nouvelles();
-      const b=el("button",{type:"button",className:"puce2 atpuce fopuce"+(n?" fort":"")},el("small",{textContent:"Formations"}),el("b",{textContent:n?String(n):"🎓"}),el("span",{textContent:n?(n>1?"formations pour toi":"formation pour toi"):"repérées selon tes projets"}),el("em",{textContent:"→"}));
-      b.setAttribute("aria-label","Formations : "+(n?n+" pour toi":"repérées selon tes projets")); b.onclick=()=>FORMS.ouvre(); z.appendChild(b); }
-    return r; };
+  /* après un avis, l'espace ouvert se redessine */
+  const oR=FORMS.rend.bind(FORMS); FORMS.rend=function(){ oR(); const c=openId&&cats.get(openId); if(c&&FORMS.estEspace(c)) renderPane(c); };
 }
+
 
 /* A8 : une icône qui ne charge pas laisse la place au logo de l'app, plus de carré blanc */
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&!i.dataset.repli&&(i.classList.contains("lgimg")||i.closest(".node,.ico"))){ i.dataset.repli="1"; i.src="icon-192.png"; i.classList.add("repli"); } },true);
@@ -6989,7 +6995,7 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=178; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=179; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
