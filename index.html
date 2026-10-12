@@ -1976,6 +1976,12 @@ html.calme :is(.souris,.chatmot,.griffes){display:none}
 :root[data-theme="sombre"] .atbientot{border-color:#a9bfff}
 
 .pen.pflash{outline:3px solid var(--k1,#002FA7);outline-offset:3px;border-radius:14px;transition:outline-color .3s}
+.chprof{display:flex;flex-direction:column;gap:6px;background:#fff;border:1.5px solid #c9d6f0;border-radius:18px;padding:12px 14px;color:#002FA7}
+.chlab{font-size:.8rem;margin-top:4px}
+.chreco{background:#c9d6f0;border-radius:16px;padding:10px 14px;display:flex;flex-direction:column;gap:6px;color:#002FA7}
+.chreco h4{margin:0;font-size:.95rem}.chreco.chia{background:#fff;border:2px solid #002FA7}
+.chli{display:flex;flex-direction:column;gap:4px;align-items:flex-start}.chli p{margin:0;font-size:.88rem;overflow-wrap:anywhere}
+
 </style>
 <script>
 /* version test : ?test=1 → données à part (préfixe « test: » sur tout le stockage local), jamais celles de la carte principale */
@@ -4045,7 +4051,7 @@ function classeur(cle,P){ if(classeur.collecte){ const z=el("section",{className
   return box; }
 /* tout l'onglet Rubriques en pages, juste sous « Rubriques · Outils de l'espace · IA et moi » : le nom de l'item (sa vitrine), ce qu'il y a à faire, ses tableaux, puis ses groupes de rubriques */
 const TODO_SIMPLE=new Set([]), NPO=new Set([]), NOTE_NOM={};
-const NOMTB={prdash:"Programmes",pldash:"Garde-manger",gdash:"Mes soins",sdash:"Mes projets",vint:"Mes ventes"};
+const NOMTB={chdash:"Mes recommandations",prdash:"Programmes",pldash:"Garde-manger",gdash:"Mes soins",sdash:"Mes projets",vint:"Mes ventes"};
 function enPages(c){ const K=[...pane.children].filter(x=>!x.matches(".tabbar,.dots")); if(!K.length) return; const nomI=c.name||"Mon espace", nomT=todoDe(c)||"À faire", aTodo=K.some(x=>x.matches(".card.todo:not(.courses)"));
   const P=[], une=(nom,cle)=>{ let q=P.find(z=>z.cle===cle); if(!q){ q={nom,cle,els:[]}; P.push(q); } return q; }, neuve=(nom,els)=>{ const m=P.find(z=>z.nom===nom); if(m){ m.els.push(...els); return m; } const q={nom,cle:"p"+P.length,els}; P.push(q); return q; }; let der=null;
   K.forEach(x=>{
@@ -4424,7 +4430,7 @@ function renderPane(c){ paneT=performance.now(); paneSig=sigCat(c); { const ici=
   pane.textContent=""; artSeq=0; pane.classList.toggle("ptrack",c.type==="habitudes"); drawer.classList.toggle("simple",c.forme==="bulle"); if(c.forme==="bulle"){ renderUrgences(c); if((c.ass||[]).includes("LIFE")) renderCockpit(); return; } const rub=c.rub||[];
   if(!sect||(sect.startsWith("rub:")&&!rub.some(r=>"rub:"+r.id===sect))) sect="rubs";
   drawer.classList.toggle("detail",!TABN.some(x=>x[0]===sect));
-  if(sect==="rubs"){ if(c.type==="habitudes"){ renderNiveau(c); renderHabits(c); renderNoteRapide(c); const ht=pane.querySelector(".htab"), d=pane.querySelector(".dots"); if(ht&&d){ d.after(ht); const he=pane.querySelector(".hedit"); if(he) ht.after(he); } enPages(c); } else { classeur.collecte=true; try{ const SM=SURMESURE[c.id]; if(SM){ renderVitrine(c,!SIG_GARDE[c.id]); SM(c); paginerTableau(c); } else renderVitrine(c); if(c.id==="sport"){ renderProgrammes(c); renderSurMesure(c); renderCourse(c); renderMurYoga(c); } if(c.id==="cuisine"){ renderPlacard(c); renderLivres(c); } if(CROCHETS.apres[c.id]) CROCHETS.apres[c.id](c); if(c.id==="journal") renderCarnets(c); const td_=todoDe(c); if(estCuisine(c)) renderCourses(c); if(td_){ if(CROCHETS.todo[c.id]) CROCHETS.todo[c.id](c); else if(c.id==="cheveux") renderSoins(c); else { const keep=tab, nt=(c.tasks||[]).filter(k=>!k.done).length; tab="tasks"; target=el("section",{className:"card todo"},el("h3",{textContent:td_})); target.dataset.k="tasks"; pane.appendChild(target); renderOne(c); tab=keep; } } renderNoteRapide(c); renderNiveau(c); if(!SM) renderRubTiles(c); else if(SM.tuiles) renderRubTiles(c,SM.tuiles); } finally{ classeur.collecte=false; } enPages(c); } return; }
+  if(sect==="rubs"){ if(c.type==="habitudes"){ renderNiveau(c); renderHabits(c); renderNoteRapide(c); const ht=pane.querySelector(".htab"), d=pane.querySelector(".dots"); if(ht&&d){ d.after(ht); const he=pane.querySelector(".hedit"); if(he) ht.after(he); } enPages(c); } else { classeur.collecte=true; try{ const SM=SURMESURE[c.id]; if(SM){ renderVitrine(c,!SIG_GARDE[c.id]); SM(c); paginerTableau(c); } else renderVitrine(c); if(c.id==="sport"){ renderProgrammes(c); renderSurMesure(c); renderCourse(c); renderMurYoga(c); } if(c.id==="cuisine"){ renderPlacard(c); renderLivres(c); } if(CROCHETS.apres[c.id]) CROCHETS.apres[c.id](c); if(c.id==="journal") renderCarnets(c); const td_=todoDe(c); if(estCuisine(c)) renderCourses(c); if(td_){ if(CROCHETS.todo[c.id]) CROCHETS.todo[c.id](c); else if(c.id==="cheveux") renderSoins(c); else { const keep=tab, nt=(c.tasks||[]).filter(k=>!k.done).length; tab="tasks"; target=el("section",{className:"card todo"},el("h3",{textContent:td_})); target.dataset.k="tasks"; pane.appendChild(target); renderOne(c); tab=keep; } } renderNoteRapide(c); renderNiveau(c); if(!SM) renderRubTiles(c); else { const T=plNorm(pane.textContent), N=(c.rub||[]).filter(r=>(SM.tuiles||[]).includes(r.name)||(!["news","objectif"].includes(r.type)&&(r.items||[]).length&&!T.includes(plNorm(r.name)))).map(r=>r.name); if(N.length) renderRubTiles(c,(c.rub||[]).map(r=>r.name).filter(n=>!N.includes(n))); } } finally{ classeur.collecte=false; } enPages(c); } return; }
   if(sect==="outils"){ const keep=tab, nt=(c.tasks||[]).filter(k=>!k.done).length; for(const [k,label] of outilsDe(c)){ tab=k; target=el("section",{className:"card"+(k==="tasks"?" todo":"")},el("h3",{textContent:k==="tasks"&&nt?label+" · "+nt:label})); target.dataset.k=k; pane.appendChild(target); renderOne(c); } tab=keep; const DOS=["#BCD0F5","#c9d6f0","#c9d6f0","#6C8FE0","#c9d6f0","#E3EAF8"], DSYM={recap:"graphique",ideas:"ampoule",dates:"calendrier",links:"boussole",rel:"spirale",log:"plume"};
     if(c.type!=="habitudes") [...pane.querySelectorAll("section.card[data-k]")].forEach((x,i)=>{ x.classList.add("dossier"); x.style.setProperty("--tab",DOS[i%DOS.length]); const h=x.querySelector("h3"), ic=el("span",{className:"dico"}); ic.innerHTML=symSvg(DSYM[x.dataset.k]||"star"); if(h) h.prepend(ic); }); addOpen(); return; }
   if(sect==="iamoi"){ if((c.ass||[]).includes("LIFE")) renderCockpit(); if(c.type!=="habitudes") renderQuiz(c); renderAssistants(c); renderSugg(c); renderRub(c,"moi"); addOpen(); return; }
@@ -5752,6 +5758,8 @@ const FICHE={ cache:new Map(),
   rendu(md){ const art=el("article",{className:"fart"}); let ul=null; String(md).replace(/\r/g,"").split("\n").forEach(l=>{ const s=l.trim(); let m;
       if(!s||/^(-{3,}|\*{3,}|_{3,})$/.test(s)){ ul=null; return; }
       if((m=s.match(/^(#{1,6})\s+(.*)$/))){ ul=null; const h=el(m[1].length<=2?"h3":"h4",{}); h.appendChild(this.ligne(m[2])); art.appendChild(h); return; }
+      /* « 1) L'idée en une phrase » : un intertitre numéroté court, sans point final, devient un titre */
+      if(/^\d{1,2}\)\s+\S.{0,58}$/.test(s)&&!/[.;:!?]$/.test(s)){ ul=null; const h=el("h4",{}); h.appendChild(this.ligne(s)); art.appendChild(h); return; }
       if((m=s.match(/^(?:[-*+]|\d+[.)])\s+(.*)$/))){ if(!ul){ ul=el("ul",{}); art.appendChild(ul); } const li=el("li",{}); li.appendChild(this.ligne(m[1])); ul.appendChild(li); return; }
       ul=null; const p=el("p",{}); p.appendChild(this.ligne(s.replace(/^>\s?/,""))); art.appendChild(p); }); return art; },
   marque(art,N){ const C=N.map(n=>String(n.cite||"").trim().slice(0,60)).filter(x=>x.length>=8); art.querySelectorAll("p,li,h3,h4").forEach(x=>{ x.classList.toggle("fmark",C.some(c=>x.textContent.includes(c))); }); },
@@ -5980,6 +5988,12 @@ window.ATELIER={ D:null, onglet:"image", filtre:"tous", occupe:false, msg:{image
       b.setAttribute("aria-label","Atelier : créer une image, outils Craft"); b.onclick=()=>ATELIER.ouvre(); z.appendChild(b); }
     return r; };
 }
+
+/* ===== Cheveux : « Mes recommandations » selon mon type de cheveux (version 173). Le profil (type, épaisseur, porosité, cuir chevelu,
+   longueurs, objectifs) est gardé dans jeu.profil et suit la synchro ; les conseils viennent de règles simples, et l'IA peut les
+   affiner à partir du profil, des produits, de la routine et de la pousse (jeu.recoIA). Conseils de soin courants, jamais un avis médical. ===== */
+
+
 
 /* A8 : une icône qui ne charge pas laisse la place au logo de l'app, plus de carré blanc */
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&!i.dataset.repli&&(i.classList.contains("lgimg")||i.closest(".node,.ico"))){ i.dataset.repli="1"; i.src="icon-192.png"; i.classList.add("repli"); } },true);
@@ -6895,7 +6909,7 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=172; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=173; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
