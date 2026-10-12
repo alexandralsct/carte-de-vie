@@ -36,5 +36,20 @@
    "text": "texte",
    "url": "lien"
   }
- }
+ },
+ "shortcuts": [
+  {
+   "name": "LIFE",
+   "short_name": "LIFE",
+   "description": "Ma messagerie",
+   "url": "./index.html#life",
+   "icons": [
+    {
+     "src": "icon-192.png",
+     "sizes": "192x192",
+     "type": "image/png"
+    }
+   ]
+  }
+ ]
 }

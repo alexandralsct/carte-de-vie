@@ -2012,6 +2012,9 @@ html.calme :is(.souris,.chatmot,.griffes){display:none}
 .cledlg .srow{display:flex;gap:8px}.cledlg .srow input{flex:1;min-width:0}
 .cledlg .clefin{margin-top:14px;width:100%}
 
+.lifep{position:fixed;inset:0;z-index:9999;background:var(--bg,#f6ecdc);display:flex;flex-direction:column}.lifep[hidden]{display:none}
+.lifep iframe{flex:1;border:0;width:100%}.lifep .lifex{align-self:flex-start;margin:calc(env(safe-area-inset-top) + 6px) 10px 4px}
+html.lifeo,html.lifeo body{overflow:hidden}
 </style>
 <script>
 /* version test : ?test=1 → données à part (préfixe « test: » sur tout le stockage local), jamais celles de la carte principale */
@@ -2050,7 +2053,7 @@ html.calme :is(.souris,.chatmot,.griffes){display:none}
 <div class="wrap">
   <header>
     <div>
-      <span class="hautg"><button class="btn ghost" id="setBtn">⚙ Réglages</button><button class="btn ghost" id="notesBtn3" title="Ouvrir mes notes">✍ Mes notes</button></span>
+      <span class="hautg"><button class="btn ghost" id="setBtn">⚙ Réglages</button><button class="btn ghost" id="cleBtn" title="Clé du lien (copier, coller, créer)" aria-label="Clé du lien">🔑 Clé</button><button class="btn ghost" id="notesBtn3" title="Ouvrir mes notes">✍ Mes notes</button></span>
       <h1>Ma carte de vie</h1>
       <p class="motto">Travailler par item</p><p class="hint" id="impMsg"></p><p class="hint" id="syncMsg" role="status"></p><p class="nosync" id="noSync" hidden>⚠ Cette carte n'est pas reliée à GitHub : ce que tu écris ici reste sur cet appareil. <button type="button" id="noSyncGo">Relier</button></p>
     </div>
@@ -5403,6 +5406,7 @@ const MEMP={ L:[], notes:[], sub:false,
   item("✦","Mon chemin",()=>V3.ouvreChemin(),"r-proprio");
   item("☾","Ferme ta journée",()=>SOIR.ouvre());
   item("🔑","Clé du lien (copier, coller, créer)",()=>CLEF.ouvre());
+  item("💬","LIFE, ma messagerie",()=>LIFEP.ouvre());
   if("Notification" in window&&Notification.permission!=="granted") item("🔔",Notification.permission==="denied"?"Rappels bloqués (réglages du téléphone)":"Activer les rappels (énergie 20 h, journée 21 h)",()=>{ if(Notification.permission==="denied") alert("Les notifications sont bloquées pour l'app : autorise-les dans les réglages du téléphone (Applications → Ma carte de vie → Notifications), puis rouvre l'app."); else RAPPELS.active(); });
   item("◎","Ma mémoire perso",()=>MEMP.ouvre());
   if($("sugBtn")) item("✎","Mes idées pour l'app",()=>$("sugBtn").click(),"r-proprio");
@@ -6116,6 +6120,14 @@ const CLEF={
     ok.onclick=()=>{ const v=k.value.trim(); if(!v) return; this.zs=null; this.rend(this.garde(v)?"Clé enregistrée sur cet appareil ✓":"Enregistrement impossible."); };
     this.zs=el("div",{className:"srow"},k,ok); this.rend("Le navigateur ne laisse pas lire le presse-papiers : colle la clé dans le champ."); setTimeout(()=>k.focus(),30); } };
 
+{ const b=$("cleBtn"); if(b) b.onclick=()=>CLEF.ouvre(); }
+/* LIFE dans la carte : même adresse (même stockage, donc même clé), plein écran, retour en haut à gauche */
+const LIFEP={ ouvre(){ let z=$("lifeP"); if(!z){ z=el("div",{id:"lifeP",className:"lifep"}); const f=el("iframe",{title:"LIFE",src:"../Life/"}); f.setAttribute("allow","clipboard-read; clipboard-write; microphone");
+      const x=el("button",{type:"button",className:"btn lifex",textContent:"← Ma carte"}); x.onclick=()=>this.ferme(); z.append(x,f); document.body.appendChild(z); }
+    z.hidden=false; document.documentElement.classList.add("lifeo"); },
+  ferme(){ const z=$("lifeP"); if(z) z.hidden=true; document.documentElement.classList.remove("lifeo"); if(location.hash==="#life") try{ history.replaceState(null,"",location.pathname+location.search); }catch(_){} } };
+if(location.hash==="#life") setTimeout(()=>LIFEP.ouvre(),300);
+window.addEventListener("hashchange",()=>{ if(location.hash==="#life") LIFEP.ouvre(); });
 /* A8 : une icône qui ne charge pas laisse la place au logo de l'app, plus de carré blanc */
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&!i.dataset.repli&&(i.classList.contains("lgimg")||i.closest(".node,.ico"))){ i.dataset.repli="1"; i.src="icon-192.png"; i.classList.add("repli"); } },true);
 
@@ -7030,7 +7042,7 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=180; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=181; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
