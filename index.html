@@ -1983,6 +1983,9 @@ html.calme :is(.souris,.chatmot,.griffes){display:none}
 .chli{display:flex;flex-direction:column;gap:4px;align-items:flex-start}.chli p{margin:0;font-size:.88rem;overflow-wrap:anywhere}
 
 .moicr{margin-top:8px}
+.node .nvb{position:absolute;top:-8px;right:-8px;min-width:24px;height:24px;padding:0 6px;box-sizing:border-box;border-radius:999px;background:#002FA7;color:#fff;border:2px solid #fff;font:800 .78rem/1 system-ui,sans-serif;display:grid;place-items:center;z-index:3;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.node.anv .urg,html:not(.nu):not(.dedans) .node.anv .urg{right:auto;left:-7px}
+.vsug{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-top:1px solid var(--pale,#c9d6f0)}.vsug p{margin:0;overflow-wrap:anywhere}
 </style>
 <script>
 /* version test : ?test=1 → données à part (préfixe « test: » sur tout le stockage local), jamais celles de la carte principale */
@@ -2415,6 +2418,7 @@ function renderBoard(){ NUS=isNu()?anneaux(cats.size).s:1; requestAnimationFrame
     b._id=c.id; const ic=el("span",{className:"ico"}); ic.innerHTML=icoHTML(c); ic.dataset.k=ICONS[c.icon||c.id]?(c.icon||c.id):"star"; b.addEventListener("pointerenter",()=>playIco(ic)); b.addEventListener("pointerdown",()=>playIco(ic)); b.append(ic,el("b",{textContent:c.name||"Sans nom"}),el("small",{textContent:bits.join(" · ")}));
     const lim=dayPlus(rappel(c)), urg=prioOf(c)>1&&((c.dates||[]).some(k=>k.date>=td&&k.date<=lim)||(c.tasks||[]).some(k=>!k.done&&k.due&&k.due<=lim));
     const lvl=Math.min(5,(c.prio||2)+(urg?1:0)); if((c.prio||2)>=3) b.classList.add("full"); b.classList.toggle("veille",prioOf(c)===1); b.classList.toggle("nbulle",c.forme==="bulle"); b.classList.toggle("prio4",prioOf(c)===4); const W=TW*(isNu()?PRW(c):1); b.style.width=W+"%"; RC[c.id]={cx,cy,W}; if(c.groupe&&!isNu()){ const z=Z.get(c.groupe)||{x0:100,x1:0,y0:100,y1:0}; z.x0=Math.min(z.x0,cx-W/2); z.x1=Math.max(z.x1,cx+W/2); z.y0=Math.min(z.y0,cy-W*HR); z.y1=Math.max(z.y1,cy+W*HR); Z.set(c.groupe,z); } b.style.setProperty("--f",(isLibre()?1.1:isNu()?1.15:1)*(isNu()?Math.max(.7,NUS):1)); b.style.zIndex=6-lvl;
+    { const nv=prioOf(c)===1?0:NV.n(c); if(nv){ const s=el("span",{className:"nvb",textContent:nv>99?"99+":String(nv)}); s.title=nv+(nv>1?" nouveautés":" nouveauté")+" depuis ta dernière visite"; s.setAttribute("aria-label",s.title); b.appendChild(s); b.classList.add("anv"); } }
     if(urg){ const u=el("span",{className:"urg",textContent:"!"}); u.title="Échéance dans les "+rappel(c)+" jours ou en retard"; b.appendChild(u); }
     attachDrag(b,c.id);
     if(stack&&c.forme==="bulle"&&c.xs!=null&&!reorg){ b.classList.add("libreb"); b.style.left=c.xs+"%"; b.style.top=c.ys+"px"; board.appendChild(b); }
@@ -2527,7 +2531,13 @@ function attachDrag(node,id){
   node.addEventListener("click",e=>{ if(moved){moved=false;e.preventDefault();return;} if(reorg&&isStack()) return; open(id); });
 }
 
-function open(id){ flushNotes(); if(openId!==id){ sect="rubs"; ranger=false; } openId=id; kick(); drawer.hidden=false; drawer.scrollTop=0; resetDel(); $("saved").textContent=""; renderDrawer(true); renderBoard(); }
+/* nouveautés : identifiants déjà vus par espace, gardés sur l'appareil ; la première fois, tout compte comme vu */
+const NV={ K:"nvVus", m:null, lis(){ if(!this.m){ try{ this.m=JSON.parse(localStorage.getItem(this.K)||"{}")||{}; }catch(_){ this.m={}; } } return this.m; },
+  ecris(){ try{ localStorage.setItem(this.K,JSON.stringify(this.m)); }catch(_){} },
+  ids(c){ const S=[]; ["tasks","ideas","dates","links","sugg"].forEach(k=>(c[k]||[]).forEach(x=>{ if(x&&x.id) S.push(x.id); })); (c.rub||[]).forEach(r=>{ (r.items||[]).forEach(x=>{ if(x&&x.id) S.push(x.id); }); (r.news||[]).forEach(x=>{ if(x&&x.id) S.push(x.id); }); }); return S; },
+  n(c){ const M=this.lis(), I=this.ids(c); if(!M[c.id]){ M[c.id]=I; this.ecris(); return 0; } const V=new Set(M[c.id]); return I.filter(x=>!V.has(x)).length; },
+  vu(id){ const c=cats.get(id); if(!c) return; const M=this.lis(); M[id]=this.ids(c); this.ecris(); } };
+function open(id){ NV.vu(id); flushNotes(); if(openId!==id){ sect="rubs"; ranger=false; } openId=id; kick(); drawer.hidden=false; drawer.scrollTop=0; resetDel(); $("saved").textContent=""; renderDrawer(true); renderBoard(); }
 let boardSale=false, paneT=0, paneSig="";
 /* empreinte d'un espace sans ses champs de synchro : sert à ne pas redessiner sa page quand la synchro renvoie la même chose */
 const sigCat=c=>{ try{ return c?JSON.stringify(c,(k,v)=>k&&k[0]==="_"?undefined:v):""; }catch(_){ return ""; } };
@@ -2869,6 +2879,8 @@ function renderCockpit(){ const k=cockpit, sec=el("section",{className:"card coc
   const sa=el("div",{className:"ckbloc"},el("h4",{textContent:"Santé du système"}),el("p",{textContent:s.erreurs_7j?s.erreurs_7j+(s.erreurs_7j>1?" erreurs":" erreur")+" en 7 jours"+(s.derniere?" — dernière : "+s.derniere.objet:""):"Aucune erreur en 7 jours."}));
   const as=el("div",{className:"ckbloc"},el("h4",{textContent:"Assistants"}),el("p",{textContent:Object.keys(ASS_ETATS).filter(x=>st[x]).map(x=>st[x]+" "+(st[x]>1?ASS_PLUR[x]:ASS_ETATS[x])).join(" · ")||"—"}));
   sec.append(sa,as,el("p",{className:"help",textContent:"Mis à jour le "+(k.maj?new Date(k.maj).toLocaleString("fr-FR",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}):"—")+"."})); pane.appendChild(sec); }
+/* les suggestions déposées dans les espaces (hors veille), pas encore traitées, les plus récentes d'abord */
+function suggAttente(){ return [...cats.values()].filter(c=>prioOf(c)!==1).flatMap(c=>(c.sugg||[]).filter(s=>s&&!s.done&&(s.titre||s.texte)).map(s=>({c,s}))).sort((a,b)=>String(b.s.t||"").localeCompare(String(a.s.t||""))); }
 function renderSugg(c){
   const own=c.sugg||[], glob=((fb&&fb.items)||[]).filter(it=>(it.espaces||[]).some(n=>String(n).toLowerCase()===(c.name||"").toLowerCase()));
   const sec=el("section",{className:"card sugg"},el("h3",{textContent:"Suggestions de l'IA"})); sec.dataset.k="sugg";
@@ -4828,7 +4840,7 @@ const ESSAI={ tr:{}, me:{}, pr:[], memF:"tout",
 
   /* --- le bandeau de l'accueil : la boussole en un coup d'œil --- */
   rend(){ const z=$("boussole"); if(!z||!loaded) return; z.textContent=""; z.hidden=false;
-    const v=this.aValider(), n=v.L.length, vb=$("valBtn"); if(vb){ vb.textContent="✓ À valider"+(n?" ("+n+")":""); vb.classList.toggle("on",!!n); }
+    const v=this.aValider(), n=(()=>{ try{ return V2.nValider(); }catch(_){ return v.L.length+suggAttente().length; } })(), vb=$("valBtn"); if(vb){ vb.textContent="✓ À valider"+(n?" ("+n+")":""); vb.classList.toggle("on",!!n); }
     const dir=el("button",{type:"button",className:"bcard bdir"},el("small",{className:"mono",textContent:"Ma direction"}),el("span",{textContent:this.tr.direction||"Écris en une phrase où tu vas."}));
     dir.onclick=()=>this.ouvreTraj(); z.appendChild(dir);
     const H=(this.tr.horizons||[]).filter(x=>x.h==="3m"&&!x.done), D=(this.tr.decisions||[]).filter(x=>x.etat!=="prise").sort((a,b)=>String(a.date||"9").localeCompare(String(b.date||"9")));
@@ -4951,7 +4963,7 @@ const ESSAI={ tr:{}, me:{}, pr:[], memF:"tout",
       a.onclick=()=>{ fetel(a); this.repond(x,"acceptee",ed?ed.value.trim():null); }; p.onclick=()=>this.repond(x,"plus_tard"); n.onclick=()=>this.repond(x,"refusee");
       box.appendChild(el("div",{className:"bact"},a,p,n)); if(window.SUIVI) SUIVI.attache(box,{titre:x.titre||d.text,contexte:[x.titre&&d.text,x.pourquoi].filter(Boolean).join(" · "),source:[TY[x.type]||x.type,c&&c.name].filter(Boolean).join(" · "),lien:d.url,range:()=>SUIVI.rangeProp(x)}); return box; };
     const sec=this.carte(z,L.length?L.length+" proposition"+(L.length>1?"s":""):"Rien à valider");
-    if(!L.length) sec.appendChild(help("Tout est traité. Les prochaines propositions arriveront ici."));
+    if(!L.length) sec.appendChild(help(suggAttente().length?"Pas de proposition générale : les pistes de tes espaces sont plus bas.":"Tout est traité. Les prochaines propositions arriveront ici."));
     /* gestion facile : accepter d'un geste toutes les propositions d'un même type */
     const parType={}; L.forEach(x=>{ (parType[x.type]=parType[x.type]||[]).push(x); });
     const lots=Object.entries(parType).filter(([,v])=>v.length>=3); if(lots.length){ const ch=el("div",{className:"chips"}); lots.forEach(([k,v])=>{ const b=el("button",{type:"button",className:"vchip",textContent:"Tout garder : les "+v.length+" « "+(TY[k]||k)+" »"});
@@ -5000,14 +5012,14 @@ const V2={
   veilles(){ const C=cockpit||{}, vus=new Set(), L=[], cle=e=>e.type+"|"+e.quand+"|"+e.objet;
     [...(C.a_relire||[]),...(C.alertes||[])].forEach(e=>{ if(!e||!e.objet) return; const k=cle(e), n=plNorm(e.objet); if(ckMasques.includes(k)||vus.has(n)) return; vus.add(n); L.push(Object.assign({_k:k},e)); });
     return L.sort((a,b)=>String(b.quand).localeCompare(String(a.quand))); },
-  nValider(){ return ESSAI.aValider().L.length+this.veilles().length; },
+  nValider(){ return ESSAI.aValider().L.length+this.veilles().length+suggAttente().length; },
   range(){ const z=$("aujIn"); if(z&&!z.dataset.pret){ z.dataset.pret="1"; z.append($("today"),$("pilote")); }
     /* les chiffres du calendrier restent en haut de l'accueil */ const ag=$("agenda"), bd=$("bande"); if(ag&&bd&&ag.nextElementSibling!==bd){ bd.before(ag); if(!ag.dataset.v3){ ag.dataset.v3="1"; ag.addEventListener("click",e=>{ if(e.target.closest(".day")) ag.classList.add("ouvert"); }); } } },
   bande(){ const z=$("bande"); if(!z||!loaded) return; this.range(); z.textContent=""; z.hidden=false; const a=this.aujourdhui(), n=this.nValider();
     const P=ESSAI&&PILOTE.prios?PILOTE.prios():[], fait=P.filter(x=>x.done).length;
     const puce=(lab,val,sous,fn,fort)=>{ const b=el("button",{type:"button",className:"puce2"+(fort?" fort":"")},el("small",{textContent:lab}),el("b",{textContent:val}),el("span",{textContent:sous})); b.onclick=fn; z.appendChild(b); };
     const nA=a.rdv+a.taches; puce("Aujourd'hui",nA?String(nA):"✓",[a.rdv?a.rdv+" rendez-vous":"",a.taches?a.taches+" à faire":"",a.habTot?(a.habTot-a.hab)+"/"+a.habTot+" habitudes":""].filter(Boolean).join(" · ")||"rien d'urgent",()=>this.ouvreAuj(),nA>0);
-    puce("À valider",n?String(Math.min(n,5)):"✓",n?(n>5?"les plus utiles d'abord":"à décider"):"tout est fait",()=>ESSAI.ouvreVal(),n>0);
+    puce("À valider",n?(n>99?"99+":String(n)):"✓",n?"à décider, les plus utiles d'abord":"tout est fait",()=>ESSAI.ouvreVal(),n>0);
     puce("Ma semaine",P.length?fait+"/"+P.length:"→",P.length?"priorités faites":"revue et priorités",()=>ESSAI.ouvreTraj()); },
   ouvreAuj(){ const pg=$("aujPage"), z=$("aujIn"); pg.hidden=false; pg.scrollTop=0;
     this.range();
@@ -6912,7 +6924,7 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=174; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=175; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
