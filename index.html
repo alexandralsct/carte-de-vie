@@ -1975,6 +1975,7 @@ html.calme :is(.souris,.chatmot,.griffes){display:none}
 :root[data-theme="sombre"] #atelierIn .vprop small.mono,:root[data-theme="sombre"] #atelierIn .atfiche small.mono{color:#a9bfff!important}
 :root[data-theme="sombre"] .atbientot{border-color:#a9bfff}
 
+.pen.pflash{outline:3px solid var(--k1,#002FA7);outline-offset:3px;border-radius:14px;transition:outline-color .3s}
 </style>
 <script>
 /* version test : ?test=1 → données à part (préfixe « test: » sur tout le stockage local), jamais celles de la carte principale */
@@ -4778,14 +4779,19 @@ const RAPPELS={
       if(c.type==="habitudes"){ const dd=new Date(td+"T12:00").getDate(); if(dd===1||dd===15){ const M=new Date().getMonth(), k=td.slice(0,7), A=(c.annuel||[]).filter(t=>t.freq!=="hebdo"&&t.freq!=="2sem"&&aPrevu(t,M)&&!(t.faits||[]).includes(k)); if(A.length) L.push({id:"a"+k+dd,titre:"Ce mois-ci · "+A.map(t=>t.name).slice(0,3).join(", "),corps:"Mois et année",quand:at(td,9,0)}); } } }
     if(dow===0&&!PILOTE.rv.some(r=>r.sem===PILOTE.plus(semaineDe(td),7))) L.push({id:"r"+td,titre:"C'est le moment de ta revue de la semaine",corps:"Cinq minutes pour choisir tes 3 priorités",quand:at(td,18,0)});
     const cu=[...cats.values()].find(x=>x.id==="cuisine"); if(dow===1&&cu&&!((cu.jeu||{}).tendances||[]).some(x=>x.sem===semaineDe(td))) L.push({id:"c"+td,titre:"Ta tendance cuisine de la semaine ?",corps:"Cuisine · Mes livres",quand:at(td,9,30)});
-    if(!PILOTE.en[td]) L.push({id:"e"+td,titre:"Ton énergie aujourd'hui ?",corps:"Un geste, de 1 à 5",quand:at(td,20,0)});
+    if(!PILOTE.en[td]) L.push({id:"e"+td,titre:"Ton énergie aujourd'hui ?",corps:"Un geste, de 1 à 5",quand:at(td,20,0),url:"./#energie"});
+    try{ SOIR.ecoute(); }catch(_){} if(!(SOIR.docs[td]&&SOIR.docs[td].t)) L.push({id:"s"+td,titre:"Ferme ta journée",corps:"Une minute pour faire le point et préparer demain",quand:at(td,21,0),url:"./#soir"});
     return L; },
   async range(){ try{ const L=this.liste(); const c=await caches.open("carte-rappels"); await c.put("rappels.json",new Response(JSON.stringify(L),{headers:{"Content-Type":"application/json"}})); }catch(_){} },
   async montre(){ if(!("Notification" in window)||Notification.permission!=="granted"||!navigator.serviceWorker) return; try{ const reg=await navigator.serviceWorker.ready, c=await caches.open("carte-rappels"), r=await c.match("vus.json"), vus=r?await r.json():[], now=Date.now(), V=new Set(vus);
-      for(const x of this.liste()){ if(x.quand<=now&&now-x.quand<6*3600e3&&!V.has(x.id)){ await reg.showNotification(x.titre,{body:x.corps,tag:x.id,icon:"icon-192.png",badge:"icon-192.png"}); V.add(x.id); } }
+      for(const x of this.liste()){ if(x.quand<=now&&now-x.quand<6*3600e3&&!V.has(x.id)){ await reg.showNotification(x.titre,{body:x.corps,tag:x.id,icon:"icon-192.png",badge:"icon-192.png",data:{url:x.url||"./"}}); V.add(x.id); } }
       await c.put("vus.json",new Response(JSON.stringify([...V].slice(-300)))); }catch(_){} },
   async active(){ try{ const p=await Notification.requestPermission(); if(p!=="granted") return PILOTE.rend(); const reg=await navigator.serviceWorker.ready; if(reg.periodicSync) try{ await reg.periodicSync.register("rappels",{minInterval:3*3600e3}); }catch(_){} await this.range(); await this.montre(); }catch(_){} PILOTE.rend(); },
-  tic(){ this.range(); this.montre(); } };
+  tic(){ this.range(); this.montre(); },
+  /* arrivée par une notification (#energie, #soir) ou un message du service worker : ouvrir la bonne page */
+  va(h){ h=String(h||"").replace(/^#/,""); if(h==="soir"){ try{ SOIR.ouvre(); }catch(_){} } else if(h==="energie"){ try{ V2.ouvreAuj(); }catch(_){} const z=$("pilote"); if(z){ setTimeout(()=>z.scrollIntoView({block:"center"}),60); const p=z.querySelector(".pen"); if(p){ p.classList.add("pflash"); setTimeout(()=>p.classList.remove("pflash"),2400); } } }
+    if(/^#(soir|energie)$/.test(location.hash)) try{ history.replaceState(null,"",location.pathname+location.search); }catch(_){} } };
+if(navigator.serviceWorker) navigator.serviceWorker.addEventListener("message",e=>{ if(e.data&&e.data.va&&loaded) RAPPELS.va(e.data.va); });
 setInterval(()=>{ if(loaded) RAPPELS.tic(); },10*60e3); document.addEventListener("visibilitychange",()=>{ if(!document.hidden&&loaded){ PILOTE.rend(); RAPPELS.tic(); } });
 $("chercheQ").addEventListener("input",e=>{ clearTimeout(PILOTE._t); PILOTE._t=setTimeout(()=>PILOTE.cherche(e.target.value),150); });
 $("chercheClose").onclick=()=>{ $("cherchePage").hidden=true; }; $("revueClose").onclick=()=>{ $("revuePage").hidden=true; }; $("chercheBtn").onclick=()=>PILOTE.ouvreRecherche();
@@ -5348,6 +5354,7 @@ const MEMP={ L:[], notes:[], sub:false,
   item("!","Urgences",()=>{ const c=[...cats.values()].find(x=>/^(a traiter|notes)$/.test(plNorm(x.name||""))||x.forme==="bulle"); if(c) open(c.id); });
   item("✦","Mon chemin",()=>V3.ouvreChemin(),"r-proprio");
   item("☾","Ferme ta journée",()=>SOIR.ouvre());
+  if("Notification" in window&&Notification.permission!=="granted") item("🔔",Notification.permission==="denied"?"Rappels bloqués (réglages du téléphone)":"Activer les rappels (énergie 20 h, journée 21 h)",()=>{ if(Notification.permission==="denied") alert("Les notifications sont bloquées pour l'app : autorise-les dans les réglages du téléphone (Applications → Ma carte de vie → Notifications), puis rouvre l'app."); else RAPPELS.active(); });
   item("◎","Ma mémoire perso",()=>MEMP.ouvre());
   if($("sugBtn")) item("✎","Mes idées pour l'app",()=>$("sugBtn").click(),"r-proprio");
   rail.append(tir,box); document.body.appendChild(rail);
@@ -6836,7 +6843,7 @@ function start(){
     col.onSnapshot(snap=>{
       loaded=true; const m=new Map();
       snap.docs.forEach(x=>{ const d=x.data(); m.set(x.id,Object.assign({id:x.id},d,{color:soft(d.color)})); });
-      cats=m; setTimeout(()=>{ PILOTE.rend(); ESSAI.rend(); RAPPELS.tic(); },0); if(!window._intro){ window._intro=1; board.classList.add("intro"); setTimeout(()=>board.classList.remove("intro"),2200); } /* nouvelle disposition des tuiles encadrées (nom sous la tuile) : sur ordinateur, la carte se range une fois d'elle-même */ if(cats.size>3&&!isStack()&&!isNu()&&!document.documentElement.classList.contains("dedans")&&(!db.cfg()||db.synced)){ let fait=true; try{ fait=!!localStorage.getItem("range108"); if(!fait) localStorage.setItem("range108","1"); }catch(_){} if(!fait) setTimeout(()=>{ arrange(); },400); }
+      cats=m; setTimeout(()=>{ PILOTE.rend(); ESSAI.rend(); RAPPELS.tic(); if(!window._vaH&&/^#(soir|energie)$/.test(location.hash)){ window._vaH=1; setTimeout(()=>RAPPELS.va(location.hash),400); } },0); if(!window._intro){ window._intro=1; board.classList.add("intro"); setTimeout(()=>board.classList.remove("intro"),2200); } /* nouvelle disposition des tuiles encadrées (nom sous la tuile) : sur ordinateur, la carte se range une fois d'elle-même */ if(cats.size>3&&!isStack()&&!isNu()&&!document.documentElement.classList.contains("dedans")&&(!db.cfg()||db.synced)){ let fait=true; try{ fait=!!localStorage.getItem("range108"); if(!fait) localStorage.setItem("range108","1"); }catch(_){} if(!fait) setTimeout(()=>{ arrange(); },400); }
       quandLibre("carte",()=>{ /* page d'un item ouverte en plein écran : la carte, cachée dessous, sera redessinée à la fermeture */ if(openId&&!drawer.hidden&&drawer.offsetWidth>=innerWidth-2) boardSale=true; else renderBoard(); if(window._autoArr) window._autoArr();
         /* la page de l'item : une seule fois par image ; si elle vient d'être redessinée par le geste lui-même, on ne met à jour que l'en-tête */ if(openId){ const t=performance.now(); cancelAnimationFrame(window._rdF); window._rdF=requestAnimationFrame(()=>{ if(openId) renderDrawer(false,paneT>t||sigCat(cats.get(openId))===paneSig); }); } if(!relPage.hidden) renderRel(); });
       if(!window._onbChecked){ window._onbChecked=true; let seen=false; try{ seen=!!localStorage.getItem("carte-de-vie-vu"); }catch(_){} if(!cats.size&&!seen){ setTimeout(()=>{ let vu=false; try{ vu=!!localStorage.getItem("carte-de-vie-vu"); }catch(_){} if(!cats.size&&!vu&&onb.hidden){ renderOnb(); onb.hidden=false; } },document.documentElement.classList.contains("claude")?8000:2500); } }
@@ -6888,7 +6895,7 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=171; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=172; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
