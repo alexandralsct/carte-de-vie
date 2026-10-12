@@ -2032,6 +2032,8 @@ html.lifeo,html.lifeo body{overflow:hidden}
 .setgrp>summary::-webkit-details-marker{display:none}.setgrp>summary::after{content:"+";font-size:1.3rem}.setgrp[open]>summary::after{content:"–"}
 .setgrp>summary small{display:block;font:400 .78rem var(--body,inherit);color:var(--muted,#5a6a90);margin-top:2px}
 .setgrp ul.setlist{margin:0 0 12px}
+.bande .atpuce{grid-column:auto!important;display:grid!important;gap:2px!important;align-content:start!important;padding:8px 10px!important;min-height:58px!important}
+.bande .atpuce em{display:none}
 
 </style>
 <script>
@@ -6185,6 +6187,8 @@ window.addEventListener("hashchange",()=>{ if(location.hash==="#life") LIFEP.ouv
   const oO=LIFEP.ouvre.bind(LIFEP), oF=LIFEP.ferme.bind(LIFEP);
   LIFEP.ouvre=function(){ if(vp&&!/interactive-widget/.test(base)) vp.setAttribute("content",base+", interactive-widget=resizes-content"); return oO(); };
   LIFEP.ferme=function(){ if(vp) vp.setAttribute("content",base); return oF(); }; }
+/* l'Atelier (Craft) devient une tuile comme les autres ; les petits carrés passent en dessous */
+{ const oB=V2.bande.bind(V2); V2.bande=function(){ const r=oB.apply(this,arguments), z=$("bande"), pc=z&&z.querySelector(".pcarres"); if(pc) z.appendChild(pc); return r; }; }
 
 /* A8 : une icône qui ne charge pas laisse la place au logo de l'app, plus de carré blanc */
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&!i.dataset.repli&&(i.classList.contains("lgimg")||i.closest(".node,.ico"))){ i.dataset.repli="1"; i.src="icon-192.png"; i.classList.add("repli"); } },true);
