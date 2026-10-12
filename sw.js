@@ -1,4 +1,4 @@
-const C="carte-de-vie-v170";
+const C="carte-de-vie-v171";
 const FILES=["./","./index.html","./manifest.webmanifest","./manifest-test.webmanifest","./icon-192.png","./icon-512.png","./icon-maskable-512.png","./monde.js"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()));});
 /* les adresses avec « ?… » (sw.js?v=…, ?test=1) ne sont jamais gardées : elles rempliraient le cache sans fin ; on retire celles des anciennes versions */

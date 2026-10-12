@@ -1940,6 +1940,41 @@ html.calme :is(.souris,.chatmot,.griffes){display:none}
 .hnom svg{color:var(--k1,#002FA7);--c:var(--k1,#002FA7)}
 .hnom svg [style*=stroke]{stroke:var(--k1,#002FA7)!important}
 .hnom svg .vL *{fill:none!important;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+/* Atelier : quatrième puce de l'accueil, page à trois onglets */
+#atelierPage{--c:var(--ink);background:var(--bg)}
+#atelierPage h2{font:600 28px/1.1 var(--display)!important;margin:0}
+/* téléphone : une ligne fine sous les trois puces ; ordinateur : quatrième puce */
+.bande .atpuce{grid-column:1/-1;min-height:0!important;display:flex;align-items:center;gap:10px;padding:8px 12px}
+.bande .atpuce b{font-size:1.1rem;line-height:1}
+.bande .atpuce span{flex:1;min-width:0}
+.bande .atpuce em{font-style:normal;font-weight:700;color:var(--ink)}
+@media (min-width:761px){ .bande:has(.atpuce){grid-template-columns:repeat(4,minmax(0,220px))!important}
+  .bande .atpuce{grid-column:auto;display:grid;gap:2px;align-content:start;padding:10px 12px}.bande .atpuce em{display:none} }
+.atseg{margin:0 0 12px;flex-wrap:nowrap}
+#atelierIn{padding-bottom:110px}
+.atsec{display:flex;flex-direction:column;gap:10px;min-width:0}
+.atlab{display:flex;flex-direction:column;gap:4px;min-width:0}
+.atsec textarea,.atsec input,.atsec select{font:inherit;font-size:.95rem;border:1.5px solid color-mix(in srgb,var(--ink) 30%,transparent);border-radius:10px;padding:8px 10px;background:var(--board);color:var(--fg);width:100%;min-width:0;box-sizing:border-box}
+.atsec textarea{resize:vertical;min-height:96px}
+.atnb{align-self:flex-end;margin-top:-6px;font-size:11px;color:var(--muted)}
+.atchips{display:flex;flex-wrap:wrap;gap:6px}
+.atbientot{margin:0;padding:10px 12px;border-radius:12px;border:1.5px dashed var(--ink);background:var(--surface);color:var(--fg);overflow-wrap:anywhere}
+.atbientot b{display:inline-block;font:700 .72rem var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--ink);color:var(--surface)}
+.atgrille{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+@media (min-width:700px){ .atgrille{grid-template-columns:repeat(2,minmax(0,1fr))} }
+.atfiche{min-width:0;overflow-wrap:anywhere;display:flex;flex-direction:column;gap:6px}
+.atfiche.s-ECHEC{border-style:dashed}
+.atfiche .bact{flex-wrap:wrap;align-items:center}
+.atimg{display:block;width:100%;max-width:320px;height:auto;border-radius:12px;border:1.5px solid color-mix(in srgb,var(--ink) 20%,transparent);background:var(--board)}
+.atimg.grand{max-width:512px}
+.attxt{margin:0;white-space:pre-wrap}
+:root[data-theme="sombre"] .bande .atpuce b{filter:none}
+#atelierIn .card{border:2px solid #002FA7;box-shadow:4px 4px 0 #c9d6f0}
+#atelierIn .atfiche small.mono{color:var(--muted)}
+:root[data-theme="sombre"] #atelierIn .card{border-color:#a9bfff;box-shadow:4px 4px 0 #070f22}
+:root[data-theme="sombre"] #atelierIn .vprop small.mono,:root[data-theme="sombre"] #atelierIn .atfiche small.mono{color:#a9bfff!important}
+:root[data-theme="sombre"] .atbientot{border-color:#a9bfff}
+
 </style>
 <script>
 /* version test : ?test=1 → données à part (préfixe « test: » sur tout le stockage local), jamais celles de la carte principale */
@@ -2075,6 +2110,7 @@ html.calme :is(.souris,.chatmot,.griffes){display:none}
 <aside class="page" id="trajPage" hidden aria-label="Ma trajectoire"><div class="page-in"><div><button class="btn ghost" id="trajClose">← Ma carte</button></div><div id="trajIn"></div></div></aside>
 <aside class="page" id="memPage" hidden aria-label="Ma mémoire"><div class="page-in"><div><button class="btn ghost" id="memClose">← Ma carte</button></div><div id="memIn"></div></div></aside>
 <aside class="page" id="suiviPage" hidden aria-label="Mon suivi"><div class="page-in"><div><button class="btn ghost" id="suiviClose">← Ma carte</button></div><div id="suiviIn"></div></div></aside>
+<aside class="page" id="atelierPage" hidden aria-label="Atelier"><div class="page-in"><div><button class="btn ghost" id="atelierClose">← Ma carte</button></div><div id="atelierIn"></div></div></aside>
 <aside class="page" id="valPage" hidden aria-label="À valider"><div class="page-in"><div><button class="btn ghost" id="valClose">← Ma carte</button></div><div id="valIn"></div></div></aside>
 <aside class="page noterp" id="noterPage" hidden aria-label="Noter"><div class="page-in"><div><button class="btn ghost" id="noterClose">← Ma carte</button></div>
  <h2>Noter</h2><textarea id="noterTxt" rows="5" placeholder="Ce qui me passe par la tête. Une ligne = une chose."></textarea>
@@ -5810,6 +5846,134 @@ function blocPropose(c){ const L=((c.jeu||{}).placard)||[], w=el("div",{classNam
       FICHES.get(r.livre_id).then(F=>{ const y=F&&F.fiches&&F.fiches[r.id]; if(!y||y.introuvable||(!(y.ing||[]).length&&!(y.etapes||[]).length)){ fz.textContent=""; fz.appendChild(el("p",{className:"mut",textContent:"Le détail de cette recette n'est pas encore prêt : ouvre le livre."+((r.ingredients_principaux||[]).length?" Ingrédients principaux : "+r.ingredients_principaux.join(", ")+".":"")})); return; } fz.replaceWith(ficheRendu(y)); }); } }
   w.appendChild(carte); return w; }
 
+/* ===== Atelier : créer une image à partir d'un prompt, confier un travail aux outils Craft =====
+   Rien ne tourne dans l'app : chaque demande part au lien avec le système (même adresse, même clé que les suivis).
+     { type:"image", image:{ prompt, format:"carre"|"portrait"|"paysage", qualite:"brouillon"|"normale"|"soignee", nom } }
+     { type:"craft", craft:{ texte, fichier, outil } }
+   meta/atelier { <id>:{ genre:"image"|"craft", date, texte, outil, statut, lien, apercu_lien }, _m, _f } est posé par l'agent du
+   système ; l'app ne l'écrit jamais. En attendant, les réponses reçues sont gardées sur l'appareil.
+   Tant que le système ne connaît pas un type (« type inconnu », lien absent), l'onglet affiche « Bientôt disponible ».
+   Statuts : SUCCES, PARTIEL, ECHEC, INCERTAIN, a_traiter. Tout texte reçu : textContent seulement, liens https seulement. */
+window.ATELIER={ D:null, onglet:"image", filtre:"tous", occupe:false, msg:{image:"",craft:""}, dernier:null,
+  FI:{prompt:"",format:"carre",qualite:"normale",nom:""}, FC:{texte:"",fichier:"",outil:""},
+  OUTILS:["PhotoCraft","VectorCraft","PdfCraft","LightCraft","FilmCraft","EffectCraft","DesignCraft"],
+  FORMATS:[["carre","Carré"],["portrait","Portrait"],["paysage","Paysage"]],
+  QUAL:[["brouillon","Brouillon"],["normale","Normale"],["soignee","Soignée"]],
+  ST:{SUCCES:"Réussi",PARTIEL:"Partiel",ECHEC:"Échec",INCERTAIN:"Incertain",a_traiter:"À traiter · 3 h au plus"},
+  K:"atelier-local", KD:"atelier-dispo", KB:"atelier-brouillon",
+  lit(k,d){ try{ const v=JSON.parse(localStorage.getItem(k)||"null"); return v==null?d:v; }catch(_){ return d; } },
+  ecrit(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(_){} },
+  lienSur(u){ u=String(u||"").trim(); return /^https:\/\/[^\s"'<>]+$/i.test(u)?u.slice(0,1000):""; },
+  imgSure(u){ u=String(u||""); return /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(u)&&u.length<15e5?u:""; },
+  idOk(i){ return /^[\w-]{1,40}$/.test(String(i||"")); },
+  /* le système a-t-il branché ce type ? oui (réponse reçue ou créations synchronisées), non (« type inconnu »), sinon inconnu */
+  dispo(g){ if(this.liste().some(x=>x.genre===g&&x.source==="carte")) return "oui"; return (this.lit(this.KD,{})||{})[g]||"inconnu"; },
+  marque(g,v){ const d=this.lit(this.KD,{})||{}; d[g]=v; this.ecrit(this.KD,d); },
+  propre(id,x,src){ if(!x||typeof x!=="object"||Array.isArray(x)||!this.idOk(id)) return null; const t=(v,n)=>typeof v==="string"?v.slice(0,n||600):"";
+    return {id:String(id),genre:x.genre==="craft"?"craft":"image",date:t(x.date,30),texte:t(x.texte||x.prompt,2000),outil:t(x.outil,40),
+      statut:this.ST[x.statut]?x.statut:"INCERTAIN",lien:this.lienSur(x.lien),apercu:this.imgSure(x.apercu)||this.lienSur(x.apercu_lien),format:t(x.format,12),source:src}; },
+  charge(d){ this.D=d&&typeof d==="object"?d:null; this.rafraichit(); },
+  locales(){ const L=this.lit(this.K,[]); return Array.isArray(L)?L:[]; },
+  garde(x){ const L=this.locales().filter(y=>y&&y.id!==x.id); L.unshift(x);
+    /* l'appareil garde 30 créations, et l'aperçu des 8 plus récentes seulement (place limitée) */
+    this.ecrit(this.K,L.slice(0,30).map((y,i)=>i<8?y:Object.assign({},y,{apercu:/^data:/.test(y.apercu||"")?"":y.apercu}))); },
+  liste(){ const o={}; this.locales().forEach(x=>{ const y=x&&this.propre(x.id,x,"appareil"); if(y) o[y.id]=y; });
+    if(this.D) Object.keys(this.D).forEach(k=>{ if(k.startsWith("_")) return; const y=this.propre(k,this.D[k],"carte"); if(y){ if(!y.apercu&&o[k]) y.apercu=o[k].apercu; o[k]=y; } });
+    return Object.values(o).sort((a,b)=>String(b.date).localeCompare(String(a.date))); },
+  brouillon(){ const b=this.lit(this.KB,null); if(b&&typeof b==="object"){ if(b.FI) Object.assign(this.FI,b.FI); if(b.FC) Object.assign(this.FC,b.FC); } },
+  retient(){ this.ecrit(this.KB,{FI:this.FI,FC:this.FC}); },
+  dit(g,t){ this.msg[g]=t; const m=this.onglet===g&&document.querySelector("#atelierIn .atmsg"); if(m) m.textContent=t; },
+  /* envoi au système ; la réponse est lue même en cas d'erreur (« type inconnu ») */
+  async envoie(g,corps,bt){ if(this.occupe) return; const cle=lienCle(), nom=g==="image"?"la création d'images":"les outils Craft";
+    if(!LIEN_URL){ this.dit(g,"Bientôt disponible : le lien avec le système n'est pas activé sur cet appareil. Ta demande est gardée."); return; }
+    if(!cle){ this.dit(g,"Colle d'abord la clé du lien avec le système (en bas de la page)."); this.cleOuverte=true; this.rend(); return; }
+    this.occupe=true; this.dit(g,g==="image"?"🎨 Je dessine… (15 à 60 secondes)":"Envoi au système…"); this.rend();
+    try{ const r=await lienPost(corps,cle), j=await r.json().catch(()=>({}));
+      if(r.status===401||r.status===403){ this.dit(g,"Clé du lien refusée : vérifie-la (« Oublier la clé », puis recolle-la)."); return; }
+      if(r.status===404||/type inconnu/i.test(String(j&&j.erreur||""))){ this.marque(g,"non"); this.dit(g,"Bientôt disponible : le système n'a pas encore branché "+nom+". Ta demande est gardée ici, tu pourras la renvoyer."); return; }
+      if(!r.ok&&!(j&&j.ok===false)){ this.dit(g,"Le système a répondu une erreur ("+r.status+"). Réessaie dans un moment."); return; }
+      this.marque(g,"oui");
+      if(j.ok===false||j.statut==="ECHEC"){ this.dit(g,"ÉCHEC — "+(typeof j.erreur==="string"&&j.erreur.trim()?j.erreur.trim().slice(0,400):"le système n'a pas pu le faire.")); return; }
+      if(!this.idOk(j.id)){ this.dit(g,"Réponse du système incomplète : statut INCERTAIN. Regarde dans « Mes créations » au prochain passage."); return; }
+      const x={id:String(j.id),genre:g,date:new Date().toISOString(),statut:this.ST[j.statut]?j.statut:(g==="craft"?"a_traiter":"INCERTAIN"),lien:this.lienSur(j.lien),
+        texte:g==="image"?corps.image.prompt:corps.craft.texte,outil:g==="craft"?corps.craft.outil||"":"",format:g==="image"?corps.image.format:"",apercu:this.imgSure(j.apercu)};
+      this.garde(x); if(bt) fetel(bt);
+      if(g==="image"){ this.dernier=x.id; this.dit(g,(this.ST[x.statut]||x.statut)+(typeof j.cout_estime==="string"||typeof j.cout_estime==="number"?" · coût estimé : "+String(j.cout_estime).slice(0,40):"")); }
+      else { this.FC={texte:"",fichier:"",outil:""}; this.retient(); this.dit(g,typeof j.reponse==="string"&&j.reponse.trim()?j.reponse.trim().slice(0,600):"Noté "+x.id+" : traité dans les 3 h au plus."); }
+    }catch(_){ this.dit(g,"Le système n'a pas répondu (connexion ?). Ta demande est gardée : réessaie dans un moment."); }
+    finally{ this.occupe=false; this.rend(); } },
+  /* « Tout de suite » : la demande part dans le presse-papiers, claude.ai/code s'ouvre */
+  async direct(){ const F=this.FC, t=F.texte.trim(); if(!t){ this.dit("craft","Écris d'abord ce que tu veux."); this.rend(); return; }
+    const txt="Avec les outils Craft (.mcp.json du dépôt) : "+t+(F.fichier.trim()?"\nFichier : "+F.fichier.trim():"")+(F.outil?"\nOutil : "+F.outil:"");
+    let copie=false; try{ await navigator.clipboard.writeText(txt); copie=true; }catch(_){}
+    window.open("https://claude.ai/code","_blank","noopener,noreferrer");
+    this.dit("craft",copie?"Ta demande est copiée : colle-la dans la session qui vient de s'ouvrir.":"Copie impossible ici : recopie ta demande dans la session qui vient de s'ouvrir."); },
+  choix(L,val,fn,lab){ const g=el("div",{className:"chips atchips"}); g.setAttribute("role","group"); g.setAttribute("aria-label",lab);
+    L.forEach(([k,n])=>{ const b=el("button",{type:"button",className:"vchip",textContent:n}); b.setAttribute("aria-pressed",String(k===val)); b.onclick=()=>{ fn(k); [...g.children].forEach(x=>x.setAttribute("aria-pressed",String(x===b))); }; g.appendChild(b); });
+    return g; },
+  lab(t,c){ return el("label",{className:"slab atlab"},el("small",{textContent:t}),c); },
+  bientot(g){ const d=this.dispo(g); if(d==="oui") return null;
+    return el("p",{className:"atbientot"},el("b",{textContent:"Bientôt disponible"}),el("span",{textContent:g==="image"?" · la création d'images sera branchée par ton système. Tu peux déjà préparer ton prompt.":" · le traitement par la routine sera branché par ton système. « Tout de suite » marche déjà."})); },
+  apercu(x,grand){ if(!x.apercu) return null; const i=el("img",{src:x.apercu,alt:"Aperçu : "+String(x.texte).slice(0,120),loading:"lazy",className:"atimg"+(grand?" grand":"")}); i.referrerPolicy="no-referrer"; return i; },
+  ongletImage(z){ const F=this.FI; const b=this.bientot("image"); if(b) z.appendChild(b);
+    const p=el("textarea",{maxLength:2000,rows:4,value:F.prompt,placeholder:"Décris l'image : sujet, ambiance, couleurs, style…"}); p.setAttribute("aria-label","Prompt");
+    const n=el("small",{className:"atnb",textContent:F.prompt.length+" / 2 000"}); p.oninput=()=>{ F.prompt=p.value; n.textContent=p.value.length+" / 2 000"; this.retient(); };
+    const nom=el("input",{maxLength:80,value:F.nom,placeholder:"facultatif"}); nom.setAttribute("aria-label","Nom de l'image"); nom.oninput=()=>{ F.nom=nom.value; this.retient(); };
+    const ok=el("button",{type:"button",className:"btn",textContent:this.occupe?"🎨 Je dessine…":"Créer l'image",disabled:this.occupe});
+    ok.onclick=()=>{ const t=p.value.trim(); if(!t){ p.focus(); return; } this.envoie("image",{type:"image",image:{prompt:t,format:F.format,qualite:F.qualite,nom:nom.value.trim()}},ok); };
+    z.append(this.lab("Prompt",p),n,this.lab("Format",this.choix(this.FORMATS,F.format,k=>{ F.format=k; this.retient(); },"Format")),
+      this.lab("Qualité",this.choix(this.QUAL,F.qualite,k=>{ F.qualite=k; this.retient(); },"Qualité")),this.lab("Nom",nom),el("div",{className:"bact"},ok));
+    z.appendChild(this.zoneMsg("image"));
+    const x=this.dernier&&this.liste().find(y=>y.id===this.dernier); if(x) z.appendChild(this.fiche(x,true)); },
+  ongletCraft(z){ const F=this.FC; const b=this.bientot("craft"); if(b) z.appendChild(b);
+    const t=el("textarea",{maxLength:2000,rows:4,value:F.texte,placeholder:"Ex. passe cette photo en noir et blanc, assemble ces 3 PDF…"}); t.setAttribute("aria-label","Ce que je veux");
+    t.oninput=()=>{ F.texte=t.value; this.retient(); };
+    const f=el("input",{maxLength:1000,value:F.fichier,placeholder:"Lien ou nom d'un fichier de ton Drive (facultatif)"}); f.setAttribute("aria-label","Fichier"); f.oninput=()=>{ F.fichier=f.value; this.retient(); };
+    const o=el("select",{}); o.setAttribute("aria-label","Outil"); [["","Au choix de Claude"],...this.OUTILS.map(k=>[k,k])].forEach(([v,n])=>o.appendChild(el("option",{value:v,textContent:n,selected:F.outil===v}))); o.onchange=()=>{ F.outil=o.value; this.retient(); };
+    const ok=el("button",{type:"button",className:"btn",textContent:"Envoyer au système",disabled:this.occupe}), dt=el("button",{type:"button",className:"btn ghost",textContent:"Tout de suite ↗"});
+    ok.onclick=()=>{ const v=t.value.trim(); if(!v){ t.focus(); return; } this.envoie("craft",{type:"craft",craft:{texte:v,fichier:f.value.trim(),outil:o.value}},ok); };
+    dt.onclick=()=>this.direct();
+    z.append(this.lab("Ce que je veux",t),this.lab("Fichier",f),this.lab("Outil",o),el("div",{className:"bact"},ok,dt),
+      help("« Envoyer » : la routine du système s'en occupe dans les 3 h au plus. « Tout de suite » : ouvre une session pour travailler en direct (ta demande est copiée)."));
+    z.appendChild(this.zoneMsg("craft")); },
+  ongletListe(z){ const L=this.liste(), V=L.filter(x=>this.filtre==="tous"||x.genre===this.filtre);
+    z.appendChild(this.choix([["tous","Tout · "+L.length],["image","Images · "+L.filter(x=>x.genre==="image").length],["craft","Craft · "+L.filter(x=>x.genre==="craft").length]],this.filtre,k=>{ this.filtre=k; this.rend(); },"Filtre"));
+    if(!V.length){ z.appendChild(help(L.length?"Rien dans ce filtre.":"Pas encore de création. Tes images et tes travaux Craft apparaîtront ici.")); return; }
+    const g=el("div",{className:"atgrille"}); V.forEach(x=>g.appendChild(this.fiche(x))); z.appendChild(g); },
+  fiche(x,grand){ const box=el("div",{className:"vprop atfiche s-"+x.statut}), d=String(x.date).slice(0,10);
+    box.appendChild(el("small",{className:"mono",textContent:[x.genre==="image"?"Image":"Craft"+(x.outil?" · "+x.outil:""),this.ST[x.statut]||x.statut,/^\d{4}-\d{2}-\d{2}$/.test(d)?new Date(d+"T12:00").toLocaleDateString("fr-FR",{day:"numeric",month:"short"}):""].filter(Boolean).join(" · ")}));
+    const a=this.apercu(x,grand); if(a) box.appendChild(a);
+    box.appendChild(el("p",{className:"attxt",textContent:x.texte||"Sans texte"}));
+    const act=el("div",{className:"bact"});
+    if(x.lien) act.appendChild(el("a",{className:"lien",href:x.lien,target:"_blank",rel:"noopener noreferrer",textContent:"Ouvrir dans le Drive ↗"}));
+    if(x.genre==="image"){ const r=el("button",{type:"button",className:"btn ghost",textContent:"Retoucher avec Craft"}); r.onclick=()=>{ this.FC={texte:"",fichier:x.lien||x.id,outil:"PhotoCraft"}; this.retient(); this.onglet="craft"; this.rend(); };
+      const re=el("button",{type:"button",className:"btn ghost",textContent:"Refaire"}); re.onclick=()=>{ this.FI.prompt=x.texte; if(x.format) this.FI.format=x.format; this.retient(); this.onglet="image"; this.rend(); };
+      act.append(r,re); }
+    if(act.children.length) box.appendChild(act); return box; },
+  zoneMsg(g){ const m=el("p",{className:"help svmsg atmsg",textContent:this.msg[g]||""}); m.setAttribute("aria-live","polite"); return m; },
+  zoneCle(){ const z=el("div",{className:"svcle"}), k=el("input",{type:"password",placeholder:"Clé du lien avec le système",autocomplete:"off"}), ok=el("button",{type:"button",className:"btn",textContent:"Enregistrer sur cet appareil"});
+    k.setAttribute("aria-label","Clé du lien avec le système"); ok.onclick=()=>{ const v=k.value.trim(); if(!v) return; try{ localStorage.setItem(LIEN_CLE,v); }catch(_){} this.cleOuverte=false; this.rend(); };
+    z.append(help("Pour envoyer tes demandes, colle une fois la clé du lien (celle donnée par ton système d'automatisation)."),el("div",{className:"srow"},k,ok)); return z; },
+  rend(){ const pg=$("atelierPage"); if(!pg||pg.hidden) return; const z=$("atelierIn"), y=pg.scrollTop; z.textContent="";
+    z.appendChild(el("div",{className:"hero"},el("div",{className:"hero-t"},el("h2",{textContent:"Atelier"}),el("p",{className:"lead",textContent:"Créer une image à partir d'un prompt, retoucher ou assembler avec les outils Craft."}))));
+    const t=el("div",{className:"seg atseg",role:"tablist"}); [["image","Image","Créer une image"],["craft","Craft","Outils Craft"],["liste","Créations","Mes créations"]].forEach(([k,n,lg])=>{ const b=el("button",{type:"button",role:"tab",textContent:n}); b.setAttribute("aria-label",lg); b.setAttribute("aria-selected",String(k===this.onglet)); b.onclick=()=>{ this.onglet=k; this.rend(); }; t.appendChild(b); });
+    const sec=el("section",{className:"card rv atsec"}); z.append(t,sec);
+    if(this.onglet==="image") this.ongletImage(sec); else if(this.onglet==="craft") this.ongletCraft(sec); else this.ongletListe(sec);
+    const cle=lienCle(); if(LIEN_URL&&this.onglet!=="liste"){ if(!cle||this.cleOuverte) z.appendChild(this.zoneCle());
+      else { const o=el("button",{type:"button",className:"btn ghost svoubli",textContent:"Oublier la clé sur cet appareil"}); o.onclick=()=>{ try{ localStorage.removeItem(LIEN_CLE); }catch(_){} this.rend(); }; z.appendChild(o); } }
+    pg.scrollTop=y; },
+  rafraichit(){ const pg=$("atelierPage"); if(!pg||pg.hidden) return; const a=document.activeElement; if(a&&$("atelierIn").contains(a)&&/^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName)) return; this.rend(); },
+  ouvre(){ const pg=$("atelierPage"); this.brouillon(); pg.hidden=false; pg.scrollTop=0; this.rend(); }
+};
+{ $("atelierClose").onclick=()=>{ $("atelierPage").hidden=true; };
+  document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("atelierPage").hidden){ $("atelierPage").hidden=true; e.stopImmediatePropagation(); } },true);
+  /* une quatrième puce sur l'accueil, après « Ma semaine » */
+  const oB=V2.bande.bind(V2); V2.bande=function(){ const r=oB.apply(this,arguments), z=$("bande"); if(z&&!z.hidden&&!z.querySelector(".atpuce")){
+      const b=el("button",{type:"button",className:"puce2 atpuce"},el("small",{textContent:"Atelier"}),el("b",{textContent:"🎨"}),el("span",{textContent:"créer une image · outils Craft"}),el("em",{textContent:"→"}));
+      b.setAttribute("aria-label","Atelier : créer une image, outils Craft"); b.onclick=()=>ATELIER.ouvre(); z.appendChild(b); }
+    return r; };
+}
+
 /* A8 : une icône qui ne charge pas laisse la place au logo de l'app, plus de carré blanc */
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&!i.dataset.repli&&(i.classList.contains("lgimg")||i.closest(".node,.ico"))){ i.dataset.repli="1"; i.src="icon-192.png"; i.classList.add("repli"); } },true);
 
@@ -6544,7 +6708,7 @@ function localDb(){ const KEY="carte-de-vie-v1", CKEY="carte-de-vie-sync"; let s
 /* --- dans Claude : les données restent dans la base de la page, la synchro GitHub et l'IA s'ajoutent --- */
 function claudeDb(d){ const CKEY="carte-de-vie-sync"; let cfg=null; try{ cfg=JSON.parse(localStorage.getItem(CKEY)||"null"); }catch(_){} if(cfg&&!repoOk(cfg.repo)) cfg=null;
   const store={}, live=k=>store[k]&&!store[k]._del, stamp=(x,k)=>{ const now=Date.now(); return Object.assign({},x,{_m:now,_f:fieldsNow(x,k?store[k]:null,now),_x:tombes(k?store[k]:null,x)}); };
-  ["meta/moi","meta/layout","meta/feedback","meta/compagnon","meta/suggestions","meta/base","meta/notes","meta/cockpit","meta/cockpit_masques","meta/fonds","meta/icones","meta/semaine","meta/journees","meta/app","meta/energie","meta/revues","meta/trajectoire","meta/memoire","meta/propositions","meta/suivi","meta/suivis"].forEach(k=>d.doc(k).onSnapshot(s=>{ if(s.exists) store[k]=s.data(); else delete store[k]; },()=>{}));
+  ["meta/moi","meta/layout","meta/feedback","meta/compagnon","meta/suggestions","meta/base","meta/notes","meta/cockpit","meta/cockpit_masques","meta/fonds","meta/icones","meta/semaine","meta/journees","meta/app","meta/energie","meta/revues","meta/trajectoire","meta/memoire","meta/propositions","meta/suivi","meta/suivis","meta/atelier"].forEach(k=>d.doc(k).onSnapshot(s=>{ if(s.exists) store[k]=s.data(); else delete store[k]; },()=>{}));
   d.collection("espaces").onSnapshot(s=>{ Object.keys(store).forEach(k=>{ if(k.startsWith("espaces/")) delete store[k]; }); s.docs.forEach(x=>{ store["espaces/"+x.id]=x.data(); }); },()=>{});
   const after=p=>p.then(v=>{ api.dirty=true; api.queue(); return v; });
   const doc=path=>{ const r=d.doc(path); return { id:r.id, path,
@@ -6660,7 +6824,7 @@ function start(){
     const semRe=()=>{ const c=openId&&cats.get(openId); if(c&&c.type==="habitudes") quandLibre("semaine",()=>renderPane(cats.get(openId))); };
     db.doc("meta/semaine").onSnapshot(x=>{ SEMAINE=x.exists?x.data():null; semRe(); },()=>{}); db.doc("meta/journees").onSnapshot(x=>{ JOURNEES=x.exists?x.data():null; semRe(); },()=>{});
     db.doc("meta/icones").onSnapshot(x=>ICOLIB.recoit(x.exists?x.data():null),()=>{});
-    db.doc("meta/energie").onSnapshot(x=>PILOTE.energie(x.exists?x.data():null),()=>{}); db.doc("meta/revues").onSnapshot(x=>PILOTE.revues(x.exists?x.data():null),()=>{}); db.doc("meta/trajectoire").onSnapshot(x=>ESSAI.trajectoire(x.exists?x.data():null),()=>{}); db.doc("meta/memoire").onSnapshot(x=>ESSAI.memoire(x.exists?x.data():null),()=>{}); db.doc("meta/propositions").onSnapshot(x=>ESSAI.propositions(x.exists?x.data():null),()=>{}); db.doc("meta/suivi").onSnapshot(x=>{ if(window.SUIVI) SUIVI.charge(x.exists?x.data():null); },()=>{}); db.doc("meta/suivis").onSnapshot(x=>{ if(window.SUIVIS) SUIVIS.charge(x.exists?x.data():null); },()=>{});
+    db.doc("meta/energie").onSnapshot(x=>PILOTE.energie(x.exists?x.data():null),()=>{}); db.doc("meta/revues").onSnapshot(x=>PILOTE.revues(x.exists?x.data():null),()=>{}); db.doc("meta/trajectoire").onSnapshot(x=>ESSAI.trajectoire(x.exists?x.data():null),()=>{}); db.doc("meta/memoire").onSnapshot(x=>ESSAI.memoire(x.exists?x.data():null),()=>{}); db.doc("meta/propositions").onSnapshot(x=>ESSAI.propositions(x.exists?x.data():null),()=>{}); db.doc("meta/suivi").onSnapshot(x=>{ if(window.SUIVI) SUIVI.charge(x.exists?x.data():null); },()=>{}); db.doc("meta/suivis").onSnapshot(x=>{ if(window.SUIVIS) SUIVIS.charge(x.exists?x.data():null); },()=>{}); db.doc("meta/atelier").onSnapshot(x=>{ if(window.ATELIER) ATELIER.charge(x.exists?x.data():null); },()=>{});
     db.doc("meta/fonds").onSnapshot(x=>FOND.recoit(x.exists?x.data():null),()=>{});
     db.doc("meta/suggestions").onSnapshot(x=>{ if(window._suggestions) window._suggestions(x.exists?x.data():null); },()=>{});
     db.doc("meta/notes").onSnapshot(x=>{ if(window._notes) window._notes(x.exists?x.data():null); },()=>{}); db.doc("meta/claude_notes").onSnapshot(x=>{ if(window._claudeNotes) window._claudeNotes(x.exists?x.data():null); },()=>{}); db.doc("meta/avis_offres").onSnapshot(x=>{ AVIS_OFFRES=(x.exists&&Array.isArray(x.data().liste))?x.data().liste:[]; },()=>{}); db.doc("meta/cockpit").onSnapshot(x=>{ cockpit=x.exists?x.data():null; },()=>{}); db.doc("meta/cockpit_masques").onSnapshot(x=>{ ckMasques=(x.exists&&Array.isArray(x.data().ids))?x.data().ids:[]; ckCoches=(x.exists&&Array.isArray(x.data().coches))?x.data().coches:[]; },()=>{}); db.doc("meta/echanges").onSnapshot(x=>{ echanges=(x.exists&&Array.isArray(x.data().liste))?x.data().liste:[]; },()=>{});
@@ -6718,13 +6882,13 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
     garde=()=>{ try{ for(let d=prof();d<2;d++) history.pushState({carte:1,d:d+1},""); }catch(_){} };
   /* Chrome ignore au bouton retour les entrées posées sans « vrai » geste : sur téléphone, le toucher ne compte qu'au moment où le doigt se lève (touchend, pointerup, click) — on pose donc les gardes là */
   ["pointerup","touchend","click","keydown"].forEach(t=>addEventListener(t,garde,{capture:true,passive:true})); addEventListener("pointerdown",e=>{ if(e.pointerType==="mouse") garde(); },true);
-  addEventListener("popstate",()=>{ let dessus=false; ["recPage","fbPage","relPage","moiPage","setPage","syncPage","sugPage","addPage","notesPage","revuePage","cherchePage","trajPage","memPage","valPage","suiviPage","noterPage","aujPage","cheminPage","agPage"].forEach(k=>{ const x=document.getElementById(k); if(x&&!x.hidden){ x.hidden=true; dessus=true; } });
+  addEventListener("popstate",()=>{ let dessus=false; ["recPage","fbPage","relPage","moiPage","setPage","syncPage","sugPage","addPage","notesPage","revuePage","cherchePage","trajPage","memPage","valPage","suiviPage","atelierPage","noterPage","aujPage","cheminPage","agPage"].forEach(k=>{ const x=document.getElementById(k); if(x&&!x.hidden){ x.hidden=true; dessus=true; } });
     document.querySelectorAll(".notesmenu").forEach(x=>{ if(!x.hidden){ x.hidden=true; dessus=true; } }); document.querySelectorAll(".prioChoix").forEach(x=>{ x.remove(); dessus=true; }); document.querySelectorAll(".phov").forEach(x=>{ x.remove(); dessus=true; });
     if(!dessus&&window._retourCarte) window._retourCarte(); setTimeout(garde,0); }); })();</script>
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=170; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=171; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
