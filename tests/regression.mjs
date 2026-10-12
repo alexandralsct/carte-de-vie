@@ -85,6 +85,15 @@ const tuile = (p, rid) => p.evaluate(rid => { const t = document.querySelector('
   await p.waitForTimeout(1200); const st = await p.evaluate(() => { const d = JSON.parse(localStorage.getItem('carte-de-vie-v1')); const r = d['espaces/jardin'].rub.find(r => r.id === 'j3'); return { n: r.releves.length, g: r.gestes[0].days.length }; });
   ok(st.n === 4 && st.g === 3, 'suivi de mesures : mesure et geste du jour enregistrés ' + JSON.stringify(st));
   ok(!(await debord(p)), 'item ouvert : pas de défilement horizontal'); await ferme(p); await p.waitForTimeout(300);
+  /* 4 bis. supprimer une rubrique depuis « ✎ Modifier » (vaut pour tous les espaces, même sur mesure) : second appui pour confirmer */
+  await item(p, 'Lecture'); await p.waitForTimeout(500);
+  await p.evaluate(() => { const m = [...document.querySelectorAll('#drawer button')].find(x => /Modifier/.test(x.textContent) && x.offsetParent); if (m) m.click(); }); await p.waitForTimeout(500);
+  const nb0 = await p.evaluate(() => [...document.querySelectorAll('.v3rdel')].filter(x => x.offsetParent).length);
+  await p.evaluate(() => { const d = [...document.querySelectorAll('.v3rubs .v3rrow')].find(x => /À lire/.test(x.textContent)); d.querySelector('.v3rdel').click(); }); await p.waitForTimeout(300);
+  const conf = await p.evaluate(() => { const d = [...document.querySelectorAll('.v3rubs .v3rrow')].find(x => /À lire/.test(x.textContent)); const b = d.querySelector('.v3rdel'); const t = b.textContent; b.click(); return t; }); await p.waitForTimeout(1200);
+  const rest = await p.evaluate(() => JSON.parse(localStorage.getItem('carte-de-vie-v1'))['espaces/lecture'].rub.map(r => r.name).join('|'));
+  ok(nb0 === 3 && /Confirmer \(perd 2 éléments\)/.test(conf) && !/À lire/.test(rest), 'supprimer une rubrique depuis « Modifier » (' + nb0 + ' rubriques, « ' + conf + ' », reste : ' + rest + ')');
+  await ferme(p); await p.waitForTimeout(300);
   /* 5. Cuisine (module personnel seulement) : recette → ingrédients */
   if (noms.includes('Cuisine')) { await item(p, 'Cuisine'); await p.waitForTimeout(600); const i = await rub(p, 'courses'); await p.waitForTimeout(800);
     if (i >= 0) { for (const [q, attendu] of [['Curry de légumes', 'Lait de coco'], ['Pâtes au pesto', 'Basilic'], ['Tarte aux pommes', 'Pommes']]) { await p.fill('#fRecette', q); await p.click('.crsrecf button'); await p.waitForTimeout(500);
