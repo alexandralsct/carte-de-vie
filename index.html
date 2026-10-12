@@ -1906,6 +1906,25 @@ html.calme :is(.souris,.chatmot,.griffes){display:none}
 .vitrine .mesauj+*,.vitrine small.mono{color:inherit;opacity:.8}
 
 .v3rubs{display:flex;flex-direction:column;gap:6px}.v3rrow{display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--pale);padding:4px 0}.v3rn{flex:1;min-width:0;overflow-wrap:anywhere}.v3rdel{min-height:36px;padding:4px 12px}.v3rdel.sure{background:var(--ink);color:var(--surface)}
+/* lecteur de fiches */
+.ficouvre{text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px;cursor:pointer}
+.fov{position:fixed;inset:0;z-index:80;background:var(--bg,#f4eee4);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(env(safe-area-inset-top,0px) + 14px) 16px calc(env(safe-area-inset-bottom,0px) + 40px)}
+.fin{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.fhead{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;position:sticky;top:0;background:var(--bg,#f4eee4);padding:6px 0;z-index:1}
+.ftitre{margin:0;font-family:var(--display);font-size:clamp(1.4rem,5vw,2rem);line-height:1.15;color:var(--ink)}
+.fart{background:var(--surface);border:1.5px solid var(--ink);border-radius:20px;padding:16px 18px;font-size:1.02rem;line-height:1.6;overflow-wrap:anywhere;-webkit-user-select:text;user-select:text}
+.fart h3{margin:18px 0 6px;font-size:1.15rem;color:var(--ink)}.fart h4{margin:14px 0 4px;font-size:1rem;color:var(--ink)}
+.fart p{margin:0 0 10px}.fart ul{margin:0 0 10px;padding-left:20px}.fart li{margin:3px 0}
+.fart .fmark{background:color-mix(in srgb,var(--ink) 14%,transparent);border-radius:6px;box-shadow:-4px 0 0 color-mix(in srgb,var(--ink) 14%,transparent)}
+.fnotes{display:flex;flex-direction:column;gap:10px;border:1.5px solid var(--ink);border-radius:20px;padding:14px 16px;background:var(--surface)}
+.fnotes h3{margin:0;font-size:1rem;color:var(--ink)}
+.fform{display:flex;flex-direction:column;gap:8px}.fform textarea{width:100%;font:inherit;border:1.5px solid var(--pale);border-radius:12px;padding:10px;background:transparent;color:inherit}
+.fcite{margin:0;padding:6px 10px;border-left:3px solid var(--ink);font-style:italic;font-size:.92rem;overflow-wrap:anywhere}
+.flist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.flist li{border-bottom:1px solid var(--pale);padding-bottom:8px;display:flex;flex-direction:column;gap:4px;position:relative}
+.flist li p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}.flist li .del{position:absolute;right:0;top:0}
+.flist small{color:inherit;opacity:.7}
+
 </style>
 <script>
 /* version test : ?test=1 → données à part (préfixe « test: » sur tout le stockage local), jamais celles de la carte principale */
@@ -4293,7 +4312,7 @@ function renderRub(c,only){ if(only==="rubs") only=null, c=Object.assign({},c,{_
       ul.appendChild(el("li",{},el("span",{className:"txt"},el("small",{className:"jdate",textContent:d?d.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"}):"Sans date"}),el("span",{className:"jtext",textContent:k.text}),...(k.photos&&k.photos.length?[el("span",{className:"jphotos"},...k.photos.map(p=>{ const im=el("img",{alt:"Photo du souvenir"}); im.dataset.ph=p.ch; im.onclick=()=>voirPhoto(p.ch); return im; }))]:[])),delBtn(()=>setRub(upd(q=>Object.assign({},q,{items:q.items.filter(i=>i.id!==k.id)})))))); });
     else items.forEach(k=>{ const cb=el("input",{type:"checkbox",checked:!!k.done,id:"r_"+k.id}); cb.setAttribute("aria-label",k.text);
       cb.onchange=()=>setRub(upd(q=>Object.assign({},q,{items:q.items.map(i=>i.id===k.id?Object.assign({},i,{done:cb.checked}):i)})));
-      const rec=estRecettes(c,r), tx=rec?el("button",{type:"button",className:"txt recouvre",textContent:k.text}):el("span",{className:"txt",textContent:k.text}); if(rec){ tx.onclick=()=>ouvrirRecette(c.id,String(k.text).split(" : ")[0]); tx.setAttribute("aria-label","Ouvrir la recette "+k.text); }
+      const rec=estRecettes(c,r), fic=!rec&&FICHE.ok(k), tx=rec||fic?el("button",{type:"button",className:"txt recouvre"+(fic?" ficouvre":""),textContent:k.text+(fic&&(k.notes||[]).length?"  ✎ "+k.notes.length:"")}):el("span",{className:"txt",textContent:k.text}); if(fic){ tx.onclick=()=>FICHE.ouvre(c,r,k); tx.setAttribute("aria-label","Lire la fiche "+k.text); } if(rec){ tx.onclick=()=>ouvrirRecette(c.id,String(k.text).split(" : ")[0]); tx.setAttribute("aria-label","Ouvrir la recette "+k.text); }
       ul.appendChild(el("li",{className:k.done?"done":""},cb,tx,delBtn(()=>setRub(upd(q=>Object.assign({},q,{items:q.items.filter(i=>i.id!==k.id)})))))); });
     const rm=el("button",{className:"rubdel",textContent:"Supprimer la rubrique"}); rm.onclick=()=>{ const nbs=items.length+(r.releves||[]).length+(r.suivis||[]).length; if(nbs&&!rm.dataset.sure){ rm.dataset.sure="1"; rm.textContent="Confirmer : supprimer avec ses "+nbs+" élément(s)"; return; } setRub(rub.filter(q=>q.id!==r.id)); };
     /* dans la liste, le nom est un bandeau qu'on touche pour ouvrir la rubrique seule ; on le renomme une fois ouverte */
@@ -5658,6 +5677,45 @@ WID.mesures=function(c,o){ const r=(c.rub||[]).find(q=>q.type==="mesures"&&(!o.r
       bt.onclick=()=>majRub(c,r,q=>Object.assign({},q,{gestes:(q.gestes||[]).map(y=>y.id!==g.id?y:Object.assign({},y,{days:on?(y.days||[]).filter(z=>z!==td):[...(y.days||[]),td].sort().slice(-400)}))})); ch.appendChild(bt); }); b.append(el("small",{className:"mono",textContent:"Aujourd'hui"}),ch); }
   const bt=el("button",{className:"vbtn",type:"button",textContent:s.n?"Noter une mesure":"Commencer"}); bt.onclick=()=>{ flushNotes(); sect="rub:"+r.id; kick(); renderPane(cats.get(c.id)); }; b.appendChild(bt); return b; };
 
+/* ===== lecteur de fiches : un élément de rubrique qui porte {fiche:"fiches/<id>.md", doc:"https://docs.google.com/…"} s'ouvre en
+   grand ; le texte vient du dépôt des données (lu avec la clé de synchro, gardé en mémoire), les annotations vont dans l'élément
+   ({notes:[{id,t,text,cite}]}) et suivent la synchro comme le reste. Le texte de la fiche est affiché avec textContent. ===== */
+const FICHE={ cache:new Map(),
+  ok:k=>!!k&&typeof k.fiche==="string"&&/^fiches\/[A-Za-z0-9_-]{10,80}\.md$/.test(k.fiche),
+  async texte(ch){ if(this.cache.has(ch)) return this.cache.get(ch); const b=await AUD.recupere(ch,"text/markdown"); const t=b?await b.text():null; if(t) this.cache.set(ch,t); return t; },
+  /* un markdown simple suffit : titres, listes, paragraphes, gras et italique ; tout le reste reste du texte */
+  ligne(t){ const out=el("span",{}); String(t).replace(/\\([\\`*_{}\[\]()#+\-.!>|~'"<=&])/g,"$1").split(/(\*\*[^*]+\*\*|\*[^*\s][^*]*\*|\[[^\]]+\]\([^)]+\))/).forEach(p=>{ if(!p) return;
+      let m; if((m=p.match(/^\*\*([^*]+)\*\*$/))) out.appendChild(el("b",{textContent:m[1]})); else if((m=p.match(/^\*([^*]+)\*$/))) out.appendChild(el("i",{textContent:m[1]}));
+      else if((m=p.match(/^\[([^\]]+)\]\(([^)]+)\)$/))) out.appendChild(/^https:\/\//i.test(m[2])?el("a",{href:m[2],target:"_blank",rel:"noopener",textContent:m[1]}):document.createTextNode(m[1])); else out.appendChild(document.createTextNode(p)); }); return out; },
+  rendu(md){ const art=el("article",{className:"fart"}); let ul=null; String(md).replace(/\r/g,"").split("\n").forEach(l=>{ const s=l.trim(); let m;
+      if(!s||/^(-{3,}|\*{3,}|_{3,})$/.test(s)){ ul=null; return; }
+      if((m=s.match(/^(#{1,6})\s+(.*)$/))){ ul=null; const h=el(m[1].length<=2?"h3":"h4",{}); h.appendChild(this.ligne(m[2])); art.appendChild(h); return; }
+      if((m=s.match(/^(?:[-*+]|\d+[.)])\s+(.*)$/))){ if(!ul){ ul=el("ul",{}); art.appendChild(ul); } const li=el("li",{}); li.appendChild(this.ligne(m[1])); ul.appendChild(li); return; }
+      ul=null; const p=el("p",{}); p.appendChild(this.ligne(s.replace(/^>\s?/,""))); art.appendChild(p); }); return art; },
+  marque(art,N){ const C=N.map(n=>String(n.cite||"").trim().slice(0,60)).filter(x=>x.length>=8); art.querySelectorAll("p,li,h3,h4").forEach(x=>{ x.classList.toggle("fmark",C.some(c=>x.textContent.includes(c))); }); },
+  ouvre(c,r,k){ document.querySelectorAll(".fov").forEach(x=>x.remove()); const self=this;
+    const ov=el("div",{className:"fov"}); ov.setAttribute("role","dialog"); ov.setAttribute("aria-label","Fiche : "+k.text);
+    const x=el("button",{type:"button",className:"btn",textContent:"← Fermer"}), tete=el("div",{className:"fhead"},x,/^https:\/\/docs\.google\.com\//.test(k.doc||"")?el("a",{className:"btn ghost",href:k.doc,target:"_blank",rel:"noopener",textContent:"Ouvrir dans Google Docs"}):"");
+    const titre=el("h2",{className:"ftitre",textContent:k.text}), corps=el("div",{className:"fcorps"},el("p",{className:"help",textContent:"J'ouvre la fiche…"})), notes=el("section",{className:"fnotes"});
+    const fin=()=>{ ov.remove(); document.removeEventListener("keydown",esc); }, esc=e=>{ if(e.key==="Escape") fin(); }; x.onclick=fin; document.addEventListener("keydown",esc);
+    ov.append(el("div",{className:"fin"},tete,titre,corps,notes)); document.body.appendChild(ov); x.focus();
+    const cur=()=>{ const cc=cats.get(c.id), rr=cc&&(cc.rub||[]).find(q=>q.id===r.id); return rr&&(rr.items||[]).find(i=>i.id===k.id)||k; };
+    const met=fn=>majRub(c,r,q=>Object.assign({},q,{items:(q.items||[]).map(i=>i.id===k.id?Object.assign({},i,{notes:fn(i.notes||[])}):i)}));
+    let art=null;
+    const rendNotes=()=>{ const N=cur().notes||[]; notes.textContent=""; if(art) self.marque(art,N);
+      const sel=el("button",{type:"button",className:"btn ghost",textContent:"✎ Annoter le passage sélectionné"}), ta=el("textarea",{rows:3,placeholder:"Ma note sur cette fiche…",maxLength:2000}), cit=el("blockquote",{className:"fcite",hidden:true});
+      ta.setAttribute("aria-label","Ma note"); let cite="";
+      sel.onclick=()=>{ const s=String(window.getSelection?window.getSelection().toString():"").trim(); if(!s){ cit.hidden=false; cit.textContent="Sélectionne d'abord un passage de la fiche (appui long sur le téléphone), puis touche ce bouton."; cite=""; return; } cite=s.slice(0,400); cit.hidden=false; cit.textContent="« "+cite+" »"; ta.focus(); };
+      const f=el("form",{className:"fform"},sel,cit,ta,el("button",{className:"btn",type:"submit",textContent:"Garder la note"}));
+      f.onsubmit=e=>{ e.preventDefault(); const v=ta.value.trim(); if(!v&&!cite) return; met(L=>[...L,{id:uid(),t:new Date().toISOString(),text:v,cite}]); setTimeout(rendNotes,60); };
+      notes.append(el("h3",{textContent:"Mes annotations"+(N.length?" ("+N.length+")":"")}),f);
+      if(N.length){ const ul=el("ul",{className:"flist"}); [...N].reverse().forEach(n=>{ const li=el("li",{}); if(n.cite) li.appendChild(el("blockquote",{className:"fcite",textContent:"« "+n.cite+" »"})); if(n.text) li.appendChild(el("p",{textContent:n.text}));
+          li.appendChild(el("small",{className:"mono",textContent:n.t?new Date(n.t).toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"}):""})); li.appendChild(delBtn(()=>{ met(L=>L.filter(y=>y.id!==n.id)); setTimeout(rendNotes,60); })); ul.appendChild(li); }); notes.appendChild(ul); } };
+    rendNotes();
+    this.texte(k.fiche).then(t=>{ if(!document.body.contains(ov)) return; corps.textContent="";
+      if(!t){ corps.appendChild(el("p",{className:"help",textContent:"Je n'arrive pas à lire la fiche (pas de connexion, ou synchronisation non réglée sur cet appareil)."+(k.doc?" Tu peux l'ouvrir dans Google Docs.":"")})); return; }
+      art=self.rendu(t); corps.appendChild(art); self.marque(art,cur().notes||[]); }); } };
+
 /* A8 : une icône qui ne charge pas laisse la place au logo de l'app, plus de carré blanc */
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&!i.dataset.repli&&(i.classList.contains("lgimg")||i.closest(".node,.ico"))){ i.dataset.repli="1"; i.src="icon-192.png"; i.classList.add("repli"); } },true);
 
@@ -6572,7 +6630,7 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=164; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=165; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
