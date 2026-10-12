@@ -2020,13 +2020,13 @@ html.lifeo,html.lifeo body{overflow:hidden}
 .racc{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--k1,#002FA7);border-radius:999px;background:var(--surface,#fff);color:var(--k1,#002FA7);font:600 .85rem var(--body,inherit);padding:7px 13px;cursor:pointer;box-shadow:2px 2px 0 var(--k2,#c9d6f0)}
 .racc i{font-style:normal;font-size:1rem;line-height:1}
 .racc:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--k2,#c9d6f0)}
-.bande .raccs.pcarres{order:0;gap:10px}
+.bande .raccs.pcarres{order:0;gap:3px}
 .pcarres .pcarre{width:70px;height:70px;min-height:0!important;padding:6px 4px!important;border:1.5px solid var(--k2,#c9d6f0)!important;box-shadow:none!important;border-radius:14px;display:grid;align-content:center;justify-items:center;text-align:center;gap:2px}
 .pcarres .pcarre b{font-size:1.15rem!important;line-height:1}
 .pcarres .pcarre small{font-size:9.5px!important;line-height:1.15;letter-spacing:.3px}
 .pcarres .pcarre span{display:none}
 .pcarres{flex-wrap:nowrap!important}
-.pcarres .pcarre.pchemin{flex:1;width:auto;min-width:0;justify-items:start;text-align:left;padding:8px 12px!important;border:1.5px solid var(--k2,#c9d6f0)!important}
+.pcarres .pcarre.pchemin{flex:none;width:143px;margin-right:7px;min-width:0;justify-items:start;text-align:left;padding:8px 12px!important;border:1.5px solid var(--k2,#c9d6f0)!important}
 .pcarres .pcarre.pchemin small{font-size:11px!important}.pcarres .pcarre.pchemin span{display:block;font-size:.72rem}
 .bande .atpuce{display:none!important}
 .outilsb{margin:14px 0 0;padding:14px 14px 18px;border:1.5px dashed var(--k2,#c9d6f0);border-radius:22px;position:relative}
@@ -2046,6 +2046,9 @@ html.lifeo,html.lifeo body{overflow:hidden}
 .outilsb .otout small{font:600 .72rem var(--mono,monospace);letter-spacing:1.5px;text-transform:uppercase}.outilsb .otout b{font-size:1.2rem}.outilsb .otout span{flex:1;font-size:.78rem}.outilsb .otout em{font-style:normal}
 .outilsb .otout,.outilsb .otout *{color:var(--nt,var(--k1,#002FA7))!important}.outilsb .otout{background:var(--surface)!important}
 html body .outilsb button.otout.otout small{color:#002FA7!important}:root[data-theme="sombre"] body .outilsb button.otout.otout small{color:#a9bfff!important}
+.board .outilsb.zone{position:relative;margin:0;border-style:dashed}.board .outilsb.zone>span{position:static;display:inline-block;margin:-26px 0 8px}
+.outilsb .rgz{position:absolute;top:-14px;right:12px}.outilsb .rgz+.rgz{right:52px}
+#iaBtn.memb b{font-size:2rem!important;line-height:1}#iaBtn.memb small{display:none!important}
 
 </style>
 <script>
@@ -6180,7 +6183,7 @@ window.addEventListener("hashchange",()=>{ if(location.hash==="#life") LIFEP.ouv
     b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/></svg>';
     b.onclick=()=>LIFEP.ouvre(); a.appendChild(b); }; pose(); }
 /* la bulle IA près de Moi devient « Ma mémoire » : même place, même aspect, même mouvement */
-{ const mem=()=>{ const b=$("iaBtn"); if(!b) return; b.hidden=false; b.classList.remove("new"); const t=b.querySelector("b"), s=$("iaSub"); if(t) t.textContent="◎"; if(s) s.textContent="ma mémoire";
+{ const mem=()=>{ const b=$("iaBtn"); if(!b) return; b.hidden=false; b.classList.remove("new"); const t=b.querySelector("b"), s=$("iaSub"); if(t) t.textContent="◎"; if(s) s.textContent=""; b.classList.add("memb");
     b.setAttribute("aria-label","Ma mémoire"); b.title="Ma mémoire"; };
   const oI=renderIa; renderIa=function(){ const r=oI.apply(this,arguments); mem(); return r; }; mem();
   document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("#iaBtn"); if(!b) return; e.preventDefault(); e.stopImmediatePropagation(); MEMP.ouvre(); },true); }
@@ -6201,12 +6204,26 @@ window.addEventListener("hashchange",()=>{ if(location.hash==="#life") LIFEP.ouv
   LIFEP.ferme=function(){ if(vp) vp.setAttribute("content",base); return oF(); }; }
 /* l'Atelier (Craft) devient une tuile comme les autres ; les petits carrés passent en dessous */
 { const oB=V2.bande.bind(V2); V2.bande=function(){ const r=oB.apply(this,arguments), z=$("bande"), pc=z&&z.querySelector(".pcarres"); if(pc) z.appendChild(pc); return r; }; }
-/* catégorie « Outils » sous la carte : la tuile Atelier (Craft) y est rangée, elle n'est plus en haut */
-{ const pose=()=>{ const sc=document.querySelector(".scroller"); if(!sc||document.querySelector(".outilsb")) return;
-    const t=el("button",{type:"button",className:"puce2 atpuce otout"},el("small",{textContent:"Atelier"}),el("b",{textContent:"🎨"}),el("span",{textContent:"créer une image · outils Craft"}),el("em",{textContent:"→"}));
-    t.setAttribute("aria-label","Atelier : créer une image, outils Craft"); t.onclick=()=>ATELIER.ouvre();
-    const z=el("section",{className:"outilsb"},el("span",{textContent:"Outils"}),el("div",{className:"ogrid"},t)); z.setAttribute("aria-label","Outils"); sc.after(z); };
-  const oI=renderIa; renderIa=function(){ const r=oI.apply(this,arguments); try{ pose(); }catch(_){} return r; }; setTimeout(pose,800); }
+/* catégorie « Outils » : la tuile Atelier (Craft) y est rangée. Téléphone : c'est une catégorie de la carte comme les autres,
+   déplaçable avec ↑ ↓ dans « Réorganiser » (sa place est gardée) ; ordinateur : au-dessus ou en dessous de la carte. */
+const CATOUT={ K:"outilsPos",
+  pos(){ try{ const v=localStorage.getItem(this.K); return v===null?999:+v; }catch(_){ return 999; } },
+  garde(v){ try{ localStorage.setItem(this.K,String(v)); }catch(_){} },
+  tuile(){ const t=el("button",{type:"button",className:"puce2 atpuce otout"},el("small",{textContent:"Atelier"}),el("b",{textContent:"🎨"}),el("span",{textContent:"créer une image · outils Craft"}),el("em",{textContent:"→"}));
+    t.setAttribute("aria-label","Atelier : créer une image, outils Craft"); t.onclick=()=>ATELIER.ouvre(); return t; },
+  pose(){ document.querySelectorAll(".outilsb").forEach(x=>x.remove()); const board=$("board"), sc=document.querySelector(".scroller"); if(!board||!sc) return;
+    const stack=isStack(), z=el("section",{className:"outilsb"+(stack?" zone":"")},el("span",{textContent:"Outils"}),el("div",{className:"ogrid"},this.tuile())); z.setAttribute("aria-label","Outils");
+    if(stack){ const Z=[...board.querySelectorAll(":scope>.zone:not(.outilsb)")], k=Math.max(0,Math.min(this.pos(),Z.length));
+      if(reorg){ const fl=(t,d,lab)=>{ const x=el("button",{type:"button",className:"rgz",textContent:t}); x.setAttribute("aria-label",lab+" Outils"); x.onclick=e=>{ e.stopPropagation(); this.garde(Math.max(0,Math.min(k+d,Z.length))); this.pose(); }; return x; };
+        z.append(fl("↑",-1,"Monter"),fl("↓",1,"Descendre")); }
+      if(k<Z.length) Z[k].before(z); else if(Z.length) Z[Z.length-1].after(z); else board.appendChild(z); }
+    else { const haut=this.pos()===0; if(reorg){ const x=el("button",{type:"button",className:"rgz",textContent:haut?"↓":"↑"}); x.setAttribute("aria-label",(haut?"Descendre":"Monter")+" Outils"); x.onclick=()=>{ this.garde(haut?999:0); this.pose(); }; z.appendChild(x); }
+      if(haut) sc.before(z); else sc.after(z); } } };
+{ const oI=renderIa; renderIa=function(){ const r=oI.apply(this,arguments); try{ CATOUT.pose(); }catch(_){} return r; }; setTimeout(()=>{ try{ CATOUT.pose(); }catch(_){} },800); }
+/* numéro de version écrit comme LIFE : 185 → V.1.8.5 */
+{ const vf=n=>"V."+String(n).split("").join("."), e=$("appVer");
+  const fmt=()=>{ if(!e) return; const t=e.textContent, u=t.replace(/Version (\d+) de l'app/,(m,n)=>"Version "+vf(n)).replace(/la version (\d+) est prête/,(m,n)=>"la version "+vf(n)+" est prête"); if(u!==t) e.textContent=u; };
+  if(e){ fmt(); new MutationObserver(fmt).observe(e,{childList:true,characterData:true,subtree:true}); } }
 
 /* A8 : une icône qui ne charge pas laisse la place au logo de l'app, plus de carré blanc */
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&!i.dataset.repli&&(i.classList.contains("lgimg")||i.closest(".node,.ico"))){ i.dataset.repli="1"; i.src="icon-192.png"; i.classList.add("repli"); } },true);
@@ -7122,7 +7139,7 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=184; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=185; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
