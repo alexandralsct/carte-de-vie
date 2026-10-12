@@ -2004,6 +2004,14 @@ html.calme :is(.souris,.chatmot,.griffes){display:none}
 :root[data-theme="sombre"] .fcarte small,:root[data-theme="sombre"] .fcarte .help{color:var(--nt)!important;opacity:.85}
 
 .fodash{display:flex;flex-direction:column;gap:10px}
+.cledlg{border:1.5px solid var(--k1,#002FA7);border-radius:16px;padding:20px;width:min(92vw,420px);background:var(--surface,#fffaf1);color:var(--k1,#002FA7)}
+.cledlg::backdrop{background:rgba(0,47,167,.18)}
+.cledlg h3{margin:0 0 6px}
+.cledlg .clebt{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.cledlg .clemsg{font-weight:600;margin:10px 0 0;overflow-wrap:anywhere}
+.cledlg .srow{display:flex;gap:8px}.cledlg .srow input{flex:1;min-width:0}
+.cledlg .clefin{margin-top:14px;width:100%}
+
 </style>
 <script>
 /* version test : ?test=1 → données à part (préfixe « test: » sur tout le stockage local), jamais celles de la carte principale */
@@ -5394,6 +5402,7 @@ const MEMP={ L:[], notes:[], sub:false,
   item("!","Urgences",()=>{ const c=[...cats.values()].find(x=>/^(a traiter|notes)$/.test(plNorm(x.name||""))||x.forme==="bulle"); if(c) open(c.id); });
   item("✦","Mon chemin",()=>V3.ouvreChemin(),"r-proprio");
   item("☾","Ferme ta journée",()=>SOIR.ouvre());
+  item("🔑","Clé du lien (copier, coller, créer)",()=>CLEF.ouvre());
   if("Notification" in window&&Notification.permission!=="granted") item("🔔",Notification.permission==="denied"?"Rappels bloqués (réglages du téléphone)":"Activer les rappels (énergie 20 h, journée 21 h)",()=>{ if(Notification.permission==="denied") alert("Les notifications sont bloquées pour l'app : autorise-les dans les réglages du téléphone (Applications → Ma carte de vie → Notifications), puis rouvre l'app."); else RAPPELS.active(); });
   item("◎","Ma mémoire perso",()=>MEMP.ouvre());
   if($("sugBtn")) item("✎","Mes idées pour l'app",()=>$("sugBtn").click(),"r-proprio");
@@ -6080,6 +6089,32 @@ const FORMS={ K:"formAvis", occupe:"", msg:{},
   const oR=FORMS.rend.bind(FORMS); FORMS.rend=function(){ oR(); const c=openId&&cats.get(openId); if(c&&FORMS.estEspace(c)) renderPane(c); };
 }
 
+
+
+const CLEF={
+  neuve(){ const a=new Uint8Array(24); crypto.getRandomValues(a); return [...a].map(x=>x.toString(16).padStart(2,"0")).join(""); },
+  garde(v){ try{ localStorage.setItem(LIEN_CLE,v); return true; }catch(_){ return false; } },
+  async copie(v){ try{ await navigator.clipboard.writeText(v); return true; }catch(_){ return false; } },
+  ouvre(){ let d=$("cleDlg"); if(!d){ d=el("dialog",{id:"cleDlg",className:"cledlg"}); d.setAttribute("aria-label","Clé du lien"); document.body.appendChild(d); d.addEventListener("click",e=>{ if(e.target===d) d.close(); }); }
+    this.rend("",d); d.open||d.showModal(); },
+  rend(msg,d){ d=d||$("cleDlg"); if(!d) return; d.textContent=""; const cle=lienCle();
+    d.appendChild(el("h3",{textContent:"🔑 Clé du lien"}));
+    d.appendChild(el("p",{className:"help",textContent:cle?"Une clé est enregistrée sur cet appareil (••••••••). Elle n'est jamais affichée.":"Aucune clé sur cet appareil. Colle celle que tu as copiée, ou crées-en une neuve."}));
+    const B=(t,fn,cls)=>{ const b=el("button",{type:"button",className:"btn"+(cls?" "+cls:""),textContent:t}); b.onclick=fn; return b; }, z=el("div",{className:"clebt"});
+    if(cle) z.appendChild(B("Copier la clé",async()=>this.rend(await this.copie(cle)?"Clé copiée ✓ — colle-la où il faut (LIFE, n8n…).":"Copie refusée par le navigateur.")));
+    z.appendChild(B(cle?"Remplacer par la clé copiée":"Coller la clé copiée",async()=>{ let v=""; try{ v=(await navigator.clipboard.readText()||"").trim(); }catch(_){}
+      if(!v){ this.saisie(); return; } if(/\s/.test(v)||v.length<12){ this.rend("Le presse-papiers ne contient pas une clé (au moins 12 caractères, sans espace)."); return; }
+      this.rend(this.garde(v)?"Clé enregistrée sur cet appareil ✓":"Enregistrement impossible sur cet appareil."); },"ghost"));
+    z.appendChild(B("Créer une clé neuve",async()=>{ if(cle&&!confirm("Remplacer la clé de cet appareil par une neuve ? Il faudra aussi la mettre dans n8n (« Lien app ») et sur tes autres appareils.")) return;
+      const v=this.neuve(); this.garde(v); this.rend(await this.copie(v)?"Clé neuve créée et copiée ✓ — colle-la maintenant dans n8n → Credentials → « Lien app » (Value), puis dans LIFE.":"Clé neuve enregistrée, mais la copie est refusée : utilise « Copier la clé »."); },"ghost"));
+    if(cle) z.appendChild(B("Oublier sur cet appareil",()=>{ if(!confirm("Oublier la clé sur cet appareil ?")) return; try{ localStorage.removeItem(LIEN_CLE); }catch(_){} this.rend("Clé oubliée sur cet appareil."); },"ghost"));
+    d.appendChild(z); if(this.zs) d.appendChild(this.zs);
+    if(msg) d.appendChild(el("p",{className:"clemsg",textContent:msg}));
+    d.appendChild(B("Fermer",()=>d.close(),"ghost clefin")); },
+  /* presse-papiers illisible (Safari, Firefox) : champ masqué où coller à la main */
+  saisie(){ const k=el("input",{type:"password",placeholder:"Colle la clé ici",autocomplete:"off"}), ok=el("button",{type:"button",className:"btn",textContent:"Enregistrer"});
+    ok.onclick=()=>{ const v=k.value.trim(); if(!v) return; this.zs=null; this.rend(this.garde(v)?"Clé enregistrée sur cet appareil ✓":"Enregistrement impossible."); };
+    this.zs=el("div",{className:"srow"},k,ok); this.rend("Le navigateur ne laisse pas lire le presse-papiers : colle la clé dans le champ."); setTimeout(()=>k.focus(),30); } };
 
 /* A8 : une icône qui ne charge pas laisse la place au logo de l'app, plus de carré blanc */
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&!i.dataset.repli&&(i.classList.contains("lgimg")||i.closest(".node,.ico"))){ i.dataset.repli="1"; i.src="icon-192.png"; i.classList.add("repli"); } },true);
@@ -6995,7 +7030,7 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=179; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=180; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
