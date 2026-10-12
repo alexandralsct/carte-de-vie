@@ -1986,6 +1986,7 @@ html.calme :is(.souris,.chatmot,.griffes){display:none}
 .node .nvb{position:absolute;top:-8px;right:-8px;min-width:24px;height:24px;padding:0 6px;box-sizing:border-box;border-radius:999px;background:#002FA7;color:#fff;border:2px solid #fff;font:800 .78rem/1 system-ui,sans-serif;display:grid;place-items:center;z-index:3;box-shadow:0 2px 6px rgba(0,0,0,.25)}
 .node.anv .urg,html:not(.nu):not(.dedans) .node.anv .urg{right:auto;left:-7px}
 .vsug{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-top:1px solid var(--pale,#c9d6f0)}.vsug p{margin:0;overflow-wrap:anywhere}
+.node .urg,html:not(.nu):not(.dedans) .node .urg{background:#fff!important;color:#002FA7!important;border:2px solid #002FA7!important}
 </style>
 <script>
 /* version test : ?test=1 → données à part (préfixe « test: » sur tout le stockage local), jamais celles de la carte principale */
@@ -6924,7 +6925,7 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=175; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=176; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
