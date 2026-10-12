@@ -1982,6 +1982,7 @@ html.calme :is(.souris,.chatmot,.griffes){display:none}
 .chreco h4{margin:0;font-size:.95rem}.chreco.chia{background:#fff;border:2px solid #002FA7}
 .chli{display:flex;flex-direction:column;gap:4px;align-items:flex-start}.chli p{margin:0;font-size:.88rem;overflow-wrap:anywhere}
 
+.moicr{margin-top:8px}
 </style>
 <script>
 /* version test : ?test=1 → données à part (préfixe « test: » sur tout le stockage local), jamais celles de la carte principale */
@@ -4578,7 +4579,9 @@ function carteLook(){ const L=Object.assign({},moi.look||{}), sec=el("section",{
   const fo=el("div",{className:"typo lookf",role:"group"}); fo.setAttribute("aria-label","Forme"); MOI_FORMES.forEach(([k,n])=>{ const b=el("button",{type:"button",title:n}); b.appendChild(el("i",{className:"moiprev"})); b.firstChild.dataset.forme=k; b.setAttribute("aria-label","Forme "+n); b.setAttribute("aria-pressed",String((L.forme||"rond")===k)); b.onclick=()=>saveMoi(Object.assign({},moi,{look:Object.assign({},moi.look,{forme:k})})); fo.appendChild(b); });
   const co=el("div",{className:"typo lookc",role:"group"}); co.setAttribute("aria-label","Couleur"); ["",...PALETTE].forEach(c=>{ const b=el("button",{type:"button"}); b.style.background=c||"var(--ink)"; b.setAttribute("aria-label",c?"Couleur "+c:"Couleur de base"); b.setAttribute("aria-pressed",String((L.couleur||"")===c)); b.onclick=()=>saveMoi(Object.assign({},moi,{look:Object.assign({},moi.look,{couleur:c})})); co.appendChild(b); });
   sec.append(el("label",{className:"lookl"},el("span",{textContent:"Son nom"}),nm),el("div",{className:"lookl"},el("span",{textContent:"Sa forme"}),fo),el("div",{className:"lookl"},el("span",{textContent:"Sa couleur"}),co)); return sec; }
-function renderMoi(){ const root=$("moiList"); root.textContent=""; moiPage.classList.toggle("moi-detail",!!moiSect); if(!moiSect) root.appendChild(carteLook());
+function renderMoi(){ const root=$("moiList"); root.textContent=""; moiPage.classList.toggle("moi-detail",!!moiSect); { const ht=moiPage.querySelector(".hero-t"); if(ht&&!ht.querySelector(".moicr")){ const b=el("button",{type:"button",className:"btn ghost v3cr moicr",textContent:"✎ Modifier"}); b.title="Modifier ma bulle (nom, forme, couleur)"; b.setAttribute("aria-label","Modifier ma bulle : nom, forme, couleur"); b.onclick=()=>{ window._moiEd=!window._moiEd; renderMoi(); }; ht.appendChild(b); }
+    const cr=moiPage.querySelector(".moicr"); if(cr){ cr.hidden=!!moiSect; cr.setAttribute("aria-expanded",String(!!window._moiEd)); }
+    if(!moiSect&&window._moiEd){ const lk=carteLook(), f=el("button",{type:"button",className:"btn",textContent:"Fermer"}); f.onclick=()=>{ window._moiEd=false; renderMoi(); }; lk.appendChild(f); root.appendChild(lk); } }
   const cent=moi.cent||[];
   if(!moiSect){
     /* en-tête : bonjour + une phrase de soi */
@@ -6909,7 +6912,7 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=173; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=174; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
