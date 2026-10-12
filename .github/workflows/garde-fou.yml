@@ -35,6 +35,9 @@ jobs:
           ce20eda9533cbed1e6c2b4276fbae1e0adc61b6754b5513084be601787b457cf  vendor/tesseract/core/tesseract-core-simd-lstm.wasm.js
           d611139672b3752c7097e671e4a1d9209dfd37f2aeb081ef6487fba3351e9255  vendor/tesseract/lang/fra.traineddata.gz
           c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08  vendor/tesseract/LICENSE
+          e99334a6b4cec7dfd82972c3cdda40bd6506d80abb1ab6d24dcc60edde6c0ffd  life/icon-192.png
+          911decb9b5c73875a1783cf51b022846e0f02cbf75f110e2a0f800a73f6a65dc  life/icon-512.png
+          3db4a287148a7d8bb77418ca5408d217a967804f150eca013b5a03f9e39f3d35  life/icon.svg
           FIN
   historique:
     # Chaque jour : tout l'historique public (lignes ajoutées et messages de commit) pour les secrets et les mots privés.
