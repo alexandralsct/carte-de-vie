@@ -2048,7 +2048,12 @@ html.lifeo,html.lifeo body{overflow:hidden}
 html body .outilsb button.otout.otout small{color:#002FA7!important}:root[data-theme="sombre"] body .outilsb button.otout.otout small{color:#a9bfff!important}
 .board .outilsb.zone{position:relative;margin:0;border-style:dashed}.board .outilsb.zone>span{position:static;display:inline-block;margin:-26px 0 8px}
 .outilsb .rgz{position:absolute;top:-14px;right:12px}.outilsb .rgz+.rgz{right:52px}
-#iaBtn.memb b{font-size:2rem!important;line-height:1}#iaBtn.memb small{display:none!important}
+html body .board.stack #iaBtn.memb{width:80px!important;height:80px!important}
+.board:not(.stack):not(.libre) #iaBtn.memb{width:11.5%!important}.board.libre #iaBtn.memb{width:19%!important}
+#iaBtn.memb b{font-size:2.7rem!important;line-height:1}#iaBtn.memb small{display:none!important}
+.board .outilsb.olarge{grid-column:1/-1!important;grid-row:99!important;order:99!important;margin-top:18px}
+.atgem{display:grid;gap:8px;margin-top:14px;padding-top:12px;border-top:1.5px dashed var(--k2,#c9d6f0)}.atgem .srow{display:flex;gap:8px}.atgem input{flex:1;min-width:0}
+#iaBtn.memb b svg{width:44px;height:44px;display:block}.board:not(.stack) #iaBtn.memb b svg,.board.libre #iaBtn.memb b svg{width:62%;height:62%;margin:auto}
 
 </style>
 <script>
@@ -6212,11 +6217,12 @@ const CATOUT={ K:"outilsPos",
   tuile(){ const t=el("button",{type:"button",className:"puce2 atpuce otout"},el("small",{textContent:"Atelier"}),el("b",{textContent:"🎨"}),el("span",{textContent:"créer une image · outils Craft"}),el("em",{textContent:"→"}));
     t.setAttribute("aria-label","Atelier : créer une image, outils Craft"); t.onclick=()=>ATELIER.ouvre(); return t; },
   pose(){ document.querySelectorAll(".outilsb").forEach(x=>x.remove()); const board=$("board"), sc=document.querySelector(".scroller"); if(!board||!sc) return;
-    const stack=isStack(), z=el("section",{className:"outilsb"+(stack?" zone":"")},el("span",{textContent:"Outils"}),el("div",{className:"ogrid"},this.tuile())); z.setAttribute("aria-label","Outils");
+    const large=board.classList.contains("stack")&&getComputedStyle(board).gridTemplateColumns.trim().split(/\s+/).length>1, stack=board.classList.contains("stack")&&!large, z=el("section",{className:"outilsb"+(stack?" zone":"")},el("span",{textContent:"Outils"}),el("div",{className:"ogrid"},this.tuile())); z.setAttribute("aria-label","Outils");
     if(stack){ const Z=[...board.querySelectorAll(":scope>.zone:not(.outilsb)")], k=Math.max(0,Math.min(this.pos(),Z.length));
       if(reorg){ const fl=(t,d,lab)=>{ const x=el("button",{type:"button",className:"rgz",textContent:t}); x.setAttribute("aria-label",lab+" Outils"); x.onclick=e=>{ e.stopPropagation(); this.garde(Math.max(0,Math.min(k+d,Z.length))); this.pose(); }; return x; };
         z.append(fl("↑",-1,"Monter"),fl("↓",1,"Descendre")); }
       if(k<Z.length) Z[k].before(z); else if(Z.length) Z[Z.length-1].after(z); else board.appendChild(z); }
+    else if(large){ z.classList.add("zone","olarge"); board.appendChild(z); }
     else { const haut=this.pos()===0; if(reorg){ const x=el("button",{type:"button",className:"rgz",textContent:haut?"↓":"↑"}); x.setAttribute("aria-label",(haut?"Descendre":"Monter")+" Outils"); x.onclick=()=>{ this.garde(haut?999:0); this.pose(); }; z.appendChild(x); }
       if(haut) sc.before(z); else sc.after(z); } } };
 { const oI=renderIa; renderIa=function(){ const r=oI.apply(this,arguments); try{ CATOUT.pose(); }catch(_){} return r; }; setTimeout(()=>{ try{ CATOUT.pose(); }catch(_){} },800); }
@@ -6224,6 +6230,54 @@ const CATOUT={ K:"outilsPos",
 { const vf=n=>"V."+String(n).split("").join("."), e=$("appVer");
   const fmt=()=>{ if(!e) return; const t=e.textContent, u=t.replace(/Version (\d+) de l'app/,(m,n)=>"Version "+vf(n)).replace(/la version (\d+) est prête/,(m,n)=>"la version "+vf(n)+" est prête"); if(u!==t) e.textContent=u; };
   if(e){ fmt(); new MutationObserver(fmt).observe(e,{childList:true,characterData:true,subtree:true}); } }
+/* la bulle mémoire : un cerveau au trait fin */
+{ const cerveau=()=>{ const b=$("iaBtn"), t=b&&b.querySelector("b"); if(!t||t.querySelector("svg")) return;
+    t.textContent=""; t.innerHTML='<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M24 9c-2-3-7-3.5-9-.5-3.5-.5-6.5 2.5-6 6-3 1.5-4 5.5-2 8.5-2 3-.5 7 3 8 0 4 4 6.5 7.5 5 1.5 2.5 5 3 6.5 1V9z"/><path d="M24 9c2-3 7-3.5 9-.5 3.5-.5 6.5 2.5 6 6 3 1.5 4 5.5 2 8.5 2 3 .5 7-3 8 0 4-4 6.5-7.5 5-1.5 2.5-5 3-6.5 1"/><path d="M15 16c2 .5 3 2 3 4M12 25c2.5-1 5 0 6 2M17 33c0-2 1.5-3.5 3.5-4M33 16c-2 .5-3 2-3 4M36 25c-2.5-1-5 0-6 2M31 33c0-2-1.5-3.5-3.5-4"/></svg>'; };
+  const oI=renderIa; renderIa=function(){ const r=oI.apply(this,arguments); cerveau(); return r; }; cerveau(); }
+/* ===== Atelier : images créées directement par Gemini, depuis l'appareil (clé Gemini collée une fois, gardée sur l'appareil).
+   Plafond : 25 images par mois sur cet appareil (environ 1 € au tarif public d'une image Gemini). ===== */
+{ const A=window.ATELIER, KG="atelier-gemini", KM="atelier-gemini-mois", MAX=25,
+    MODELES=["gemini-2.5-flash-image","gemini-3-pro-image-preview","gemini-2.0-flash-preview-image-generation"],
+    FORMAT={carre:"format carré 1:1",portrait:"format portrait 3:4",paysage:"format paysage 16:9"},
+    QUAL={brouillon:"rendu simple",normale:"",soignee:"rendu très soigné, détaillé"};
+  const cle=()=>{ try{ return (localStorage.getItem(KG)||"").trim(); }catch(_){ return ""; } };
+  const mois=()=>new Date().toISOString().slice(0,7), compte=()=>{ const c=A.lit(KM,{}); return c&&c.mois===mois()?(+c.n||0):0; };
+  const petite=(src)=>new Promise(ok=>{ const im=new Image(); im.onload=()=>{ const m=1024, r=Math.min(1,m/Math.max(im.width,im.height)), c=document.createElement("canvas");
+      c.width=Math.round(im.width*r); c.height=Math.round(im.height*r); c.getContext("2d").drawImage(im,0,0,c.width,c.height); ok(c.toDataURL("image/jpeg",.85)); }; im.onerror=()=>ok(""); im.src=src; });
+  A.gemini=async function(corps,bt){ if(this.occupe) return; const k=cle(), I=corps.image;
+    if(compte()>=MAX){ this.dit("image","Plafond du mois atteint ("+MAX+" images, environ 1 €). Il se remet à zéro le 1er."); this.rend(); return; }
+    this.occupe=true; this.dit("image","🎨 Gemini dessine… (10 à 40 secondes)"); this.rend();
+    try{ let j=null, err="";
+      for(const m of MODELES){ const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+m+":generateContent",{method:"POST",headers:{"content-type":"application/json","x-goog-api-key":k},
+          body:JSON.stringify({contents:[{parts:[{text:I.prompt+"\n("+[FORMAT[I.format],QUAL[I.qualite]].filter(Boolean).join(", ")+")"}]}],generationConfig:{responseModalities:["IMAGE","TEXT"]}})});
+        const x=await r.json().catch(()=>({}));
+        if(r.status===404){ err="modèle indisponible"; continue; }
+        if(r.status===400&&/API key|API_KEY/i.test(JSON.stringify(x))){ err="clé Gemini refusée"; break; }
+        if(r.status===403){ err="clé Gemini refusée ou sans accès à la création d'images"; break; }
+        if(r.status===429){ err="trop de demandes ou quota Gemini atteint : réessaie plus tard"; break; }
+        if(!r.ok){ err="Gemini a répondu une erreur ("+r.status+")"; continue; }
+        j=x; break; }
+      const p=j&&(((j.candidates||[])[0]||{}).content||{}).parts||[], d=p.find(x=>x.inlineData&&/^image\//.test(x.inlineData.mimeType||""));
+      if(!d){ this.dit("image","ÉCHEC — "+(err||"Gemini n'a pas rendu d'image (demande refusée ou trop vague ?)")+"."); return; }
+      const brut="data:"+d.inlineData.mimeType+";base64,"+d.inlineData.data, ap=await petite(brut);
+      A.ecrit(KM,{mois:mois(),n:compte()+1});
+      const x={id:"GM-"+Date.now(),genre:"image",date:new Date().toISOString(),statut:"SUCCES",lien:"",texte:I.prompt,outil:"",format:I.format,apercu:this.imgSure(ap)};
+      this.garde(x); this.dernier=x.id; this.dernierBrut=brut; if(bt) fetel(bt);
+      this.dit("image","Réussi · "+(compte())+" / "+MAX+" images ce mois-ci. Touche « Enregistrer l'image » pour la garder.");
+    }catch(_){ this.dit("image","Gemini n'a pas répondu (connexion ?). Réessaie dans un moment."); }
+    finally{ this.occupe=false; this.rend(); } };
+  const oE=A.envoie.bind(A); A.envoie=function(g,corps,bt){ return g==="image"&&cle()?this.gemini(corps,bt):oE(g,corps,bt); };
+  const oB=A.bientot.bind(A); A.bientot=function(g){ return g==="image"&&cle()?null:oB(g); };
+  const oF=A.fiche.bind(A); A.fiche=function(x,grand){ const box=oF(x,grand);
+    if(/^GM-/.test(x.id)&&x.apercu){ const a=el("a",{className:"lien",href:(x.id===this.dernier&&this.dernierBrut)||x.apercu,textContent:"Enregistrer l'image ↓"}); a.setAttribute("download",(x.texte||"image").slice(0,40).replace(/[^\wÀ-ÿ -]/g,"").trim()+".png"); box.appendChild(a); }
+    return box; };
+  const oI=A.ongletImage.bind(A); A.ongletImage=function(z){ oI(z); const k=cle(), w=el("div",{className:"atgem"});
+    if(k){ w.append(el("small",{className:"mono",textContent:"Images par Gemini · "+compte()+" / "+MAX+" ce mois-ci (≈ 1 €)"}));
+      const o=el("button",{type:"button",className:"btn ghost",textContent:"Oublier la clé Gemini"}); o.onclick=()=>{ try{ localStorage.removeItem(KG); }catch(_){} this.rend(); }; w.append(o); }
+    else { const i=el("input",{type:"password",placeholder:"Clé Gemini (aistudio.google.com → Get API key)",autocomplete:"off"}), s=el("button",{type:"button",className:"btn",textContent:"Brancher Gemini"});
+      i.setAttribute("aria-label","Clé Gemini"); s.onclick=()=>{ const v=i.value.trim(); if(v.length<20) { i.focus(); return; } try{ localStorage.setItem(KG,v); }catch(_){} this.rend(); };
+      w.append(el("small",{className:"mono",textContent:"Créer les images directement avec Gemini : colle ta clé une fois (elle reste sur cet appareil)."}),el("div",{className:"srow"},i,s)); }
+    z.appendChild(w); }; }
 
 /* A8 : une icône qui ne charge pas laisse la place au logo de l'app, plus de carré blanc */
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&!i.dataset.repli&&(i.classList.contains("lgimg")||i.closest(".node,.ico"))){ i.dataset.repli="1"; i.src="icon-192.png"; i.classList.add("repli"); } },true);
@@ -7139,7 +7193,7 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=185; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=186; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
