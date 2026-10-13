@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-0emXp6fTPkDAr/Ru/DOJXg+S36b0y4XbP7URRMYtLOQ=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-UtOEim0QBAUVyDcs/8LIW8h2gbJCCSFR6AAEtskbx3U=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-uwEPg/LR3aCjPpW4EPZjyG+bqYW1TTNuqGafi3pmnzo=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-kliq8/Nox5GgvUj19VVGbyaV8sjPvAbiYsEeC7/29bI=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f4eee4">
@@ -2179,6 +2179,7 @@ html body header .top3a .noterb{display:none!important}
 /* compagnon : rien ne dépasse sur les côtés (sinon le téléphone dézoome la page) */
 .cpnZone{position:absolute;left:0;top:0;width:100%;height:0;overflow-x:clip;overflow-y:visible}
 
+.semnav{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:2px 0 10px}.semnav .semnavl{flex:1;min-width:8em;text-align:center;font-weight:600}.semnav button:disabled{opacity:.4}
 html.klein .node .ico svg,html.klein .node .ico{color:#002fa7!important;--c:#002fa7}
 html.demarre .wrap>:not(header){visibility:hidden!important}
 /* accessibilité (13/10) : titre de l'accueil lisible par les lecteurs d'écran seulement */
@@ -5257,7 +5258,7 @@ const V2={
   ouvreAuj(){ const pg=$("aujPage"), z=$("aujIn"); pg.hidden=false; pg.scrollTop=0;
     this.range();
     PILOTE.rend(); },
-  tabs(actif){ const t=el("div",{className:"seg",role:"tablist"}); [["semaine","Ma semaine",()=>ESSAI.ouvreTraj()],["fil","Mon fil",()=>{ $("trajPage").hidden=true; ESSAI.ouvreMem(); }],["revue","La revue",()=>{ PILOTE.ouvreRevue(); }]].forEach(([k,n,f])=>{ const b=el("button",{type:"button",role:"tab",textContent:n}); b.setAttribute("aria-selected",String(k===actif)); b.onclick=()=>{ if(k!==actif){ $("trajPage").hidden=k!=="semaine"; $("memPage").hidden=k!=="fil"; f(); } }; t.appendChild(b); }); return t; },
+  tabs(actif){ const t=el("div",{className:"seg",role:"tablist"}); [["semaine","Ma semaine",()=>{ V2.ongDemande="semaine"; ESSAI.ouvreTraj(); }],["sujets","Mes sujets",()=>{ V2.ongDemande="sujets"; ESSAI.ouvreTraj(); }],["fil","Mon fil",()=>{ $("trajPage").hidden=true; ESSAI.ouvreMem(); }],["revue","La revue",()=>{ PILOTE.ouvreRevue(); }]].forEach(([k,n,f])=>{ const b=el("button",{type:"button",role:"tab",textContent:n}); b.setAttribute("aria-selected",String(k===actif)); b.onclick=()=>{ if(k!==actif){ $("trajPage").hidden=k!=="semaine"&&k!=="sujets"; $("memPage").hidden=k!=="fil"; f(); } }; t.appendChild(b); }); return t; },
   /* « Ma semaine » : les 3 priorités de la semaine en tête, puis grands sujets, horizons, décisions */
   prios(z){ const P=PILOTE.prios(), c=el("section",{className:"card rv"},el("h3",{textContent:"Mes 3 priorités de la semaine"}));
     if(P.length){ const ul=el("ul",{className:"pprl"}); P.forEach(x=>ul.appendChild(el("li",{className:x.done?"done":""},el("span",{textContent:(x.done?"✓ ":"○ ")+x.text})))); c.appendChild(ul); }
@@ -5304,9 +5305,14 @@ const V2={
 };
 /* branchements sur les écrans existants */
 { const o1=ESSAI.rend.bind(ESSAI); ESSAI.rend=function(){ o1(); V2.bande(); };
-  const o2=ESSAI.ouvreTraj.bind(ESSAI); ESSAI.ouvreTraj=function(a){ o2(a); const z=$("trajIn"), h=z.querySelector(".hero"); if(h){ h.querySelector("h2").textContent="Ma semaine"; h.querySelector(".lead").textContent="Tes priorités, tes grands sujets, tes horizons et tes décisions. La revue du dimanche les met à jour."; h.after(V2.tabs("semaine")); }
+  const o2=ESSAI.ouvreTraj.bind(ESSAI); ESSAI.ouvreTraj=function(a){ const ong=a===true?(V2.ong||"semaine"):(a==="horizons"||a==="decisions")?"sujets":(V2.ongDemande||"semaine"); V2.ongDemande=null; V2.ong=ong; if(a!==true) SEM_DEC=0;
+    o2(a); const z=$("trajIn"), h=z.querySelector(".hero"); if(h){ h.querySelector("h2").textContent="Ma semaine"; h.querySelector(".lead").textContent=ong==="sujets"?"Tes grands sujets, tes horizons et tes décisions en attente. La revue du dimanche les met à jour.":"Tes 3 priorités et ta semaine heure par heure. La revue du dimanche les met à jour."; h.after(V2.tabs(ong)); }
     [...z.querySelectorAll(".card")].forEach(c=>{ const t=c.querySelector("h3"); if(t&&t.textContent==="Ma direction") c.remove(); });
-    const tb=z.querySelector(".seg"); if(tb&&!z.querySelector(".v2prios")){ const p=V2.prios(z); p.classList.add("v2prios"); tb.after(p); }
+    const tb=z.querySelector(".seg");
+    /* chaque onglet ne garde que ses cartes : « Mes sujets » = tout ce que la page trajectoire construit sous l'en-tête */
+    if(tb&&ong==="semaine") [...z.children].forEach(x=>{ if(x!==h&&x!==tb) x.remove(); });
+    if(ong==="sujets") return;
+    if(tb&&!z.querySelector(".v2prios")){ const p=V2.prios(z); p.classList.add("v2prios"); tb.after(p); }
     /* le tableau horaire de la semaine, juste après les priorités */
     if(tb&&!z.querySelector(".hsemaine")) (z.querySelector(".v2prios")||tb).after(renderSemaine(null)); };
   const o3=ESSAI.ouvreMem.bind(ESSAI); ESSAI.ouvreMem=function(a){ o3(a); const z=$("memIn"), h=z.querySelector(".hero"); if(h&&!z.querySelector(".seg")){ h.querySelector("h2").textContent="Mon fil"; h.after(V2.tabs("fil")); } };
@@ -6704,7 +6710,18 @@ function hForm(h,ok){ let sym=h.sym||"goutte", type=h.type||"oui";
 const HIDEES=[["Boire de l'eau","goutte",7,"compte",8],["Méditer","lotus",7],["Lire 20 min","livre",5],["Marcher 30 min","empreinte",5],["Sport","haltere",3],["Me coucher avant 23 h","reverie",6],["Écrire mon journal","plume",7],["Prendre soin de mes cheveux","cheveux",3],["Un fruit et des légumes","feuille",7,"compte",5],["Respirer 5 minutes","spirale",7],["Un moment pour moi","coeur",7],["Pas d'écran le soir","bougie",5]];
 /* « Ma semaine » : le tableau Tracking Planning de la propriétaire (une case par demi-heure, une couleur par catégorie).
    meta/semaine est posé par le système (lecture du tableau) ; meta/journees garde les moments ajoutés depuis l'app, à recopier dans le tableau. */
-let SEMAINE=null, JOURNEES=null;
+let SEMAINE=null, JOURNEES=null, SEM_DEC=0; const SEM_CACHE={};
+/* un jour de la semaine affichée (0 = cette semaine, -1 = la semaine dernière…) */
+function semJour(){ const d=new Date(today()+"T12:00"); d.setDate(d.getDate()+7*SEM_DEC); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function semVa(n,qui){ SEM_DEC=Math.min(0,n); const k=semJour();
+  if(SEM_DEC<0&&!SEM_CACHE[k]){ if(!PASS.ok()) SEM_CACHE["!"+k]="Branche la passerelle (plus bas) pour revoir tes anciennes semaines.";
+    else{ delete SEM_CACHE["!"+k]; PASS.lire(k).then(S=>{ SEM_CACHE[k]=S; },x=>{ SEM_CACHE["!"+k]=/introuvable/.test(String(x&&x.message||x))?"Cette semaine n'est pas dans ton tableau.":"Lecture impossible ("+String(x&&x.message||x).slice(0,50)+")."; }).then(()=>{ if(semJour()===k){ semRedessine(); semFocus(qui); } }); } }
+  semRedessine(); semFocus(qui); }
+function semFocus(qui){ const b=qui&&document.querySelector('#trajIn .semnav [data-n="'+qui+'"]'); if(b&&!b.disabled) b.focus(); }
+function semNav(){ const n=el("div",{className:"semnav"}), av=el("button",{type:"button",className:"vbtn ghostb",textContent:"‹ Avant"}), ap=el("button",{type:"button",className:"vbtn ghostb",textContent:"Après ›"});
+  av.dataset.n="av"; ap.dataset.n="ap"; av.setAttribute("aria-label","Semaine d'avant"); ap.setAttribute("aria-label","Semaine d'après"); av.onclick=()=>semVa(SEM_DEC-1,"av"); ap.onclick=()=>semVa(SEM_DEC+1,"ap"); ap.disabled=SEM_DEC>=0;
+  n.append(av,el("span",{className:"semnavl",textContent:SEM_DEC===0?"Cette semaine":SEM_DEC===-1?"La semaine dernière":"Il y a "+(-SEM_DEC)+" semaines"}),ap);
+  if(SEM_DEC<0){ const r=el("button",{type:"button",className:"vbtn ghostb",textContent:"Revenir à cette semaine"}); r.dataset.n="ici"; r.onclick=()=>semVa(0,"av"); n.appendChild(r); } return n; }
 const semH=i=>String(Math.floor(i/2)).padStart(2,"0")+":"+(i%2?"30":"00"), semI=h=>{ const m=String(h||"").match(/^(\d{1,2}):(\d{2})$/); return m?(+m[1])*2+(+m[2]>=30?1:0):-1; };
 const semHeures=v=>String(v).replace(".",",")+" h";
 
@@ -6730,7 +6747,9 @@ function semRedessine(){ const x=document.querySelector("#trajIn .hsemaine"); if
 function semLecture(force){ if(!PASS.ok()||renderSemaine.encours) return; renderSemaine.encours=true;
   Promise.resolve().then(async()=>{ let ch=false; try{ ch=(await PASS.recopie())>0; ch=(await PASS.relire(ch||force))||ch; }catch(_){} renderSemaine.encours=false; if(ch) quandLibre("semaine",semRedessine); }); }
 function renderSemaine(c){ const s=el("section",{className:"card hab hsemaine"},el("h3",{textContent:"Ma semaine"}));
-  const S=SEMAINE; if(!S||!Array.isArray(S.jours)){ s.append(help("Ta semaine arrive ici depuis ton tableau « Tracking Planning » : le temps passé par catégorie et ta semaine en couleurs."),semPasserelle(c));
+  const passee=SEM_DEC<0, S=passee?SEM_CACHE[semJour()]:SEMAINE; s.appendChild(semNav());
+  if(passee&&!S){ s.append(help(SEM_CACHE["!"+semJour()]||"Je lis cette semaine dans ton tableau…")); return s; }
+  if(!S||!Array.isArray(S.jours)){ s.append(help("Ta semaine arrive ici depuis ton tableau « Tracking Planning » : le temps passé par catégorie et ta semaine en couleurs."),semPasserelle(c));
     /* première lecture forcée une seule fois par ouverture de l'app (sinon, tableau toujours vide : relecture sans fin) */
     semLecture(!semLecture.forcee); semLecture.forcee=true; return s; }
   const C=(S.categories||[]).map(x=>({nom:x.nom,hex:x.hex})), lib=n=>{ const t=String(n||"").toLowerCase().replace("quoitidien","quotidien").replace("carriere","carrière").replace("sante","santé").replace("numerique","numérique").replace("developpement","développement").replace(/\//g," · "); return t.charAt(0).toUpperCase()+t.slice(1); };
@@ -6785,7 +6804,7 @@ function renderSemaine(c){ const s=el("section",{className:"card hab hsemaine"},
     const L=[...((JOURNEES&&JOURNEES.saisies)||[]),{id:uid(),j:jour.value,d:de.value,f:a_.value==="24:00"?"24:00":a_.value,c:cat.value,t:txt.value.trim().slice(0,120),ts:new Date().toISOString(),etat:"a_recopier"}];
     JOURNEES={saisies:L}; if(db) db.doc("meta/journees").set({saisies:L}).catch(()=>{}); semRedessine();
     if(PASS.ok()) PASS.recopie().then(n=>{ if(n) PASS.relire(true).then(()=>semRedessine()); else semRedessine(); }).catch(()=>{}); };
-  s.append(el("h4",{textContent:"Ajouter un moment"}),f);
+  if(!passee) s.append(el("h4",{textContent:"Ajouter un moment"}),f);
   const nAtt=A.filter(x=>x.etat!=="recopie").length; if(nAtt) s.appendChild(el("p",{className:"mut",textContent:nAtt+" moment"+(nAtt>1?"s":"")+" ajouté"+(nAtt>1?"s":"")+" dans l'app pas encore recopié"+(nAtt>1?"s":"")+" dans ton tableau"+(PASS.ok()?" (touche « Relire et recopier »).":" : branche la passerelle ci-dessous.")}));
   s.appendChild(semPasserelle(c));
   /* à l'ouverture : relit le tableau (au plus toutes les 10 min) et recopie ce qui attend */
@@ -7155,7 +7174,7 @@ $("onbGo").onclick=()=>{ const all=[]; onbG.forEach(G=>G.it.forEach(([n,ic])=>{ 
      que celle de la version qu'elle modifie : ce qui est fait après avoir reçu une version l'emporte sur elle, même si l'horloge
      de l'appareil retarde ou si celle d'un autre avance ;
    - listes sans id (V.200) : listes de valeurs simples (jours cochés, identifiants…) et listes d'objets datés sans id (journal log
-     {t, m}, relevés {d, …}) fusionnées par union : un ajout de chaque côté est gardé ; un retrait fait par l'app est daté dans _xt
+     {t, m}, relevés {d, …} : valeurs simples seulement) fusionnées par union : un ajout de chaque côté est gardé ; un retrait fait par l'app est daté dans _xt
      (« chemin|=valeur », « chemin|#empreinte ») ; un ajout daté (« chemin|+=valeur ») l'emporte sur un retrait plus ancien.
      Un ajout sans trace (écrivain externe) est gardé s'il est daté et pas plus ancien que la liste qui l'emporte (une liste tronquée
      ne fait pas revenir ses vieilles lignes) ; un élément sans id ajouté à une liste d'éléments à id reçoit un id tiré de son contenu ;
@@ -7202,7 +7221,9 @@ const retire=(C,ch,x)=>{ const k=ch+"|"+String(x.id); return aCle(C.xt,k)&&C.xt[
 const prim=v=>v===null||typeof v==="string"||typeof v==="number"||typeof v==="boolean";
 const listePrim=a=>Array.isArray(a)&&a.every(prim);
 const tEnt=x=>x.t!==undefined?x.t:x.d!==undefined?x.d:x.date;
-const listeDatee=a=>Array.isArray(a)&&a.every(x=>estObj(x)&&x.id==null&&(typeof tEnt(x)==="string"||typeof tEnt(x)==="number"));
+/* une ligne datée (journal {t, m}, relevé {d, v}) n'a que des valeurs simples ; un objet qui contient une liste ou un objet
+   (les jours de meta/semaine et leurs créneaux…) est un instantané : la version la plus récente le remplace en entier (V.202) */
+const listeDatee=a=>Array.isArray(a)&&a.every(x=>estObj(x)&&x.id==null&&(typeof tEnt(x)==="string"||typeof tEnt(x)==="number")&&Object.values(x).every(prim));
 const mixte=a=>Array.isArray(a)&&a.length>0&&a.every(estObj)&&a.some(x=>x.id!=null)&&a.some(x=>x.id==null);
 function empreinteTxt(t){ let h=2166136261; for(let i=0;i<t.length;i++){ h^=t.charCodeAt(i); h=Math.imul(h,16777619)>>>0; } return h.toString(36); }
 const cleVal=(v,dat)=>dat?"#"+empreinteTxt(JSON.stringify(v)):"="+JSON.stringify(v);
@@ -7557,8 +7578,8 @@ function start(){
    C'est elle qui fait foi : une copie gardée sur l'appareil, ou un fichier en ligne, n'est exécuté que si son texte a exactement
    cette empreinte. Une empreinte rangée dans le stockage de l'appareil n'est plus jamais utilisée (qui peut écrire l'un peut écrire
    l'autre). */
-const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=201;
-const PERSO_EMP="5d58c9a954231df26b4b7d25db0ffc7928a71a9a460c2aaf629656f6b582e426", PERSO_GIT="d5d9f6bc2c6d426ffa3312f5b6629ef2bba96ad2", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
+const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=202;
+const PERSO_EMP="550b790384cfb7f29500baadd1e26e1ec63712257d3c4e9ffb7df0037037a66f", PERSO_GIT="4988b2e086d261bbfec7d29c3fcaa02dfe26ea00", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
 try{ ["carte-de-vie-perso-sha","carte-de-vie-perso-suivant-sha"].forEach(k=>localStorage.removeItem(k)); }catch{ /* stockage bloqué */ }
 /* le module n'est jamais exécuté deux fois (il pose des minuteries et des écouteurs) */
 let persoFait=false;
@@ -7659,7 +7680,7 @@ function persoDepotUI(){ const pg=document.getElementById("syncLinked"); if(!pg|
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=201; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=202; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0="carte-de-vie-v"+APP_V, rec=false;

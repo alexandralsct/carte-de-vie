@@ -131,6 +131,11 @@ const days = d => rub(d, 'r3').gestes[0].days;
 { const [a, b] = deux2(); a.ecrit(d => { rub(d, 'r1').items.push({ id: 'i9', text: 'ajout de l\'app', done: false }); return d; }); avance(3e3);
   const ext = clone(b.doc); rub(ext, 'r1').items.push({ text: 'ajout externe sans id', done: false }); ext._m = T; ext._f = Object.assign({}, ext._f, { rub: T });
   for (const m of [A.fusion(clone(ext), clone(a.doc)), A.fusion(clone(a.doc), clone(ext))]) ok(rub(m, 'r1').items.length === 4 && rub(m, 'r1').items.every(x => x.id != null), 'N7. un écrivain externe ajoute un élément sans id : il reçoit un id tiré de son contenu, rien n\'est perdu (' + rub(m, 'r1').items.length + '/4)'); }
+{ /* V.202 : meta/semaine (jours avec leurs créneaux) est un instantané : la version la plus récente le remplace, jamais d'union
+     (avant : 9 jours, lundi et mardi en double, une copie vide et une copie remplie) */
+  const N = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'], sem = (plein, t) => ({ feuille: 'S1', jours: N.map((n, k) => ({ nom: n, date: '2026-01-0' + (5 + k), creneaux: plein && k < 2 ? [['09:00', 'x', 0]] : [] })), _m: t, _f: { feuille: t, jours: t } });
+  const vieille = sem(false, T - 6e4), neuve = sem(true, T);
+  for (const m of [A.fusion(clone(vieille), clone(neuve)), A.fusion(clone(neuve), clone(vieille))]) ok(m.jours.length === 7 && new Set(m.jours.map(j => j.date)).size === 7 && m.jours[0].creneaux.length === 1, 'meta/semaine : la semaine la plus récente remplace l\'ancienne, 7 jours sans doublon (' + m.jours.length + ' jours)'); }
 if (A.supprime) { const [a, b] = deux2(-2 * J, 0); b.ecrit(d => { d.name = 'B'; return d; }); avance(5e3); a.recoit(b.doc); avance(1e3); const s = A.supprime(a.doc, a.H.now());
   ok(A.fusion(clone(s), clone(b.doc))._del && A.fusion(clone(b.doc), clone(s))._del, 'document supprimé après avoir reçu la dernière version, horloge en retard de 2 jours : la suppression l\'emporte'); }
 /* import d'une sauvegarde (comme load() de l'app) : fusion, pas remplacement */
