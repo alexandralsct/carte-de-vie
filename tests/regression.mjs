@@ -31,7 +31,8 @@ const DEMO = {
     { id: 'p1', name: 'Séances', items: [it('Course', true), it('Natation')] },
     { id: 'p2', name: 'Objectif kilomètres', type: 'objectif', cible: 100, actuel: 20, unite: 'km', pas: 5, items: [] }]),
 };
-const TEL = devices['Galaxy S9+'], ORDI = { viewport: { width: 1280, height: 900 }, deviceScaleFactor: 1, isMobile: false, hasTouch: false };
+/* app téléphone : Galaxy S9+ émulé (tactile) à 412 px de large, comme avant (le profil de Playwright seul fait 320 px) */
+const TEL = Object.assign({}, devices['Galaxy S9+'], { viewport: { width: 412, height: 915 } }), ORDI = { viewport: { width: 1280, height: 900 }, deviceScaleFactor: 1, isMobile: false, hasTouch: false };
 const ouvre = async (vp, theme = 'clair', profil = TEL) => {
   const ctx = await b.newContext(Object.assign({}, profil, { viewport: vp || profil.viewport || { width: 412, height: 915 }, serviceWorkers: 'block', locale: 'fr-FR', timezoneId: 'Europe/Paris' }));
   /* règle de sécurité (CSP) : toute violation est notée (un script ou une ressource bloqués casseraient l'app en silence) */
@@ -55,16 +56,28 @@ const tuile = (p, rid) => p.evaluate(rid => { const t = document.querySelector('
 /* la règle de sécurité n'autorise que les scripts de la page, par empreinte (ni 'unsafe-inline', ni adresse quelconque) */
 { const h = await (await fetch(URL)).text(), m = /script-src ([^;]*);/.exec(h), src = m ? m[1] : '';
   ok(m && /'sha256-/.test(src) && !/unsafe-inline/.test(src) && !/(^| )(https?:|\*)( |$)/.test(src), 'règle de sécurité : scripts autorisés par empreinte seulement, sans \'unsafe-inline\''); }
+/* séparation des deux apps dans le CSS : l'app ordinateur n'a qu'une référence, « (min-width:900px) and (pointer:fine) », et l'app
+   téléphone son complément exact ; les autres seuils de largeur (mises en page fluides) ne peuvent que diminuer */
+{ const h = await (await fetch(URL)).text(), css = [...h.matchAll(/<style>([\s\S]*?)<\/style>/g)].map(m => m[1]).join('\n'), N = {};
+  for (const m of css.matchAll(/@media([^{]*)\{/g)) { const q = m[1].replace(/\s+/g, ' ').trim(); N[q] = (N[q] || 0) + 1; }
+  const ORDI_Q = '(min-width:900px) and (pointer:fine)', TEL_Q = 'not all and (min-width:900px) and (pointer:fine)';
+  const BASE = { '(min-width:700px)': 3, '(max-width:460px)': 1, '(max-width:720px)': 1, '(orientation:landscape) and (max-height:520px)': 1, '(max-width:760px)': 6, '(min-width:760px)': 1,
+    '(max-width:520px)': 1, '(max-width:420px)': 2, '(min-width:761px)': 11, '(min-width:821px)': 1, '(min-width:1000px)': 2, '(prefers-reduced-motion:reduce)': 4 };
+  const hors = Object.entries(N).filter(([q, n]) => q !== ORDI_Q && q !== TEL_Q && !(n <= (BASE[q] || 0)));
+  ok(N[ORDI_Q] >= 1 && !hors.length, 'CSS : une seule référence pour l\'app ordinateur (' + (N[ORDI_Q] || 0) + ' blocs) et son complément pour l\'app téléphone (' + (N[TEL_Q] || 0) + ') ; aucun nouveau seuil' + (hors.length ? ' — nouveaux : ' + hors.map(([q, n]) => q + ' ×' + n).join(', ') : ''));
+  const enMoins = Object.entries(BASE).filter(([q, n]) => (N[q] || 0) < n); if (enMoins.length) console.log('--  seuils en baisse (abaisser BASE) : ' + enMoins.map(([q]) => q).join(', ')); }
 console.log('== App téléphone');
 { const { ctx, p, err, cdp } = await ouvre();
   const noms = await p.evaluate(() => [...document.querySelectorAll('.node b')].map(x => x.textContent.replace(/\s+/g, ' ').trim()).filter(Boolean));
   ok(noms.length >= 4, 'la carte affiche ' + noms.length + ' items');
   ok(!(await debord(p)), 'accueil : pas de défilement horizontal');
+  ok(await p.evaluate(() => !matchMedia('(min-width:900px) and (pointer:fine)').matches && !document.documentElement.classList.contains('ordi')), 'contexte tactile : les règles de l\'app ordinateur ne s\'appliquent pas');
   /* 1. chaque item s'ouvre ; swipe des pages, lent et rapide */
   for (const n of noms) { await item(p, n); await p.waitForTimeout(500); ok(await p.evaluate(() => !document.getElementById('drawer').hidden), 'ouverture de « ' + n + ' »');
     const np = await p.evaluate(() => document.querySelectorAll('#pane .rpage').length); if (np < 2) { await ferme(p); await p.waitForTimeout(250); continue; }
     let bloque = 0; for (const ms of [220, 900]) { await p.evaluate(() => { const tr = document.querySelector('#pane .rptrack'); tr.scrollTo({ left: 0 }); const d = document.getElementById('drawer'); d.scrollTop = tr.getBoundingClientRect().top + d.scrollTop - 160; }); await p.waitForTimeout(400);
-      const y = await p.evaluate(() => { const r = document.querySelector('#pane .rptrack').getBoundingClientRect(); return Math.min(innerHeight - 60, r.top + Math.min(220, r.height / 2)); }); await glisse(cdp, p, 370, y, 60, y + 4, ms); if (await sel(p) !== 1) bloque++; }
+      const y = await p.evaluate(() => { const r = document.querySelector('#pane .rptrack').getBoundingClientRect(); return Math.min(innerHeight - 60, r.top + Math.min(220, r.height / 2)); }); await glisse(cdp, p, 370, y, 60, y + 4, ms);
+      if (await sel(p) !== 1) bloque++; }
     ok(!bloque, 'swipe des pages dans « ' + n + ' » (' + np + ' pages)'); await ferme(p); await p.waitForTimeout(250); }
   /* 2. couleur d'un item (dans la feuille « ✎ Modifier ») */
   await item(p, 'Lecture'); await p.waitForTimeout(600); const sw = await p.evaluate(() => { const m = [...document.querySelectorAll('#drawer button')].find(x => /Modifier/.test(x.textContent) && x.offsetParent); if (m) m.click(); const s = document.querySelector('.swcur'); if (s) s.scrollIntoView({ block: 'center' }); return !!s; });
@@ -163,8 +176,12 @@ console.log('\n== App ordinateur');
   let foc = null; for (let i = 0; i < 40 && !foc; i++) { await p.keyboard.press('Tab'); foc = await p.evaluate(() => { const a = document.activeElement; return a && a.classList.contains('node') ? getComputedStyle(a).outlineStyle !== 'none' || getComputedStyle(a).boxShadow !== 'none' : null; }); }
   ok(foc === true, tag + ' : au clavier, Tab atteint un item, contour visible');
   await p.keyboard.press('Enter'); await p.waitForTimeout(600); const ouv = await p.evaluate(() => !document.getElementById('drawer').hidden);
+  /* page plein écran : dialogue modal, carte en dessous inerte, focus dans la page */
+  const dlg = await p.evaluate(() => { const d = document.getElementById('drawer'), w = document.querySelector('.wrap'); return d.getAttribute('role') === 'dialog' && d.getAttribute('aria-modal') === 'true' && !!d.getAttribute('aria-label') && w.inert && d.contains(document.activeElement) && !d.closest('[inert]'); });
   await p.keyboard.press('Escape'); await p.waitForTimeout(600); const ferm = await p.evaluate(() => document.getElementById('drawer').hidden);
   ok(ouv && ferm, tag + ' : au clavier, Entrée ouvre l\'item et Échap le ferme');
+  ok(dlg, tag + ' : page ouverte = dialogue modal (role, aria-modal, nom), carte en dessous inerte, focus dans la page');
+  ok(await p.evaluate(() => !document.querySelector('.wrap').inert && document.activeElement.classList.contains('node')), tag + ' : page fermée, la carte redevient active et le focus revient sur l\'item');
   ok(!err.length, tag + ' : aucune erreur JavaScript' + (err.length ? ' : ' + err.slice(0, 3).join(' / ') : ''));
   await csp(p, tag);
   await budgets(tag, p, cdp, { ouvrir: 800, repos: 25, tas: 80 });
