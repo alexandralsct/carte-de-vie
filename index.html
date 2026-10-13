@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-WGQillY3qH8/StUusVFJhgEM1C7N3drsagwrBbFFblo=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-0WRUPB5Wp78C1sdchJbaL89Dnn4yGE3RkbS8gjIDvrE=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-rr2McCDlwQJzwb6f8Kt5W0drerJsLUwgL4hLDAuSZkI=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-NOd0DEF1tMMFOtHZoTP+Bq4uLHsCz3m+IC+QzIt+RrM=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f4eee4">
@@ -2202,6 +2202,18 @@ html body header .top3a .noterb{display:none!important}
 .omni .omnist.s-àconfirmer{border-style:dashed}
 .omni .omnist.s-contradiction{background:currentColor;color:var(--surface)}
 .omni .omnioub{justify-self:start}
+
+/* Version 205 : « Mes assistants » (téléphone et ordinateur) */
+#assistPage{--c:var(--ink);background:var(--bg)!important;z-index:60}
+#assistPage .asshg{margin:18px 0 6px;font-size:1rem}
+#assistPage .assc{display:grid;gap:6px;margin:0 0 10px}
+#assistPage .asstete{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+#assistPage .assst{font-size:11px;font-weight:700;border:1.5px solid currentColor;border-radius:999px;padding:1px 8px}
+#assistPage .s-specifie .assst{border-style:dashed}
+#assistPage .s-actif .assst{background:currentColor;color:var(--surface)}
+#assistPage .assc p{margin:0}
+#assistPage .assout{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:8px}
+#assistPage .assout li{border-top:1px solid var(--pale,#dbe3f7);padding-top:6px;display:grid;gap:2px}
 
 html.klein .node .ico svg,html.klein .node .ico{color:#002fa7!important;--c:#002fa7}
 html.demarre .wrap>:not(header){visibility:hidden!important}
@@ -6544,6 +6556,39 @@ window.addEventListener("message",e=>{ if(e.origin===location.origin&&e.data&&e.
 { const e=MEMP.ecoute.bind(MEMP); MEMP.ecoute=function(){ e(); if(!OMNI.sub&&db){ OMNI.sub=true; db.doc("meta/omniscient").onSnapshot(x=>OMNI.charge(x.exists?x.data():null),()=>{}); } };
   const o=MEMP.ouvre.bind(MEMP); MEMP.ouvre=function(){ o(); const z=$("memPersoPage"), c=z&&z.querySelector(".card"); if(c&&!z.querySelector(".omni")) c.before(OMNI.section()); }; }
 
+/* ===== Version 205 : « Mes assistants » (Outils, sous l'Atelier) : les nouveaux assistants, leur état et ce qu'ils ont préparé =====
+   meta/assistants (lecture seule, posé par le système) : { liste:[{ id, nom, groupe, statut: specifie|brouillon|actif|pause,
+   role, dernier, sorties:[{id,date,titre,texte,lien}] }], _m }. Aucun nom d'assistant dans ce code : tout vient des données.
+   Ils lisent, analysent et préparent des brouillons ; ils n'envoient, ne publient et ne paient jamais rien. */
+const ASSIST={ d:null,
+  charge(d){ this.d=d&&typeof d==="object"&&Array.isArray(d.liste)?d:null; try{ CATOUT.pose(); }catch(_){} const p=$("assistPage"); if(p&&!p.hidden) this.ouvre(true); },
+  ETAT:{specifie:"en préparation",brouillon:"construit · à publier",actif:"actif",pause:"en pause"},
+  nouveau(){ const L=this.d?this.d.liste:[], s=new Date(Date.now()-7*864e5).toISOString().slice(0,10); return L.reduce((n,a)=>n+(a.sorties||[]).filter(x=>String(x.date||"")>=s).length,0); },
+  tuile(){ const L=this.d?this.d.liste:[], n=this.nouveau(), sous=!L.length?"bientôt ici":L.length+" assistants"+(n?" · "+n+" nouveauté"+(n>1?"s":""):"");
+    const t=el("button",{type:"button",className:"puce2 atpuce otout asspuce"},el("small",{textContent:"Mes assistants"}),el("b",{textContent:"◇"}),el("span",{textContent:sous}),el("em",{textContent:"→"}));
+    t.setAttribute("aria-label","Mes assistants : "+sous); t.onclick=()=>this.ouvre(); return t; },
+  lien(u){ return /^https:\/\//.test(String(u||""))?String(u):""; },
+  ouvre(garde){ const p=$("assistPage"), y=garde&&p?p.scrollTop:0, inn=PAGEX("assistPage","Mes assistants"); if(garde) $("assistPage").scrollTop=y;
+    inn.appendChild(help("Ils lisent, analysent et te préparent des brouillons. Ils n'envoient, ne publient et ne paient jamais rien : c'est toi qui décides."));
+    const L=this.d?this.d.liste:[];
+    if(!L.length){ inn.appendChild(help("Tes assistants apparaîtront ici au prochain passage du système (7 h 30 et 19 h 30).")); return; }
+    const G=[]; L.forEach(a=>{ const g=String(a.groupe||"Autres"); if(!G.includes(g)) G.push(g); });
+    G.forEach(g=>{ inn.appendChild(el("h3",{className:"asshg",textContent:g}));
+      L.filter(a=>String(a.groupe||"Autres")===g).forEach(a=>{ const st=String(a.statut||""), c=el("section",{className:"card soirc assc s-"+st.replace(/[^a-z]/g,"")});
+        c.appendChild(el("div",{className:"asstete"},el("b",{textContent:String(a.nom||a.id||"")}),el("span",{className:"assst",textContent:this.ETAT[st]||st||"—"})));
+        if(a.role) c.appendChild(el("p",{textContent:String(a.role)}));
+        if(a.dernier) c.appendChild(el("small",{className:"mut",textContent:"dernier passage : "+String(a.dernier)}));
+        const S=Array.isArray(a.sorties)?a.sorties.slice(0,5):[];
+        if(S.length){ const ul=el("ul",{className:"assout"}); S.forEach(x=>{ const li=el("li",{},el("small",{className:"mono",textContent:String(x.date||"")}),el("b",{textContent:String(x.titre||"")}));
+            if(x.texte) li.appendChild(el("p",{textContent:String(x.texte).slice(0,600)}));
+            const u=this.lien(x.lien); if(u) li.appendChild(el("a",{href:u,target:"_blank",rel:"noopener",textContent:"Ouvrir ↗"}));
+            ul.appendChild(li); }); c.appendChild(ul); }
+        else if(st==="actif") c.appendChild(help("Rien à te dire pour l'instant : il ne se manifeste que s'il y a quelque chose."));
+        inn.appendChild(c); }); }); } };
+/* la tuile se range dans « Outils », sous l'Atelier */
+{ const o=CATOUT.pose.bind(CATOUT); CATOUT.pose=function(){ o(); document.querySelectorAll(".outilsb .ogrid").forEach(g=>{ if(!g.querySelector(".asspuce")) g.appendChild(ASSIST.tuile()); }); };
+  let n=0; const go=()=>{ if(typeof db!=="undefined"&&db){ db.doc("meta/assistants").onSnapshot(x=>ASSIST.charge(x.exists?x.data():null),()=>{}); } else if(++n<120) setTimeout(go,500); }; go(); }
+
 /* A8 : une icône qui ne charge pas laisse la place au logo de l'app, plus de carré blanc */
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&!i.dataset.repli&&(i.classList.contains("lgimg")||i.closest(".node,.ico"))){ i.dataset.repli="1"; i.src="icon-192.png"; i.classList.add("repli"); } },true);
 
@@ -7663,8 +7708,8 @@ function start(){
    C'est elle qui fait foi : une copie gardée sur l'appareil, ou un fichier en ligne, n'est exécuté que si son texte a exactement
    cette empreinte. Une empreinte rangée dans le stockage de l'appareil n'est plus jamais utilisée (qui peut écrire l'un peut écrire
    l'autre). */
-const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=204;
-const PERSO_EMP="41da611b53d41dc1628acc81236032086077cdbff2ab6dbd3e857f47eba14098", PERSO_GIT="d7865836e2954cb3515be0ad35f091dc5af12a36", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
+const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=205;
+const PERSO_EMP="73aeee2c2a49999adc6178677af287c8280bbff4c859d1990a830a2fe8e5f727", PERSO_GIT="8bbe19c2d3016884a240ad63c296169f99e78eaf", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
 try{ ["carte-de-vie-perso-sha","carte-de-vie-perso-suivant-sha"].forEach(k=>localStorage.removeItem(k)); }catch{ /* stockage bloqué */ }
 /* le module n'est jamais exécuté deux fois (il pose des minuteries et des écouteurs) */
 let persoFait=false;
@@ -7765,7 +7810,7 @@ function persoDepotUI(){ const pg=document.getElementById("syncLinked"); if(!pg|
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=204; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=205; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0="carte-de-vie-v"+APP_V, rec=false;
