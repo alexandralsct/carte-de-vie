@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 # Hook local : le garde-fou passe avant chaque commit. Activer une fois : git config core.hooksPath .githooks
-# La liste des mots privés est lue dans le dépôt privé de données (jamais ici) : MOTS_FICHIER, sinon l'emplacement habituel.
-export MOTS_FICHIER="${MOTS_FICHIER:-$(git rev-parse --show-toplevel)/../carte-de-vie-donnees/securite/mots-sensibles.txt}"
+# Liste des mots privés (jamais ici) : variable MOTS_FICHIER, ou « git config gardefou.motsfichier <chemin> » (réglage local de ce clone).
+export MOTS_FICHIER="${MOTS_FICHIER:-$(git config --get gardefou.motsfichier || true)}"
 exec bash "$(git rev-parse --show-toplevel)/tests/garde-fou.sh"

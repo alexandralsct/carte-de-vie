@@ -2,8 +2,7 @@
  * Passerelle « Ma semaine » ⇄ Google Sheets « Tracking Planning » (Apps Script, à coller dans le tableau).
  * - POST {cle, lire:'AAAA-MM-JJ'}        → la semaine qui contient ce jour, au format de meta/semaine de l'app.
  * - POST {cle, saisies:[{id,j,d,f,c,t}]} → écrit chaque moment dans la bonne feuille (texte, couleur de la catégorie, cases fusionnées).
- * - GET  ?cle=…&jour=AAAA-MM-JJ          → ancienne lecture (la clé passe dans l'adresse) : gardée seulement pour les appareils
- *                                          pas encore mis à jour ; l'app utilise maintenant le POST.
+ * - GET : refusé (la clé ne passe plus jamais dans l'adresse).
  * Après avoir collé cette version : Déployer → Gérer les déploiements → modifier → Version : « Nouvelle version » → Déployer
  * (l'adresse /exec reste la même).
  * La clé n'est pas dans ce fichier : Paramètres du projet → Propriétés du script → CLE = (un mot de passe à toi).
@@ -15,12 +14,8 @@ function sortie(o) { return ContentService.createTextOutput(JSON.stringify(o)).s
 function cleOk(c) { var k = PropertiesService.getScriptProperties().getProperty('CLE'); return !!k && c === k; }
 
 function doGet(e) {
-  var p = (e && e.parameter) || {};
-  if (!cleOk(p.cle)) return sortie({ erreur: 'cle' });
-  var jour = p.jour || Utilities.formatDate(new Date(), 'Europe/Paris', 'yyyy-MM-dd');
-  var f = feuilleDuJour(jour);
-  if (!f) return sortie({ erreur: 'semaine_introuvable', jour: jour });
-  return sortie(lireSemaine(f.feuille, f.dates));
+  // la clé ne doit jamais passer dans l'adresse (journaux, historique) : lecture en POST seulement depuis la V.198 de l'app
+  return sortie({ erreur: 'post_seulement' });
 }
 
 function doPost(e) {

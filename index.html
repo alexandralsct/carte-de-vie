@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-AWVSlBezbR1Bf8UyEzFn/zV88igavV/IFB8WPQX9U48=' 'sha256-wlYuxUKIz9+ySQscjBjr5yYZml1cWRMkcQ5MsQARp+U=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-WHAy/v0YH+iwK6I37UDWKH65g2cRS60c8izgYKAMSKQ=' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f4eee4">
@@ -434,6 +434,8 @@ html.klein :is(.node,#heroArt,.biglogo){--c:#002fa7!important}html.klein .node{c
 .cpn[data-a=chien].walk .lg{animation:pasD .8s linear infinite}.cpn[data-a=chien].walk .l1{animation-delay:0s}.cpn[data-a=chien].walk .l3{animation-delay:-.2s}.cpn[data-a=chien].walk .l2{animation-delay:-.4s}.cpn[data-a=chien].walk .l4{animation-delay:-.6s}.cpn[data-a=chien].walk .bd{animation:dos .4s linear infinite}
 .cpn.joue .own2 .l1{animation:bat2 .32s ease-in-out infinite alternate}.cpn.ronron .own2{animation:breathe 1.6s ease-in-out infinite}.cpn.feule .own2{animation:gonfle .35s cubic-bezier(.3,1.7,.5,1) both,tremble .07s .35s linear infinite alternate}
 .cpn[data-a=photo].carton .own2{display:none}
+.cpn{contain:layout style}.cpn.pause,.cpn.pause *,.pelote.pause,.pelote.pause *{animation-play-state:paused!important}
+@media (prefers-reduced-motion:reduce){.cpn,.cpn *,.pelote,.pelote *{animation:none!important}}
 
 .cpnParle{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));translate:-50% 0;z-index:62;display:flex;gap:6px;align-items:center;background:var(--surface);border:2px solid var(--ink);border-radius:999px;padding:5px;box-shadow:5px 5px 0 var(--sh);width:min(520px,calc(100vw - 24px));animation:popin .3s cubic-bezier(.34,1.56,.64,1) both}.cpnParle[hidden]{display:none}
 .cpnParle input{flex:1;min-width:0;font:inherit;border:0;background:transparent;color:var(--ink);padding:6px 8px;outline:none}.cpnParle .mic,.cpnParle .fx{width:38px;height:38px;flex:none;border-radius:50%;border:1.5px solid var(--ink);background:var(--surface);color:var(--ink);padding:7px;cursor:pointer}.cpnParle .mic svg{width:100%;height:100%;display:block}.cpnParle .mic.on{background:var(--ink);color:var(--surface);animation:pulse 1s infinite}.cpnParle .fx{border:0;font-size:1rem;padding:0}
@@ -2282,6 +2284,7 @@ html.klein .node .ico svg,html.klein .node .ico{color:#002fa7!important;--c:#002
       <li class="go"><button class="rowbtn" id="iaSet"><span><b>Intelligence artificielle</b><small>Suggestions et feedback sur ta carte</small></span><i aria-hidden="true">→</i></button></li>
       <li class="go"><button class="rowbtn" id="expBtn"><span><b>Exporter</b><small>Télécharger une sauvegarde de ta carte</small></span><i aria-hidden="true">↓</i></button></li>
       <li class="go"><label class="rowbtn" for="impFile" tabindex="0"><span><b>Importer</b><small>Remplacer ta carte par une sauvegarde</small></span><i aria-hidden="true">↑</i></label></li>
+      <li class="go"><button class="rowbtn" id="effBtn"><span><b>Effacer cet appareil</b><small>Retire la carte, ses réglages et sa clé de cet appareil (rien n'est effacé en ligne)</small></span><i aria-hidden="true">✕</i></button></li>
       <li class="go"><button class="rowbtn" id="avisBtn"><span><b>Donner mon avis</b><small>Ce que tu aimes, un bug, une idée : envoie-le en un geste</small></span><i aria-hidden="true">✉︎</i></button></li>
       <li class="go"><button class="rowbtn" id="baseBtn"><span><b>Modifier les réglages de base</b><small id="baseSmall"></small></span><i aria-hidden="true">✎</i></button></li>
     </ul>
@@ -2521,6 +2524,9 @@ function ringSlots(list,M){ const R=boardR(), n=list.length, ia=Math.atan2(.643,
   const A=list.filter(c=>prioOf(c)===4), B=list.filter(c=>prioOf(c)!==4).sort((x,y)=>String(x.groupe||"~").localeCompare(String(y.groupe||"~"))||(x.order||0)-(y.order||0)), D={}, used=new Set();
   [...S.keys()].sort((i,j)=>S[i].d-S[j].d).slice(0,A.length).forEach((k,i)=>{ D[A[i].id]=S[k]; used.add(k); });
   let k=0; B.forEach(c=>{ while(used.has(k)) k++; D[c.id]=S[k]||{x:M.x,y:96}; k++; }); return D; }
+/* app ordinateur : souris et au moins 900 px (règle de la propriétaire) ; seule référence, suivie quand l'écran change */
+const ORDI_MQ=matchMedia("(min-width:900px) and (pointer:fine)"), estOrdi=()=>ORDI_MQ.matches;
+document.documentElement.classList.toggle("ordi",estOrdi()); ORDI_MQ.addEventListener("change",()=>document.documentElement.classList.toggle("ordi",estOrdi()));
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
 const fmtDate=(d,t)=>{let s=new Date(d+"T12:00").toLocaleDateString("fr-FR",{weekday:"short",day:"numeric",month:"short",year:"numeric"});return t?s+" à "+t.replace(":","h"):s;};
@@ -4376,7 +4382,7 @@ function renderRubTiles(c,sauf){ const rub=(c.rub||[]).filter(r=>!(sauf||[]).inc
     pane.appendChild(classeur(c.id,P.map((p,i)=>{ const g=RID.grille(c,p.rubs,ouvre); if(i===P.length-1) g.appendChild(nb()); return {nom:p.nom,el:g}; }))); return; }
   const doux=c.id==="cuisine", off=0, g=el("section",{className:"mgrid igrid"+(doux?" doux lay0":"")});
   const TM=dispDe(c).taille;
-  rub.forEach((r,ri)=>{ const items=r.items||[], b=el("button",{className:"mtile it bloc k"+((ri+off)%4)+(r.type==="monde"?" monde":r.type==="objectif"?" obj":"")+(TM[r.id]?" t-"+TM[r.id]:"")}); b.dataset.rid=r.id; b.dataset.i=String(ri+1).padStart(2,"0"); b.dataset.l=((r.name||"?").trim()[0]||"?").toUpperCase(), s=el("span",{className:"msym"}); s.innerHTML=symSvg(r.sym||fam[ri%fam.length]);
+  rub.forEach((r,ri)=>{ const items=r.items||[], b=el("button",{className:"mtile it bloc k"+((ri+off)%4)+(r.type==="monde"?" monde":r.type==="objectif"?" obj":"")+(TM[r.id]?" t-"+TM[r.id]:"")}); b.dataset.rid=r.id; b.dataset.i=String(ri+1).padStart(2,"0"); b.dataset.l=((r.name||"?").trim()[0]||"?").toUpperCase(); const s=el("span",{className:"msym"}); s.innerHTML=symSvg(r.sym||fam[ri%fam.length]);
     let num, last, extra=null;
     if(r.type==="objectif"){ const cur=+r.actuel||0, cib=Math.max(1,+r.cible||1), pc=Math.min(100,Math.round(cur*100/cib)); num=fmtN(cur,r.unite||""); last="sur "+fmtN(cib,r.unite||"")+" · "+pc+" %"; if(doux){ const nd=cib<=60?cib:40, on=Math.round(Math.min(cur,cib)*nd/cib); extra=el("span",{className:"tdots"}); for(let q=0;q<nd;q++) extra.appendChild(el("i",{className:q<on?"on":""})); } else { last="objectif "+fmtN(cib,r.unite||"")+" · "+pc+" %"; extra=el("span",{className:"tbar"},el("i",{style:"width:"+pc+"%"})); } }
     else if(r.type==="monde"){ const v=(r.pays||[]).length; num=String(v); last="Colorie les pays que tu as vus et ceux dont tu rêves"; }
@@ -6686,8 +6692,7 @@ const SEM_POURQUOI={"SOMMEIL":"7 à 9 h par nuit","TRAVAIL/CARRIERE":"avancer sa
 /* passerelle Apps Script avec le tableau (adresse et clé gardées sur l'appareil seulement) */
 const PASS={ K:"carte-de-vie-passerelle", lit(){ try{ return JSON.parse(localStorage.getItem(this.K)||"null")||{}; }catch(_){ return {}; } }, ecrit(o){ try{ localStorage.setItem(this.K,JSON.stringify(o)); }catch(_){} },
   ok(){ const o=this.lit(); return /^https:\/\/script\.google(usercontent)?\.com\//.test(o.url||"")&&!!o.cle; },
-  async lire(jour){ const o=this.lit(), J=jour||today(); const r=await fetch(o.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({cle:o.cle,lire:J}),cache:"no-store"}); const j=await r.json(); if(j.erreur) throw new Error(j.erreur); if(Array.isArray(j.jours)) return j;
-    const r2=await fetch(o.url+(o.url.includes("?")?"&":"?")+"cle="+encodeURIComponent(o.cle)+"&jour="+encodeURIComponent(J),{cache:"no-store"}); const j2=await r2.json(); if(j2.erreur) throw new Error(j2.erreur); return j2; },
+  async lire(jour){ const o=this.lit(), J=jour||today(); const r=await fetch(o.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({cle:o.cle,lire:J}),cache:"no-store"}); const j=await r.json(); if(j.erreur) throw new Error(j.erreur); if(Array.isArray(j.jours)) return j; throw new Error("passerelle à mettre à jour (lecture en POST)"); },
   async ecrire(L){ const o=this.lit(); const r=await fetch(o.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({cle:o.cle,saisies:L})}); const j=await r.json(); if(j.erreur) throw new Error(j.erreur); return j.res||[]; },
   async relire(force){ const o=this.lit(); if(!this.ok()||(!force&&Date.now()-(o.t||0)<10*60e3)) return false; o.t=Date.now(); this.ecrit(o);
     const S=await this.lire(today()); if(S&&Array.isArray(S.jours)){ SEMAINE=S; if(db) db.doc("meta/semaine").set(S).catch(()=>{}); return true; } return false; },
@@ -6859,7 +6864,15 @@ function fete(x,y){ burst(x,y); setTimeout(()=>burst(x-70,y-30),140); setTimeout
   const cpnZone=el("div",{className:"cpnZone"}); cpnZone.append(ball,cat); document.body.append(cpnZone,bulle);
   /* le chat vit dans la page ouverte (item, Moi…) : il défile avec son contenu, jamais collé à l'écran */
   const hote=()=>[...document.querySelectorAll("aside.page")].find(q=>!q.hidden)||null, sY=()=>window.scrollY, sX=()=>window.scrollX;
-  const sw=$("petSw"); let on=true, t=0, run=0, C={x:-200,y:0}, bulleFor=null; try{ on=localStorage.getItem("compagnon")!=="0"; }catch(_){}
+  const sw=$("petSw"); let on=true, t=0, run=0, C={x:-200,y:0}, bulleFor=null;
+  const moinsMvt=matchMedia("(prefers-reduced-motion: reduce)"), parDefaut=()=>estOrdi()&&!moinsMvt.matches;
+  try{ on=localStorage.getItem("compagnonChoisi")==="1"?localStorage.getItem("compagnon")!=="0":parDefaut(); }catch{ on=parDefaut(); }
+  let derGeste=Date.now(), horsVue=false; const dort=()=>document.hidden||horsVue||moinsMvt.matches||Date.now()-derGeste>25e3;
+  ["pointerdown","keydown","wheel","touchstart","scroll"].forEach(ev=>addEventListener(ev,()=>{ derGeste=Date.now(); },{passive:true,capture:true}));
+  if("IntersectionObserver" in window) new IntersectionObserver(E=>{ horsVue=!E[E.length-1].isIntersecting; }).observe(cat);
+  const veille=()=>{ const d=on&&!cat.hidden&&dort(); if(d===cat.classList.contains("pause")) return; cat.classList.toggle("pause",d); ball.classList.toggle("pause",d);
+    try{ [...cat.getAnimations({subtree:true}),...ball.getAnimations({subtree:true})].forEach(a=>{ if(d&&a.playState==="running") a.pause(); else if(!d&&a.playState==="paused") a.play(); }); }catch{ /* navigateur ancien : la classe pause suffit */ } };
+  setInterval(veille,1000); document.addEventListener("visibilitychange",veille);
   const W=()=>cat.offsetWidth||140, H=()=>W()*(animal==="chien"?54/76:animal==="photo"&&own?(own.parts?own.parts.h/own.parts.w:own.h/own.w):44.5/34), calme=()=>document.documentElement.classList.contains("calme");
   const place=()=>{ cat.style.transform=`translate(${C.x-W()/2}px,${C.y-H()}px)`; };
   const wait=ms=>new Promise(r=>setTimeout(r,ms));
@@ -6950,6 +6963,7 @@ function fete(x,y){ burst(x,y); setTimeout(()=>burst(x-70,y-30),140); setTimeout
     if(C.x<0||C.x>innerWidth){ nouveauCircuit(); const e=Math.random(), y=solY();
       C=e<.45?{x:-W(),y}:e<.9?{x:innerWidth+W(),y}:{x:rx(.2,.8),y:docH()-8}; place(); cat.hidden=false; await suivre(id); }
     while(id===run&&on){
+      if(dort()){ veille(); while(id===run&&on&&dort()) await wait(1000); veille(); if(id!==run||!on) return; }
       if(C.x>innerWidth||C.y>docH()){ C={x:clampX(C.x),y:Math.min(C.y,docH()-8)}; place(); }
       const U=urgences(), now=Date.now(), r=Math.random();
       if(pose_){ const q=Math.random(); if(U.length&&now-vuUrg>45e3){ vuUrg=now; const u=U[0]; pose("sit"); dire("<b>Urgent · "+u.c.name+"</b>"+u.text+" — "+u.quand,true,u.c.id); await wait(7000); if(id===run) tais(); }
@@ -7027,7 +7041,7 @@ function fete(x,y){ burst(x,y); setTimeout(()=>burst(x-70,y-30),140); setTimeout
     await moveTo(clampX(nx-dir*W()*.62),C.y,170); if(id!==run) return; await jouer(id); if(id!==run) return; ball.hidden=true; vie(id); });
   addEventListener("resize",()=>{ if(!cat.hidden){ C={x:clampX(C.x),y:Math.min(C.y,docH()-8)}; place(); } });
   const set=v=>{ on=v; sw.checked=v; sw.nextElementSibling.textContent=v?"Activé":"Désactivé"; try{ localStorage.setItem("compagnon",v?"1":"0"); }catch(_){} if(v){ if(cat.hidden) start(); } else stop(); };
-  sw.onchange=()=>set(sw.checked); set(on);
+  sw.onchange=()=>{ try{ localStorage.setItem("compagnonChoisi","1"); }catch{ /* stockage bloqué */ } set(sw.checked); }; set(on);
   const AN={chat:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M5 3.5l3.2 3.3a9 9 0 0 1 7.6 0L19 3.5l.7 6.3A8 8 0 0 1 20.5 13c0 4.7-3.8 7.5-8.5 7.5S3.5 17.7 3.5 13a8 8 0 0 1 .8-3.2z"/><circle cx="9" cy="12.5" r="1.6" fill="var(--surface)"/><circle cx="15" cy="12.5" r="1.6" fill="var(--surface)"/></svg>',chien:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 4c4.6 0 7.5 3 7.5 7.4 0 5-3.4 8.6-7.5 8.6s-7.5-3.6-7.5-8.6C4.5 7 7.4 4 12 4z"/><path d="M5.6 5C3 5.4 1.8 9 2.8 12.8 5 12 6.2 8.4 5.6 5zM18.4 5c2.6.4 3.8 4 2.8 7.8C19 12 17.8 8.4 18.4 5z" opacity=".55"/><circle cx="9.2" cy="11" r="1.5" fill="var(--surface)"/><circle cx="14.8" cy="11" r="1.5" fill="var(--surface)"/><ellipse cx="12" cy="15.2" rx="1.6" ry="1.1" fill="var(--surface)"/></svg>'};
   const setAnimal=(k,local)=>{ if(k==="photo"&&!own) k="chat"; const chg=animal!==k; animal=k; if(!local&&chg&&db) db.doc("meta/compagnon").update({animal:k}).catch(()=>db.doc("meta/compagnon").set({animal:k}).catch(()=>{})); try{ localStorage.setItem("animal",k); }catch(_){} habille(); [...$("animalSet").children].forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.k===k))); };
   AN.photo='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="10.5" r="1.8"/><path d="M5.5 17l4.5-4.5 3 3 2.5-2.5 3 3"/></svg>';
@@ -7090,35 +7104,139 @@ $("impFile").addEventListener("change",()=>{ onb.hidden=true; });
 $("onbGo").onclick=()=>{ const all=[]; onbG.forEach(G=>G.it.forEach(([n,ic])=>{ if(picked.has(n)) all.push({g:G.g,n,ic}); })); const N=all.length, now=new Date().toISOString();
   all.forEach((a,i)=>{ const t=(-140+i*360/N)*Math.PI/180; col.doc("e"+i+"-"+uid()).set(Object.assign(a.ic==="habitudes"?{type:"habitudes",habits:[]}:{},{name:a.n,icon:a.ic,logo:onbDefLogo(a.n,a.ic),groupe:a.g,color:PALETTE[Math.round(i*PALETTE.length/N)%PALETTE.length],x:Math.round((50+40*Math.cos(t))*10)/10,y:Math.round((50+34*Math.sin(t))*10)/10,order:i,notes:"",tasks:[],rub:[],log:[{t:now,m:"Espace créé"}]})); });
   closeOnb(); };
-const META=k=>k==="_m"||k==="_f"||k==="_x";
-/* fusion élément par élément : une liste (tâches, idées, rubriques et leurs éléments…) n'écrase plus celle d'un autre appareil.
-   Ce qui manque d'un côté est gardé, sauf si c'est dans _x, la liste des éléments vraiment supprimés. */
-const idsDe=a=>{ const S=new Set(); (Array.isArray(a)?a:[]).forEach(x=>{ if(x&&typeof x==="object"&&x.id!=null){ S.add(String(x.id)); if(Array.isArray(x.items)) x.items.forEach(y=>{ if(y&&typeof y==="object"&&y.id!=null) S.add(String(y.id)); }); } }); return S; };
-const avecIds=a=>Array.isArray(a)&&a.every(x=>x&&typeof x==="object"&&x.id!=null);
-function fusionListe(g,p,X){ if(!p.length||!avecIds(g)||!avecIds(p)) return g; const G=idsDe(g), garde=y=>y&&y.id!=null&&!G.has(String(y.id))&&!X.has(String(y.id));
-  const out=g.map(x=>{ const q=Array.isArray(x.items)?p.find(y=>String(y.id)===String(x.id)):null; if(!q||!Array.isArray(q.items)) return x; const plus=q.items.filter(garde); return plus.length?Object.assign({},x,{items:[...x.items,...plus]}):x; });
-  p.forEach(y=>{ if(garde(y)) out.push(Array.isArray(y.items)?Object.assign({},y,{items:y.items.filter(z=>!z||z.id==null||(!G.has(String(z.id))&&!X.has(String(z.id))))}):y); });
-  return out; }
-const tombes=(old,x)=>{ const X=new Set((old&&old._x)||[]); if(old) Object.keys(x).forEach(k=>{ if(META(k)||!Array.isArray(old[k])) return; const n=idsDe(x[k]); idsDe(old[k]).forEach(i=>{ if(!n.has(i)) X.add(i); }); }); return X.size?[...X].slice(-1500):undefined; };
-const ftime=(o,k)=>!o||!(k in o)?-1:(o._f&&k in o._f?o._f[k]:(o._m||0));
-function mergeDoc(r,l){ if(!r) return l; if(!l) return r; if(r._del||l._del){ const tr=r._del?(r._m||0):Math.max(r._m||0,...Object.values(r._f||{})), tl=l._del?(l._m||0):Math.max(l._m||0,...Object.values(l._f||{})); return tr>=tl?r:l; }
-  const out={}, f={}, X=new Set([...(r._x||[]),...(l._x||[])].map(String)); new Set([...Object.keys(r),...Object.keys(l)]).forEach(k=>{ if(META(k)) return; const tr=ftime(r,k), tl=ftime(l,k); const src=tr>=tl?r:l, aut=src===r?l:r; if(k in src){ out[k]=Array.isArray(src[k])&&Array.isArray(aut[k])?fusionListe(src[k],aut[k],X):src[k]; f[k]=Math.max(tr,tl); } });
-  out._m=Math.max(r._m||0,l._m||0); out._f=f; if(X.size) out._x=[...X].slice(-1500); return out; }
-const fieldsNow=(x,old,now)=>{ const f=Object.assign({},(old&&old._f)||{}); Object.keys(x).forEach(k=>{ if(!META(k)) f[k]=now; }); return f; };
+/* FUSION:debut — fusion de deux versions de la carte (cet appareil, le fichier en ligne), document par document.
+   Format, compatible avec les versions précédentes et avec les autres écrivains (système, routines) :
+   - _m : heure de la dernière écriture du document ; _f : heure de chaque champ ; _x : identifiants retirés (ancien format, sans date) ;
+   - _xt : {"chemin|id": heure} : élément retiré (supprimé ou déplacé ailleurs) de la liste « chemin » à cette heure
+     (chemin : champ, puis id du parent et nom de la sous-liste à chaque niveau, ex. « rub/r1/items ») ;
+   - _h, dans un élément de liste : heure de sa dernière modification, ou de son arrivée dans sa liste.
+   Règles de fusion :
+   - une liste d'éléments à id est fusionnée élément par élément, à toute profondeur, et dans les objets qui la contiennent ;
+   - pour un même élément, la version la plus récente l'emporte (_h, puis heure du champ) ; ses sous-listes sont fusionnées à leur tour ;
+   - un élément présent d'un seul côté est gardé, sauf s'il a été retiré de cette liste après sa dernière modification (_xt),
+     ou s'il figure dans l'ancien _x et n'a pas été modifié depuis la dernière écriture du côté qui l'a retiré ;
+   - aucun plafond sur _x ni _xt (l'ancien plafond de 1 500 faisait revenir les plus vieux éléments supprimés) ;
+   - horloge hybride : une heure d'écriture n'est jamais inférieure à la plus grande heure déjà vue (bornée à un jour d'avance),
+     pour qu'un appareil dont l'horloge avance ne l'emporte pas sur une modification faite après avoir vu la sienne.
+   Testé par tests/fusion.mjs (dépôt public), qui extrait ce bloc tel quel de index.html. */
+const META=k=>k==="_m"||k==="_f"||k==="_x"||k==="_xt";
+const estObj=v=>v!==null&&typeof v==="object"&&!Array.isArray(v);
+const avecIds=a=>Array.isArray(a)&&a.every(x=>estObj(x)&&x.id!=null);
+const htime=x=>estObj(x)&&typeof x._h==="number"?x._h:0;
+const aCle=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
+function egal(a,b){ if(a===b) return true; if(typeof a!=="object"||typeof b!=="object"||a===null||b===null) return false;
+  if(Array.isArray(a)){ if(!Array.isArray(b)||a.length!==b.length) return false; for(let i=0;i<a.length;i++) if(!egal(a[i],b[i])) return false; return true; }
+  if(Array.isArray(b)) return false; const ka=Object.keys(a); if(ka.length!==Object.keys(b).length) return false;
+  for(const k of ka) if(!aCle(b,k)||!egal(a[k],b[k])) return false; return true; }
+/* contenu propre d'un élément : tout sauf _h et ses sous-listes à id (elles ont leurs propres heures) */
+function egalPropre(a,b){ const ks=new Set([...Object.keys(a),...Object.keys(b)]);
+  for(const k of ks){ if(k==="_h") continue; const x=a[k], y=b[k];
+    if(Array.isArray(x)&&Array.isArray(y)&&avecIds(x)&&avecIds(y)) continue;
+    if(estObj(x)&&estObj(y)){ if(!egalPropre(x,y)) return false; continue; }
+    if(!egal(x,y)) return false; } return true; }
+/* horloge hybride : jamais en arrière de la plus grande heure vue */
+function creeHorloge(base){ let max=0; return { now(){ const t=Math.max(base(),max+1); max=t; return t; }, vu(t){ t=+t; if(t>max&&t<=base()+864e5) max=t; }, max:()=>max }; }
+const HORLOGE=creeHorloge(()=>Date.now());
+const vuDoc=(H,d)=>{ if(!estObj(d)) return; H.vu(d._m); if(estObj(d._f)) Object.keys(d._f).forEach(k=>H.vu(d._f[k])); };
+const ftime=(o,k)=>!o||!aCle(o,k)?-1:(estObj(o._f)&&typeof o._f[k]==="number"?o._f[k]:(+o._m||0));
+const plusRecent=(a,b,ta,tb)=>ta!==tb?ta>tb:(egal(a,b)||JSON.stringify(a)>=JSON.stringify(b));
+const elemGagne=(a,b,ta,tb)=>{ const ha=htime(a), hb=htime(b); return ha!==hb?ha>hb:plusRecent(a,b,ta,tb); };
+/* listes que l'ancienne fusion réunissait déjà (champ du document, et « items » de ses éléments) : un élément sans _h venu de
+   l'autre côté y est gardé comme avant ; ailleurs (sous-listes, listes dans un objet), l'ancienne règle était « le plus récent
+   l'emporte » : un élément sans _h de l'autre côté n'y est repris que s'il porte une heure (sinon on ferait revenir d'anciennes
+   suppressions qui n'avaient laissé aucune trace) */
+const unionAncienne=ch=>{ const s=ch.split("/"); return s.length===1||(s.length===3&&s[2]==="items"); };
+const retire=(C,ch,x)=>{ const k=ch+"|"+String(x.id); return aCle(C.xt,k)&&C.xt[k]>htime(x); };
+function fusionVal(a,b,aG,ta,tb,ch,C){ if(egal(a,b)) return aG?a:b;
+  if(Array.isArray(a)&&Array.isArray(b)&&avecIds(a)&&avecIds(b)) return fusionListe(a,b,ta,tb,ch,C);
+  if(estObj(a)&&estObj(b)) return fusionObj(a,b,aG,ta,tb,ch,C,false);
+  return aG?a:b; }
+/* deux versions d'un objet (élément de liste si elem) : clés du plus récent ; clés communes fusionnées ; une sous-liste à id
+   présente d'un seul côté est gardée pour ses éléments non retirés */
+function fusionObj(a,b,aG,ta,tb,ch,C,elem){ const W=aG?a:b, L=aG?b:a, base=elem?ch+"/"+String(a.id):ch, o={};
+  for(const k of Object.keys(W)){ if(aCle(L,k)) o[k]=k==="_h"?Math.max(htime(a),htime(b)):fusionVal(a[k],b[k],aG,ta,tb,base+"/"+k,C); else o[k]=W[k]; }
+  for(const k of Object.keys(L)){ if(aCle(W,k)) continue; const v=L[k]; if(Array.isArray(v)&&v.length&&avecIds(v)){ const c=base+"/"+k, u=unionAncienne(c), r=v.filter(x=>!retire(C,c,x)&&(u||htime(x)>0)); if(r.length) o[k]=r; } }
+  return o; }
+function fusionListe(A,B,ta,tb,ch,C){ const aBase=plusRecent(A,B,ta,tb), P=aBase?A:B, Q=aBase?B:A, tP=aBase?ta:tb;
+  const iQ=new Map(Q.map(y=>[String(y.id),y])), iP=new Set(P.map(x=>String(x.id)));
+  const u=unionAncienne(ch), garde=(x,deBase)=>!retire(C,ch,x)&&(deBase||((u||htime(x)>0)&&(!C.X.has(String(x.id))||htime(x)>tP)));
+  const out=[];
+  for(const x of P){ const id=String(x.id), y=iQ.get(id);
+    if(y){ const a=aBase?x:y, b=aBase?y:x; out.push(fusionObj(a,b,elemGagne(a,b,ta,tb),ta,tb,ch,C,true)); }
+    else if(garde(x,true)) out.push(x); }
+  /* éléments d'un seul côté (Q) : remis après leur voisin d'origine */
+  const suiv=new Map(); let prec="\u0000";
+  for(const y of Q){ const id=String(y.id); if(iP.has(id)){ prec=id; continue; } if(!garde(y,false)) continue; if(!suiv.has(prec)) suiv.set(prec,[]); suiv.get(prec).push(y); prec=id; }
+  if(!suiv.size) return out;
+  const res=[], emet=k0=>{ const st=[[k0,0]]; while(st.length){ const t=st[st.length-1], L=suiv.get(t[0]); if(!L||t[1]>=L.length){ st.pop(); continue; } const y=L[t[1]++]; res.push(y); st.push([String(y.id),0]); } };
+  emet("\u0000"); for(const m of out){ res.push(m); emet(String(m.id)); } return res; }
+const xtUnion=(a,b)=>{ const o={}; [a,b].forEach(x=>{ if(estObj(x)) Object.keys(x).forEach(k=>{ const t=+x[k]||0; if(!aCle(o,k)||t>o[k]) o[k]=t; }); }); return o; };
+const tDel=d=>d._del?(+d._m||0):Math.max(+d._m||0,...Object.values(estObj(d._f)?d._f:{}).map(v=>+v||0));
+function mergeDoc(r,l){ if(!estObj(r)) return l; if(!estObj(l)) return r; if(r===l) return r;
+  if(r._del||l._del){ const tr=tDel(r), tl=tDel(l); return tr!==tl?(tr>tl?r:l):(r._del?l:r); }
+  const C={xt:xtUnion(r._xt,l._xt),X:new Set([...(Array.isArray(r._x)?r._x:[]),...(Array.isArray(l._x)?l._x:[])].map(String))}, out={}, f={};
+  const ks=Object.keys(r); Object.keys(l).forEach(k=>{ if(!aCle(r,k)) ks.push(k); });
+  ks.forEach(k=>{ if(META(k)) return; const tr=ftime(r,k), tl=ftime(l,k);
+    out[k]=!aCle(r,k)?l[k]:!aCle(l,k)?r[k]:fusionVal(r[k],l[k],plusRecent(r[k],l[k],tr,tl),tr,tl,k,C); f[k]=Math.max(tr,tl); });
+  out._m=Math.max(+r._m||0,+l._m||0); out._f=f; if(C.X.size) out._x=[...C.X]; if(Object.keys(C.xt).length) out._xt=C.xt; return out; }
+/* écriture d'un document par l'app : _m ; _f des champs vraiment changés ; _h des éléments changés ou arrivés dans une liste ;
+   _xt des éléments sortis d'une liste. vieux : la dernière version écrite (copie sûre), nouveau : le document voulu. */
+function marque(o,n,now,ch,xt){
+  if(Array.isArray(n)&&avecIds(n)){ const V=avecIds(o)?o:[], iv=new Map(V.map(x=>[String(x.id),x])), vus=new Set();
+    const res=n.map(x=>{ const id=String(x.id), ox=iv.get(id); vus.add(id); const y=Object.assign({},x);
+      if(!ox){ y._h=now; return y; }
+      Object.keys(y).forEach(k=>{ if(k==="_h") return; const a=ox[k], b=y[k];
+        if(Array.isArray(b)&&avecIds(b)) y[k]=marque(a,b,now,ch+"/"+id+"/"+k,xt); else if(estObj(b)&&estObj(a)) y[k]=marqueObj(a,b,now,ch+"/"+id+"/"+k,xt); });
+      Object.keys(ox).forEach(k=>{ if(!aCle(y,k)&&avecIds(ox[k])) ox[k].forEach(z=>{ xt[ch+"/"+id+"/"+k+"|"+String(z.id)]=now; }); });
+      if(!egalPropre(ox,y)) y._h=now; else if(typeof ox._h==="number") y._h=ox._h; else delete y._h;
+      return y; });
+    V.forEach(x=>{ const id=String(x.id); if(!vus.has(id)) xt[ch+"|"+id]=now; });
+    return res; }
+  if(estObj(n)&&estObj(o)) return marqueObj(o,n,now,ch,xt);
+  return n; }
+function marqueObj(o,n,now,ch,xt){ const y=Object.assign({},n);
+  Object.keys(y).forEach(k=>{ const a=o[k], b=y[k]; if(Array.isArray(b)&&avecIds(b)) y[k]=marque(a,b,now,ch+"/"+k,xt); else if(estObj(a)&&estObj(b)) y[k]=marqueObj(a,b,now,ch+"/"+k,xt); });
+  Object.keys(o).forEach(k=>{ if(!aCle(y,k)&&avecIds(o[k])) o[k].forEach(z=>{ xt[ch+"/"+k+"|"+String(z.id)]=now; }); });
+  return y; }
+function estampille(vieux,nouveau,now){ vieux=estObj(vieux)&&!vieux._del?vieux:null;
+  const out={}, f=Object.assign({},vieux&&estObj(vieux._f)?vieux._f:{}), xt=Object.assign({},vieux&&estObj(vieux._xt)?vieux._xt:{});
+  Object.keys(nouveau).forEach(k=>{ if(META(k)) return; const n=nouveau[k];
+    if(vieux&&aCle(vieux,k)&&egal(vieux[k],n)){ out[k]=n; if(typeof f[k]!=="number") f[k]=+vieux._m||0; return; }
+    out[k]=marque(vieux?vieux[k]:undefined,n,now,k,xt); f[k]=now; });
+  Object.keys(f).forEach(k=>{ if(!aCle(out,k)) delete f[k]; });
+  out._m=now; out._f=f; if(vieux&&Array.isArray(vieux._x)&&vieux._x.length) out._x=vieux._x.slice(); if(Object.keys(xt).length) out._xt=xt; return out; }
+/* import d'une sauvegarde, ou « garder ce qui est sur cet appareil » : tout ce document devient la version la plus récente */
+const toutDate=(v,now)=>Array.isArray(v)?v.map(x=>estObj(x)&&x.id!=null?Object.assign(toutDateObj(x,now),{_h:now}):toutDate(x,now)):estObj(v)?toutDateObj(v,now):v;
+const toutDateObj=(o,now)=>{ const y={}; Object.keys(o).forEach(k=>{ y[k]=k==="_h"?o[k]:toutDate(o[k],now); }); return y; };
+function restampe(d,now){ if(!estObj(d)) return d; if(d._del) return Object.assign({},d,{_m:now}); const out={}, f={};
+  Object.keys(d).forEach(k=>{ if(META(k)) return; out[k]=toutDate(d[k],now); f[k]=now; });
+  out._m=now; out._f=f; if(Array.isArray(d._x)&&d._x.length) out._x=d._x.slice(); if(estObj(d._xt)&&Object.keys(d._xt).length) out._xt=Object.assign({},d._xt); return out; }
+/* FUSION:fin */
+(function(){ const P=[...document.querySelectorAll("aside.page")], W=document.querySelector(".wrap"); if(!W) return; let avant=null;
+  P.forEach(p=>{ p.setAttribute("role","dialog"); p.setAttribute("aria-modal","true"); if(!p.hasAttribute("tabindex")) p.setAttribute("tabindex","-1"); });
+  const suit=()=>{ const ouv=P.filter(p=>!p.hidden), a=document.activeElement; W.inert=ouv.length>0;
+    if(ouv.length){ const p=ouv[ouv.length-1]; if(!p.contains(a)){ if(a&&a!==document.body&&!P.some(q=>q.contains(a))) avant=a; try{ p.focus({preventScroll:true}); }catch{ /* rien */ } } }
+    else if(avant){ if(avant.isConnected&&(!a||a===document.body||!a.isConnected)) try{ avant.focus({preventScroll:true}); }catch{ /* rien */ } avant=null; } };
+  const mo=new MutationObserver(suit); P.forEach(p=>mo.observe(p,{attributes:true,attributeFilter:["hidden"]})); suit(); })();
 function repoOk(r){ return /^[\w.-]+\/[\w.-]+$/.test(String(r||"")); }
 const appV=()=>{ try{ return APP_V; }catch(_){ return 0; } };
 const versionTropVieille=data=>{ const min=+(((data||{})["meta/app"])||{}).min||0, v=appV(); return !!(v&&min>v); };
-function localDb(){ const KEY="carte-de-vie-v1", CKEY="carte-de-vie-sync"; let store={}; try{ store=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(_){ store={}; }
+const proprioConnu=()=>{ let p=""; try{ const c=JSON.parse(localStorage.getItem("carte-de-vie-sync")||"null"); p=(c&&c.repo)||localStorage.getItem("carte-de-vie-proprio")||""; }catch{ p=""; } return String(p).split("/")[0].toLowerCase(); };
+const retiensProprio=repo=>{ try{ localStorage.setItem("carte-de-vie-proprio",String(repo).split("/")[0].toLowerCase()); }catch{ /* stockage bloqué */ } };
+function localDb(){ const KEY="carte-de-vie-v1", CKEY="carte-de-vie-sync"; let store={}, brut0=null; try{ brut0=localStorage.getItem(KEY); store=JSON.parse(brut0||"{}")||{}; }catch(_){ store={}; brut0=null; }
+  Object.keys(store).forEach(k=>vuDoc(HORLOGE,store[k]));
+  const vu=new Map(); let base0=null; const ancien=p=>{ if(vu.has(p)){ const t=vu.get(p); return t?JSON.parse(t):null; } if(base0===null){ try{ base0=JSON.parse(brut0||"{}")||{}; }catch{ base0={}; } brut0=null; } return base0[p]||null; };
+  const note=p=>{ vu.set(p,store[p]?JSON.stringify(store[p]):""); };
   const subs=[], clone=o=>JSON.parse(JSON.stringify(o)), live=k=>store[k]&&!store[k]._del;
-  let persistT=null; const persistNow=()=>{ clearTimeout(persistT); persistT=null; try{ localStorage.setItem(KEY,JSON.stringify(store)); }catch(_){ $("saved").textContent="Stockage de l'appareil plein ou bloqué."; } };
+  let persistT=null; const persistNow=()=>{ clearTimeout(persistT); persistT=null; if(window._efface) return; try{ localStorage.setItem(KEY,JSON.stringify(store)); }catch(_){ $("saved").textContent="Stockage de l'appareil plein ou bloqué."; } };
   const persist=()=>{ clearTimeout(persistT); if(document.hidden) return persistNow(); persistT=setTimeout(persistNow,800); };
   addEventListener("pagehide",()=>{ if(persistT) persistNow(); }); addEventListener("beforeunload",()=>{ if(persistT) persistNow(); }); document.addEventListener("visibilitychange",()=>{ if(document.hidden&&persistT) persistNow(); });
   const notify=()=>subs.slice().forEach(f=>f());
   let gen=0; const save=()=>{ persist(); notify(); gen++; api.dirty=true; api.queue(); };
   const doc=path=>({ id:path.split("/").pop(), path,
-    set:d=>{ const now=Date.now(), old=store[path]; store[path]=Object.assign(clone(d),{_m:now,_f:fieldsNow(d,null,now),_x:tombes(old,d)}); save(); return Promise.resolve(); },
-    update:d=>{ if(!live(path)) return Promise.reject({code:"invalid_argument"}); const now=Date.now(); store[path]=Object.assign({},store[path],clone(d),{_m:now,_f:fieldsNow(d,store[path],now),_x:tombes(store[path],d)}); save(); return Promise.resolve(); },
-    delete:()=>{ store[path]={_del:true,_m:Date.now()}; save(); return Promise.resolve(); },
+    set:d=>{ store[path]=estampille(ancien(path),clone(d),HORLOGE.now()); note(path); save(); return Promise.resolve(); },
+    update:d=>{ if(!live(path)) return Promise.reject({code:"invalid_argument"}); store[path]=estampille(ancien(path),Object.assign({},store[path],clone(d)),HORLOGE.now()); note(path); save(); return Promise.resolve(); },
+    delete:()=>{ store[path]={_del:true,_m:HORLOGE.now()}; note(path); save(); return Promise.resolve(); },
     onSnapshot:f=>{ let vu, deja=false; const fire=()=>{ const cur=store[path]; if(deja&&cur===vu) return; deja=true; vu=cur; f({id:path.split("/").pop(),exists:!!live(path),data:()=>store[path]}); }; subs.push(fire); setTimeout(fire,0); return ()=>{}; } });
   /* --- synchronisation avec un fichier carte.json dans un dépôt GitHub privé --- */
   let cfg=null; try{ cfg=JSON.parse(localStorage.getItem(CKEY)||"null"); }catch(_){} if(cfg&&!repoOk(cfg.repo)) cfg=null;
@@ -7126,20 +7244,23 @@ function localDb(){ const KEY="carte-de-vie-v1", CKEY="carte-de-vie-sync"; let s
   const url=()=>"https://api.github.com/repos/"+cfg.repo+"/contents/carte.json", hdr=()=>({Authorization:"Bearer "+cfg.token,Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"});
   let der=null; /* dernière version lue en ligne {repo,etag,data,sha}, en mémoire seulement */
   const pull=()=>{ const prec=der&&der.repo===cfg.repo&&der.etag?der:null, h=hdr(); if(prec) h["If-None-Match"]=prec.etag;
-    return fetch(url(),{headers:h,cache:"no-store"}).then(r=>{ if(r.status===304&&prec) return {data:api.dirty?clone(prec.data):null,sha:prec.sha,inchange:true}; der=null;
-      if(r.status===404) return {data:null,sha:null}; if(!r.ok) throw {status:r.status}; const etag=r.headers.get("ETag"), garde=o=>{ if(etag&&o.data) der={repo:cfg.repo,etag,data:o.data,sha:o.sha}; return o; };
-      return r.json().then(j=>{ /* au-delà de 1 Mo, GitHub ne renvoie pas le contenu : on lit alors le fichier brut */ if(!j.content&&j.size>0) return fetch(url(),{headers:Object.assign(hdr(),{Accept:"application/vnd.github.raw"}),cache:"no-store"}).then(r2=>{ if(!r2.ok) throw {status:r2.status}; return r2.text(); }).then(t=>garde({data:JSON.parse(t)||{},sha:j.sha}));
-      let d={}; try{ d=JSON.parse(b64d(j.content))||{}; }catch(_){ throw {status:"lecture"}; } return garde({data:d,sha:j.sha}); }); }); };
+    return fetch(url(),{headers:h,cache:"no-store"}).then(r=>{ if(r.status===304&&prec) return {data:api.dirty?JSON.parse(prec.texte):null,sha:prec.sha,inchange:true}; der=null;
+      if(r.status===404) return {data:null,sha:null}; if(!r.ok) throw {status:r.status}; const etag=r.headers.get("ETag"), garde=(o,t)=>{ if(etag&&o.data) der={repo:cfg.repo,etag,texte:t,sha:o.sha}; return o; };
+      return r.json().then(j=>{ /* au-delà de 1 Mo, GitHub ne renvoie pas le contenu : on lit alors le fichier brut */ if(!j.content&&j.size>0) return fetch(url(),{headers:Object.assign(hdr(),{Accept:"application/vnd.github.raw"}),cache:"no-store"}).then(r2=>{ if(!r2.ok) throw {status:r2.status}; return r2.text(); }).then(t=>garde({data:JSON.parse(t)||{},sha:j.sha},t));
+      let d={}, t=""; try{ t=b64d(j.content); d=JSON.parse(t)||{}; }catch(_){ throw {status:"lecture"}; } return garde({data:d,sha:j.sha},t); }); }); };
   const push=(sha)=>fetch(url(),{method:"PUT",headers:hdr(),body:JSON.stringify(Object.assign({message:"Carte mise à jour depuis l'application",content:b64e(JSON.stringify(store,null,1))},sha?{sha}:{}))}).then(r=>{ if(!r.ok) throw {status:r.status}; der=null; });
-  const merge=(remote)=>{ let changedLocal=false, needPush=false; const out={};
-    new Set([...Object.keys(remote),...Object.keys(store)]).forEach(k=>{ const r=remote[k], l=store[k], m=mergeDoc(r,l), js=JSON.stringify(m); out[k]=m; if(js!==JSON.stringify(l)) changedLocal=true; if(js!==JSON.stringify(r)) needPush=true; });
+  const merge=(remote)=>{ let changedLocal=false, needPush=false; const out={}; Object.keys(remote).forEach(k=>vuDoc(HORLOGE,remote[k]));
+    new Set([...Object.keys(remote),...Object.keys(store)]).forEach(k=>{ const r=remote[k], l=store[k], jr=r===undefined?undefined:JSON.stringify(r), jl=l===undefined?undefined:JSON.stringify(l);
+      if(jr!==undefined&&jr===jl){ out[k]=l; return; } const m=mergeDoc(r,l), js=JSON.stringify(m); out[k]=m; if(js!==jl){ changedLocal=true; vu.set(k,js); } if(js!==jr) needPush=true; });
     store=out; return {changedLocal,needPush}; };
-  let busy=false, again=false, timer=null; const say=t=>{ const e=$("syncMsg"); if(e) e.textContent=t; };
+  let busy=false, again=false, timer=null, premier=0; const say=t=>{ const e=$("syncMsg"); if(e) e.textContent=t; };
+  const tout=()=>{ if(cfg&&api.dirty&&timer){ clearTimeout(timer); timer=null; premier=0; api.sync(); } };
+  document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden") tout(); }); addEventListener("pagehide",tout);
   const api={ doc, dirty:false, cfg:()=>cfg,
     collection:name=>({ doc:id=>doc(name+"/"+(id||uid())), onSnapshot:f=>{ const fire=()=>f({docs:Object.keys(store).filter(k=>k.startsWith(name+"/")&&live(k)).sort().map(k=>({id:k.slice(name.length+1),data:()=>store[k]}))}); subs.push(fire); setTimeout(fire,0); return ()=>{}; } }),
-    dump:()=>JSON.stringify(store,null,1), load:o=>{ const now=Date.now(); Object.keys(store).forEach(k=>{ if(!(k in o)) o[k]={_del:true,_m:now}; }); Object.keys(o).forEach(k=>{ o[k]._m=now; }); store=o; save(); },
+    dump:()=>JSON.stringify(store,null,1), load:o=>{ const now=HORLOGE.now(); Object.keys(store).forEach(k=>{ if(!(k in o)) o[k]={_del:true,_m:now}; }); Object.keys(o).forEach(k=>{ o[k]=restampe(o[k],now); }); store=o; Object.keys(store).forEach(note); save(); },
     hasLocal:()=>Object.keys(store).some(live),
-    queue:()=>{ if(!cfg) return; clearTimeout(timer); timer=setTimeout(()=>api.sync(),2500); },
+    queue:()=>{ if(!cfg) return; clearTimeout(timer); const t=Date.now(); if(!premier) premier=t; timer=setTimeout(()=>{ premier=0; api.sync(); },Math.max(0,Math.min(8000,premier+30000-t))); },
     sync:()=>{ if(!cfg) return Promise.resolve("off"); if(busy){ again=true; return Promise.resolve("busy"); } busy=true; say("Synchronisation…"); const g0=gen;
       return pull().then(({data,sha,inchange})=>{ if(inchange&&!data) return; const avant=data?JSON.stringify(data).length:0, m=merge(data||{}); if(m.changedLocal){ persist(); notify(); }
           /* protection de la carte : une version de l'app plus ancienne que celle déjà utilisée n'écrit rien ; et jamais d'envoi qui ferait fondre la carte */
@@ -7148,30 +7269,33 @@ function localDb(){ const KEY="carte-de-vie-v1", CKEY="carte-de-vie-sync"; let s
         .then(()=>{ if(gen===g0) api.dirty=false; api.synced=true; if(window._autoArr) setTimeout(window._autoArr,0); say("Synchronisé à "+new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})); return "ok"; },
               e=>{ const st=e&&e.status; if(st==="version"||st==="retrait"){ say(st==="version"?"Une version plus récente de l'app a déjà été utilisée : ferme complètement l'app et rouvre-la. En attendant, rien n'est envoyé, pour protéger ta carte.":"Envoi bloqué : il aurait effacé une partie de ta carte. Ferme et rouvre l'app, puis réessaie."); return st; } if(st===409||st===422){ again=true; return "retry"; } say(st===401||st===403?"Clé d'accès refusée : vérifie-la dans Synchro.":st===404?"Dépôt introuvable : vérifie son nom dans Synchro.":"Hors ligne : les modifications partiront au retour du réseau."); return "err:"+(st||"net"); })
         .then(res=>{ busy=false; if(again){ again=false; api.queue(); } return res; }); },
-    connect:(repo,token,keep)=>{ if(!repoOk(repo)) return Promise.reject({status:404}); cfg={repo,token}; der=null; return pull().then(({data})=>{ const remoteHas=data&&Object.keys(data).some(k=>!data[k]._del);
-        if(remoteHas&&api.hasLocal()&&!keep){ cfg=null; return "choose"; }
-        if(keep==="device"){ const now=Date.now(); Object.keys(store).forEach(k=>{ store[k]._m=now; }); } if(keep==="online"){ store={}; }
-        try{ localStorage.setItem(CKEY,JSON.stringify(cfg)); }catch(_){} return api.sync(); },e=>{ cfg=null; throw e; }); },
+    connect:(repo,token,keep)=>{ if(!repoOk(repo)) return Promise.reject({status:404}); const avant=cfg; cfg={repo,token}; der=null; return pull().then(({data})=>{ const remoteHas=data&&Object.keys(data).some(k=>!data[k]._del);
+        if(remoteHas&&api.hasLocal()&&(!keep||keep==="lire")){ cfg=null; return "choose"; }
+        if(!remoteHas&&api.hasLocal()&&keep!=="envoyer"){ cfg=avant; return "vide"; }
+        if(keep==="device"){ const now=HORLOGE.now(); Object.keys(store).forEach(k=>{ store[k]=restampe(store[k],now); note(k); }); } if(keep==="online"){ store={}; vu.clear(); base0={}; brut0=null; }
+        try{ localStorage.setItem(CKEY,JSON.stringify(cfg)); }catch(_){} retiensProprio(repo); return api.sync(); },e=>{ cfg=null; throw e; }); },
     disconnect:()=>{ cfg=null; try{ localStorage.removeItem(CKEY); }catch(_){} say(""); },
     history:()=>fetch("https://api.github.com/repos/"+cfg.repo+"/commits?path=carte.json&per_page=60",{headers:hdr(),cache:"no-store"}).then(r=>{ if(!r.ok) throw {status:r.status}; return r.json(); }).then(a=>a.map(c=>({sha:c.sha,date:c.commit.committer.date}))),
-    version:sha=>fetch(url()+"?ref="+sha,{headers:hdr(),cache:"no-store"}).then(r=>{ if(!r.ok) throw {status:r.status}; return r.json(); }).then(j=>JSON.parse(b64d(j.content))) };
+    version:sha=>fetch(url()+"?ref="+encodeURIComponent(sha),{headers:hdr(),cache:"no-store"}).then(r=>{ if(!r.ok) throw {status:r.status}; return r.json(); }).then(j=>{
+      if(!j.content&&j.size>0) return fetch(url()+"?ref="+encodeURIComponent(sha),{headers:Object.assign(hdr(),{Accept:"application/vnd.github.raw"}),cache:"no-store"}).then(r2=>{ if(!r2.ok) throw {status:r2.status}; return r2.text(); }).then(t=>JSON.parse(t));
+      return JSON.parse(b64d(j.content)); }) };
   setTimeout(()=>api.sync(),300); setInterval(()=>{ if(document.visibilityState==="visible") api.sync(); },60000); document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") api.sync(); }); addEventListener("online",()=>api.sync());
   return api; }
 /* --- dans Claude : les données restent dans la base de la page, la synchro GitHub et l'IA s'ajoutent --- */
 function claudeDb(d){ const CKEY="carte-de-vie-sync"; let cfg=null; try{ cfg=JSON.parse(localStorage.getItem(CKEY)||"null"); }catch(_){} if(cfg&&!repoOk(cfg.repo)) cfg=null;
-  const store={}, live=k=>store[k]&&!store[k]._del, stamp=(x,k)=>{ const now=Date.now(); return Object.assign({},x,{_m:now,_f:fieldsNow(x,k?store[k]:null,now),_x:tombes(k?store[k]:null,x)}); };
+  const store={}, live=k=>store[k]&&!store[k]._del, stamp=(x,k)=>estampille(k&&store[k]?JSON.parse(JSON.stringify(store[k])):null,x,HORLOGE.now());
   ["meta/moi","meta/layout","meta/feedback","meta/compagnon","meta/suggestions","meta/base","meta/notes","meta/cockpit","meta/cockpit_masques","meta/fonds","meta/icones","meta/semaine","meta/journees","meta/app","meta/energie","meta/revues","meta/trajectoire","meta/memoire","meta/propositions","meta/suivi","meta/suivis","meta/atelier","meta/formations"].forEach(k=>d.doc(k).onSnapshot(s=>{ if(s.exists) store[k]=s.data(); else delete store[k]; },()=>{}));
   d.collection("espaces").onSnapshot(s=>{ Object.keys(store).forEach(k=>{ if(k.startsWith("espaces/")) delete store[k]; }); s.docs.forEach(x=>{ store["espaces/"+x.id]=x.data(); }); },()=>{});
   const after=p=>p.then(v=>{ api.dirty=true; api.queue(); return v; });
   const doc=path=>{ const r=d.doc(path); return { id:r.id, path,
-    set:x=>after(r.set(Object.assign(stamp(x),{_x:tombes(store[path],x)}))), update:x=>after(r.update(stamp(x,path))), delete:()=>after(r.set({_del:true,_m:Date.now()})),
+    set:x=>after(r.set(stamp(x,path))), update:x=>after(r.update(stamp(Object.assign({},store[path]||{},x),path))), delete:()=>after(r.set({_del:true,_m:HORLOGE.now()})),
     onSnapshot:(f,e)=>r.onSnapshot(s=>{ const v=s.exists?s.data():undefined; f({id:s.id,exists:!!(v&&!v._del),data:()=>v}); },e) }; };
   const b64e=t=>btoa(unescape(encodeURIComponent(t))), b64d=t=>decodeURIComponent(escape(atob(String(t||"").replace(/\s/g,""))));
   const url=()=>"https://api.github.com/repos/"+cfg.repo+"/contents/carte.json", hdr=()=>({Authorization:"Bearer "+cfg.token,Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"});
   const pull=()=>fetch(url(),{headers:hdr(),cache:"no-store"}).then(r=>{ if(r.status===404) return {data:null,sha:null}; if(!r.ok) throw {status:r.status}; return r.json().then(j=>{ if(!j.content&&j.size>0) return fetch(url(),{headers:Object.assign(hdr(),{Accept:"application/vnd.github.raw"}),cache:"no-store"}).then(r2=>{ if(!r2.ok) throw {status:r2.status}; return r2.text(); }).then(t=>({data:JSON.parse(t)||{},sha:j.sha}));
       let o={}; try{ o=JSON.parse(b64d(j.content))||{}; }catch(_){ throw {status:"lecture"}; } return {data:o,sha:j.sha}; }); });
   const push=(sha,out)=>fetch(url(),{method:"PUT",headers:hdr(),body:JSON.stringify(Object.assign({message:"Carte mise à jour depuis Claude",content:b64e(JSON.stringify(out,null,1))},sha?{sha}:{}))}).then(r=>{ if(!r.ok) throw {status:r.status}; });
-  const merge=remote=>{ let needPush=false; const out={}, ops=[];
+  const merge=remote=>{ let needPush=false; const out={}, ops=[]; Object.keys(remote).forEach(k=>vuDoc(HORLOGE,remote[k]));
     new Set([...Object.keys(remote),...Object.keys(store)]).forEach(k=>{ const r=remote[k], l=store[k];
       const m=mergeDoc(r,l), js=JSON.stringify(m); out[k]=m; if(js!==JSON.stringify(l)){ store[k]=m; ops.push(d.doc(k).set(m)); } if(js!==JSON.stringify(r)) needPush=true; });
     return Promise.all(ops).then(()=>({needPush,out})); };
@@ -7179,7 +7303,7 @@ function claudeDb(d){ const CKEY="carte-de-vie-sync"; let cfg=null; try{ cfg=JSO
   const api={ doc, dirty:false, cfg:()=>cfg,
     collection:name=>({ doc:id=>doc(name+"/"+(id||uid())), onSnapshot:(f,e)=>d.collection(name).onSnapshot(s=>f({docs:s.docs.filter(x=>!(x.data()||{})._del)}),e) }),
     dump:()=>JSON.stringify(store,null,1),
-    load:o=>{ const now=Date.now(); Object.keys(store).forEach(k=>{ if(!(k in o)) o[k]={_del:true}; }); return Promise.all(Object.keys(o).map(k=>d.doc(k).set(Object.assign({},o[k],{_m:now}))))
+    load:o=>{ const now=HORLOGE.now(); Object.keys(store).forEach(k=>{ if(!(k in o)) o[k]={_del:true,_m:now}; }); return Promise.all(Object.keys(o).map(k=>d.doc(k).set(restampe(o[k],now))))
       .then(()=>{ api.dirty=true; api.queue(); }); },
     hasLocal:()=>Object.keys(store).some(live),
     queue:()=>{ if(!cfg) return; clearTimeout(timer); timer=setTimeout(()=>api.sync(),2500); },
@@ -7188,11 +7312,12 @@ function claudeDb(d){ const CKEY="carte-de-vie-sync"; let cfg=null; try{ cfg=JSO
         .then(()=>{ api.dirty=false; api.synced=true; if(window._autoArr) setTimeout(window._autoArr,0); say("Synchronisé à "+new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})); return "ok"; },
               e=>{ const st=e&&e.status; if(st==="version"||st==="retrait"){ say(st==="version"?"Une version plus récente de l'app a déjà été utilisée : ferme complètement l'app et rouvre-la. En attendant, rien n'est envoyé, pour protéger ta carte.":"Envoi bloqué : il aurait effacé une partie de ta carte. Ferme et rouvre l'app, puis réessaie."); return st; } if(st===409||st===422){ again=true; return "retry"; } say(st===401||st===403?"Clé d'accès refusée : vérifie-la dans Synchro.":st===404?"Dépôt introuvable : vérifie son nom dans Synchro.":"GitHub injoignable depuis Claude pour le moment. Tes modifications restent enregistrées ici."); return "err:"+(st||"net"); })
         .then(res=>{ busy=false; if(again){ again=false; api.queue(); } return res; }); },
-    connect:(repo,token,keep)=>{ if(!repoOk(repo)) return Promise.reject({status:404}); cfg={repo,token}; return pull().then(({data})=>{ const remoteHas=data&&Object.keys(data).some(k=>!data[k]._del);
-        if(remoteHas&&api.hasLocal()&&!keep){ cfg=null; return "choose"; }
-        const now=Date.now(); let ops=[];
-        if(keep==="device") ops=Object.keys(store).map(k=>{ store[k]=Object.assign({},store[k],{_m:now}); return d.doc(k).set(store[k]); });
-        if(keep==="online") Object.keys(store).forEach(k=>{ if(data&&data[k]) store[k]=Object.assign({},store[k],{_m:0}); else { store[k]={_del:true,_m:now}; ops.push(d.doc(k).set(store[k])); } });
+    connect:(repo,token,keep)=>{ if(!repoOk(repo)) return Promise.reject({status:404}); const avant=cfg; cfg={repo,token}; return pull().then(({data})=>{ const remoteHas=data&&Object.keys(data).some(k=>!data[k]._del);
+        if(remoteHas&&api.hasLocal()&&(!keep||keep==="lire")){ cfg=null; return "choose"; }
+        if(!remoteHas&&api.hasLocal()&&keep!=="envoyer"){ cfg=avant; return "vide"; }
+        const now=HORLOGE.now(); let ops=[];
+        if(keep==="device") ops=Object.keys(store).map(k=>{ store[k]=restampe(store[k],now); return d.doc(k).set(store[k]); });
+        if(keep==="online") Object.keys(store).forEach(k=>{ if(data&&data[k]) store[k]={_del:true,_m:0}; else { store[k]={_del:true,_m:now}; ops.push(d.doc(k).set(store[k])); } });
         return Promise.all(ops).then(()=>{ try{ localStorage.setItem(CKEY,JSON.stringify(cfg)); }catch(_){} return api.sync(); }); },e=>{ cfg=null; throw e; }); },
     disconnect:()=>{ cfg=null; try{ localStorage.removeItem(CKEY); }catch(_){} say(""); } };
   setTimeout(()=>api.sync(),1500); setInterval(()=>{ if(document.visibilityState==="visible") api.sync(); },60000); document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") api.sync(); }); addEventListener("online",()=>api.sync());
@@ -7229,7 +7354,7 @@ function start(){
       const go=keep=>{ const repo=$("syncRepo").value.trim().replace(/^https?:\/\/github\.com\//,"").replace(/\/$/,""), token=$("syncToken").value.trim()||(db.cfg()||{}).token||"";
         if(!/^[\w.-]+\/[\w.-]+$/.test(repo)||!token){ st.textContent="Renseigne le dépôt (identifiant/nom) et la clé d'accès."; return; }
         st.textContent="Connexion…"; ch.hidden=true;
-        db.connect(repo,token,keep||(db.cfg()?"merge":undefined)).then(r=>{ if(r==="choose"){ st.textContent="Une carte existe déjà en ligne, et une autre sur cet appareil. Laquelle garder ?"; ch.hidden=false; return; }
+        db.connect(repo,token,keep||(db.cfg()?"merge":undefined)).then(r=>{ if(r==="vide"){ if(confirm("Le dépôt « "+repo+" » ne contient pas encore de carte.\n\nY envoyer toute la carte de cet appareil ?")) go("envoyer"); else st.textContent="Rien n'a été envoyé."; return; } if(r==="choose"){ st.textContent="Une carte existe déjà en ligne, et une autre sur cet appareil. Laquelle garder ?"; ch.hidden=false; return; }
           $("syncToken").value=""; refresh(); st.textContent=r==="ok"?"Relié. La carte est synchronisée.":"Relié, mais la première synchronisation n'a pas abouti. Elle reprendra toute seule."; },
           e=>{ const s2=e&&e.status; st.textContent=s2===401||s2===403?"Clé d'accès refusée. Vérifie qu'elle donne accès à ce dépôt en lecture et écriture.":s2===404?"Dépôt introuvable avec cette clé.":"Connexion impossible. Vérifie le réseau et réessaie."; }); };
       $("syncBtn").onclick=()=>{ pg.hidden=false; pg.scrollTop=0; ch.hidden=true; refresh(); }; $("syncClose").onclick=()=>{ pg.hidden=true; };
@@ -7239,6 +7364,14 @@ function start(){
       $("setBtn").onclick=()=>{ $("setPage").hidden=false; $("setPage").scrollTop=0; const sm=$("arrBtn").querySelector("small"); if(sm) sm.textContent=isNu()?"Remet les icônes en cercle autour de Moi ; tu pourras ensuite les déplacer librement":"Aligne tes espaces par catégorie ; tu pourras ensuite les déplacer librement"; }; $("setClose").onclick=()=>{ $("setPage").hidden=true; }; $("iaSet").onclick=()=>{ $("iaBtn").click(); }; $("arrBtn").onclick=()=>{ arrange(); $("setPage").hidden=true; };
       $("impFile").addEventListener("change",()=>{ $("setPage").hidden=true; }); refresh();
       $("syncGo").onclick=()=>go(); $("keepBoth").onclick=()=>go("merge"); $("keepOnline").onclick=()=>{ if(confirm("Ce qui n'existe que sur cet appareil sera effacé. Continuer ?")) go("online"); }; $("keepDevice").onclick=()=>go("device");
+      $("effBtn").onclick=async()=>{ const c=db.cfg&&db.cfg();
+        const avert=c?(db.dirty?"Des modifications ne sont pas encore parties en ligne : elles seront perdues.\n\n":"")+"La carte en ligne (dépôt « "+c.repo+" ») n'est pas touchée.":"Cet appareil n'est relié à aucun dépôt : sans sauvegarde exportée, ta carte sera perdue.";
+        if(!confirm("Effacer la carte de cet appareil ?\n\n"+avert)) return; const m=prompt("Pour confirmer, écris EFFACER"); if(String(m||"").trim().toUpperCase()!=="EFFACER") return;
+        window._efface=true; const CL=["animal", "animalImg", "atelier-gemini", "atelier-local", "base", "chatCircuit", "compagnon", "formAvis", "hRap", "hRapH", "hRapVu", "icones", "klein", "livresT", "medDuree", "medEnCours", "mouvements", "notesApp", "notesApps", "nvVus", "outilsPos", "prenom", "range108", "sugVu", "theme", "typo2"];
+        try{ Object.keys(localStorage).forEach(k=>{ if(k.startsWith("carte-de-vie")||CL.includes(k)) localStorage.removeItem(k); }); }catch{ /* stockage bloqué */ }
+        try{ const K=await caches.keys(); await Promise.all(K.filter(n=>n.startsWith("carte-de-vie-")||n==="carte-rappels").map(n=>caches.delete(n))); }catch{ /* pas de cache */ }
+        try{ indexedDB.deleteDatabase("carte-audio"); }catch{ /* pas de base */ }
+        location.replace(location.pathname); };
       $("syncOff").onclick=()=>{ db.disconnect(); $("syncRepo").value=""; refresh(); st.textContent="Cet appareil n'est plus relié. Ses données restent ici."; };
       const listMissing=(old)=>{ const out=[]; Object.keys(old).forEach(k=>{ if(!k.startsWith("espaces/")) return; const o=old[k], id=k.slice(8), c=cats.get(id); if(!o||o._del) return;
           if(!c){ out.push({id,name:o.name,whole:o,items:["tout l'espace « "+(o.name||id)+" »"]}); return; }
@@ -7263,7 +7396,7 @@ function start(){
       refresh();
       const h=/[#&]relier=([A-Za-z0-9+/_-]+)/.exec(location.hash);
       if(h){ try{ const o=JSON.parse(decodeURIComponent(escape(atob(h[1].replace(/-/g,"+").replace(/_/g,"/"))))); history.replaceState(null,"",location.pathname+location.search);
-        if(o&&o.r&&o.t&&/^[\w.-]+\/[\w.-]+$/.test(o.r)&&confirm("Relier cet appareil au dépôt « "+o.r+" » ?\n\nN'accepte que si tu as créé ce lien toi-même.")){ try{ localStorage.setItem("carte-de-vie-vu","1"); }catch(_){} $("syncRepo").value=o.r; $("syncToken").value=o.t; pg.hidden=false; refresh(); $("syncForm").hidden=false; go(); } }catch(_){} } })();
+        if(o&&o.r&&o.t&&/^[\w.-]+\/[\w.-]+$/.test(o.r)&&(()=>{ const p=proprioConnu(); if(p&&p!==o.r.split("/")[0].toLowerCase()){ alert("Ce lien mène au dépôt « "+o.r+" », d'un autre compte que celui déjà utilisé sur cet appareil : il est refusé."); return false; } return true; })()&&confirm("Relier cet appareil au dépôt « "+o.r+" » ?\n\nN'accepte que si tu as créé ce lien toi-même.")){ try{ localStorage.setItem("carte-de-vie-vu","1"); }catch(_){} $("syncRepo").value=o.r; $("syncToken").value=o.t; pg.hidden=false; refresh(); $("syncForm").hidden=false; go("lire"); } }catch(_){} } })();
     if(!CL&&navigator.storage&&navigator.storage.persist) navigator.storage.persist().catch(()=>{});
     $("expBtn").onclick=()=>{ const name="carte-de-vie-"+today()+".json";
       if(CL) return window.claude.use("downloads").then(dl=>dl?dl.save({filename:name,data:db.dump()}):null).catch(()=>{});
@@ -7297,31 +7430,49 @@ function start(){
 }
 /* compléments personnels : un module gardé dans le dépôt de données de la propriétaire, jamais dans ce code public.
    Il n'est lu que pour un dépôt de son compte, avec sa clé ; ailleurs l'app reste générique. */
-const PERSO_K="carte-de-vie-perso", PERSO_SHA="carte-de-vie-perso-sha";
-function persoEval(t){ try{ eval(t); return true; }catch(err){ console.warn("module perso",err); return false; } }
+const PERSO_K="carte-de-vie-perso", PERSO_SHA="carte-de-vie-perso-sha", PERSO_V=198;
+/* le module n'est jamais exécuté deux fois (il pose des minuteries et des écouteurs) */
+let persoFait=false;
+function persoEval(t){ if(persoFait) return false; persoFait=true; try{ eval(t); return true; }catch(err){ console.warn("module perso",err); return false; } }
 /* propriétaire : un dépôt de son compte, reconnu par empreinte (le nom du compte n'est pas écrit ici) */
 function estProprio(r){ const o=String(r||"").split("/")[0].toLowerCase(); let h1=0xdeadbeef, h2=0x41c6ce57; for(let i=0;i<o.length;i++){ const ch=o.charCodeAt(i); h1=Math.imul(h1^ch,2654435761); h2=Math.imul(h2^ch,1597334677); }
   h1=Math.imul(h1^(h1>>>16),2246822507); h1^=Math.imul(h2^(h2>>>13),3266489909); h2=Math.imul(h2^(h2>>>16),2246822507); h2^=Math.imul(h1^(h1>>>13),3266489909);
   return String(r||"").includes("/") && (4294967296*(2097151&h2)+(h1>>>0)).toString(36)==="h7637qhg6a"; }
 function persoOk(){ const c=AUD.cfg(); return !!(c&&c.repo&&c.token&&repoOk(c.repo)&&estProprio(c.repo)); }
-/* le module gardé sur l'appareil n'est exécuté que s'il est la version en ligne (même empreinte « sha » que le fichier du dépôt) ;
-   hors ligne (ou GitHub injoignable), on garde la dernière version reçue ; clé refusée ou fichier absent : rien n'est exécuté */
-const persoTexte=b=>{ try{ return new TextDecoder().decode(Uint8Array.from(atob(String(b||"").replace(/\s/g,"")),x=>x.charCodeAt(0))); }catch(_){ return ""; } };
-async function persoEnLigne(){ const c=AUD.cfg(); if(!c||navigator.onLine===false) return null; const ac=typeof AbortController==="function"?new AbortController():null, tm=setTimeout(()=>{ if(ac) ac.abort(); },2500);
+/* empreinte git d'un texte (sha1 de « blob <taille>\0<contenu> »), celle que GitHub donne pour le fichier : un texte n'est exécuté
+   que si son empreinte est celle attendue (copie sur l'appareil comprise) ; sinon il n'est pas exécuté et c'est signalé */
+async function shaGit(t){ try{ const o=new TextEncoder().encode(t), e=new TextEncoder().encode("blob "+o.length+"\0"), b=new Uint8Array(e.length+o.length); b.set(e); b.set(o,e.length);
+    return [...new Uint8Array(await crypto.subtle.digest("SHA-1",b))].map(x=>x.toString(16).padStart(2,"0")).join(""); }catch{ return ""; } }
+const persoSur=async(t,sha)=>!!(t&&sha&&/^[0-9a-f]{40}$/.test(sha)&&await shaGit(t)===sha);
+const persoAlerte=()=>{ console.warn("compléments personnels : empreinte inattendue, non exécutés"); const e=document.getElementById("syncMsg"); if(e) e.textContent="Compléments personnels non chargés : leur texte ne correspond pas à l'original attendu. Ils seront relus en ligne au prochain lancement."; };
+const persoVersion=t=>{ const m=/^\/\* carte-module v(\d+) \*\//.exec(t||""); return m?+m[1]:0; };
+const persoTexte=b=>{ try{ return new TextDecoder().decode(Uint8Array.from(atob(String(b||"").replace(/\s/g,"")),x=>x.charCodeAt(0))); }catch{ return ""; } };
+async function persoEnLigne(delai){ const c=AUD.cfg(); if(!c||navigator.onLine===false) return null; const ac=typeof AbortController==="function"?new AbortController():null, tm=delai?setTimeout(()=>{ if(ac) ac.abort(); },delai):0;
   try{ const r=await fetch("https://api.github.com/repos/"+c.repo+"/contents/perso/module.js",{headers:AUD.hd(c),cache:"no-store",signal:ac?ac.signal:undefined});
     if(r.status===401||r.status===404) return {refus:r.status}; if(!r.ok) return null; const j=await r.json(); return {sha:String(j.sha||""),texte:j.content?persoTexte(j.content):""}; }
-  catch(_){ return null; } finally{ clearTimeout(tm); } }
-const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.setItem(PERSO_SHA,sha); }catch(_){} };
-(async()=>{ let brut=null;
-  if(persoOk()){ let t=null, s0=null; try{ t=localStorage.getItem(PERSO_K); s0=localStorage.getItem(PERSO_SHA); }catch(_){}
-    const L=await persoEnLigne();
-    if(!L){ if(t) persoEval(t); }
-    else if(L.sha&&L.sha===s0&&t) persoEval(t);
-    else if(L.sha&&L.texte){ persoGarde(L.texte,L.sha); persoEval(L.texte); }
-    else if(L.sha) brut=L.sha; }
+  catch{ return null; } finally{ clearTimeout(tm); } }
+const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.setItem(PERSO_SHA,sha); }catch{} };
+/* texte du module en ligne (lu en brut s'il est trop gros pour être renvoyé avec ses métadonnées), vérifié, gardé sur l'appareil */
+async function persoRecu(L){ if(!L||!L.sha) return ""; let tx=L.texte; if(!tx){ const b=await AUD.recupere("perso/module.js","text/plain"); tx=b?await b.text():""; }
+  if(!tx) return ""; if(!await persoSur(tx,L.sha)){ persoAlerte(); return ""; } persoGarde(tx,L.sha); return tx; }
+/* démarrage : la copie gardée sur l'appareil, si elle est faite pour cette version de l'app et intacte, est exécutée tout de suite,
+   sans attendre le réseau ; la version en ligne est relue ensuite et gardée pour le prochain lancement. Sinon (première fois,
+   nouvelle version de l'app), on attend la version en ligne 2,5 s au plus, comme avant. */
+(async()=>{ let t=null, s0=null, tard=false;
+  if(persoOk()){ try{ t=localStorage.getItem(PERSO_K); s0=localStorage.getItem(PERSO_SHA); }catch{}
+    if(t&&!await persoSur(t,s0)){ persoAlerte(); t=null; }
+    if(t&&persoVersion(t)===PERSO_V) persoEval(t);
+    else { const L=await persoEnLigne(2500);
+      if(!L){ if(t) persoEval(t); }
+      else if(L.sha&&L.sha===s0&&t) persoEval(t);
+      else if(L.sha&&L.texte){ const tx=await persoRecu(L); if(tx) persoEval(tx); }
+      else if(L.sha) tard=L; } }
   start();
-  /* fichier trop gros pour être renvoyé avec ses métadonnées : lu en brut après le démarrage */
-  if(brut){ const b=await AUD.recupere("perso/module.js","text/plain"); const tx=b?await b.text():""; if(tx){ persoGarde(tx,brut); if(persoEval(tx)&&loaded){ renderBoard(); if(openId&&!drawer.hidden) renderPane(cats.get(openId)); } } }
+  if(!persoOk()) return;
+  /* trop gros pour être renvoyé avec ses métadonnées : lu en brut après le démarrage, puis affiché */
+  if(tard){ const tx=await persoRecu(tard); if(tx&&persoEval(tx)&&loaded){ renderBoard(); if(openId&&!drawer.hidden) renderPane(cats.get(openId)); } return; }
+  /* mise à jour en arrière-plan : jamais exécutée maintenant (le module ne tourne qu'une fois), seulement gardée */
+  if(persoFait&&persoVersion(t)===PERSO_V){ const L=await persoEnLigne(0); if(L&&L.sha&&L.sha!==s0) await persoRecu(L); }
 })();
 })();
 
@@ -7340,10 +7491,10 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=197; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=198; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
-(function(){ if(window.claude) return; let v0=null, rec=false;
+(function(){ if(window.claude) return; let v0="carte-de-vie-v"+APP_V, rec=false;
   const lire=()=>fetch("sw.js?v="+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.text():"").then(t=>{ const m=/carte-de-vie-v\d+/.exec(t); return m?m[0]:null; }).catch(()=>null);
   const libre=()=>{ const a=document.activeElement; return !(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))&&[...document.querySelectorAll("aside.page")].every(p=>p.hidden); };
   const verif=()=>lire().then(v=>{ if(!v) return; if(!v0){ v0=v; return; } if(v!==v0&&!rec){ rec=true; const go=()=>{ if(navigator.serviceWorker) navigator.serviceWorker.getRegistration().then(r=>r&&r.update()).finally(()=>location.reload()); else location.reload(); };
