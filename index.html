@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-rr2McCDlwQJzwb6f8Kt5W0drerJsLUwgL4hLDAuSZkI=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-NOd0DEF1tMMFOtHZoTP+Bq4uLHsCz3m+IC+QzIt+RrM=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-II4uc0DCLPuaATT+Q76jg1LsrF/U9lKNARjkd57EzyA=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-YgmW0TW3OXC1Mvetr4bLFngFXMBuh0C+zOWUjN4Gw3c=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f4eee4">
@@ -2202,6 +2202,19 @@ html body header .top3a .noterb{display:none!important}
 .omni .omnist.s-àconfirmer{border-style:dashed}
 .omni .omnist.s-contradiction{background:currentColor;color:var(--surface)}
 .omni .omnioub{justify-self:start}
+/* Version 206 : page « Omni » en onglets, plus lisible */
+.omni .omnihaut{display:grid;gap:8px;margin:0 0 12px}
+.omni .omnisum{font-size:1.05rem;font-weight:600;margin:0}
+.omni .omnipz{margin:0;font-weight:600}
+.omni .omniseg{margin:0 0 12px}
+.omni .omnigr{border:2px solid var(--k1);border-radius:16px;margin:0 0 10px;background:var(--surface)}
+.omni .omnigr>summary{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;cursor:pointer;font-size:1rem}
+.omni .omnin2{font-size:12px;font-weight:700;border:1.5px solid currentColor;border-radius:999px;padding:0 8px}
+.omni .omnigr .omnifil{padding:0 14px 12px}
+.omni .omnigr .omnifil li{border:0;border-top:1px solid var(--pale,#dbe3f7);border-radius:0;padding:10px 0 0}
+.omni .omnic{font-size:1rem;line-height:1.45}
+.omni .omnimeta{opacity:.75}
+.omni .omnioub{justify-self:start;background:none;border:0;padding:4px 0;color:inherit;text-decoration:underline;font:inherit;font-size:.85rem;cursor:pointer;min-height:24px}
 
 /* Version 205 : « Mes assistants » (téléphone et ordinateur) */
 #assistPage{--c:var(--ink);background:var(--bg)!important;z-index:60}
@@ -6382,7 +6395,7 @@ window.addEventListener("hashchange",()=>{ if(location.hash==="#life") LIFEP.ouv
     b.onclick=()=>LIFEP.ouvre(); a.appendChild(b); }; pose(); }
 /* la bulle IA près de Moi devient « Ma mémoire » : même place, même aspect, même mouvement */
 { const mem=()=>{ const b=$("iaBtn"); if(!b) return; b.hidden=false; b.classList.remove("new"); const t=b.querySelector("b"), s=$("iaSub"); if(t) t.textContent="◎"; if(s) s.textContent=""; b.classList.add("memb");
-    b.setAttribute("aria-label","Ma mémoire"); b.title="Ma mémoire"; };
+    b.setAttribute("aria-label","Omni"); b.title="Omni"; };
   const oI=renderIa; renderIa=function(){ const r=oI.apply(this,arguments); mem(); return r; }; mem();
   document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("#iaBtn"); if(!b) return; e.preventDefault(); e.stopImmediatePropagation(); MEMP.ouvre(); },true); }
 /* Réglages simplifiés : les lignes rangées en groupes repliables */
@@ -6503,40 +6516,46 @@ window.addEventListener("message",e=>{ if(e.origin===location.origin&&e.data&&e.
    L'app n'écrit rien ici : « Oublie ça », la pause et les questions PRÉPARENT un message dans LIFE (fil Général) ; la
    personne le relit et touche Envoyer. Tout texte reçu est affiché avec textContent. */
 const OMNI={ d:null, filtre:null, z:null,
-  charge(d){ this.d=d&&typeof d==="object"?d:null; this.rend(); },
+  charge(d){ this.d=d&&typeof d==="object"?d:null; if(this.z&&this.z.isConnected) this.rend(); },
   /* ouvre LIFE et y prépare le message (jamais envoyé sans la personne) */
   prepare(texte){ LIFEP.ouvre(); const f=document.querySelector("#lifeP iframe"); if(!f) return;
     const go=()=>{ try{ f.contentWindow.postMessage({life:"preparer",fil:"general",texte},location.origin); }catch(_){} };
     if(LIFEP.pret) go(); else { LIFEP.attente=go; } },
   date(s){ const x=new Date(String(s||"").length<=10?s+"T12:00":s); return isNaN(x)?String(s||""):x.toLocaleDateString("fr-FR",{day:"numeric",month:"short"}); },
   STAT:{"règle":"règle","regle":"règle","confirmé":"confirmé","confirme":"confirmé","proposé":"à confirmer","propose":"à confirmer","contradiction":"contradiction"},
-  section(){ const s=el("section",{className:"card soirc omni"}); this.z=s; this.rend(); return s; },
-  rend(){ const s=this.z; if(!s) return; s.textContent=""; const D=this.d;
-    s.appendChild(el("h3",{textContent:"Ce que LIFE a appris de moi"}));
-    if(!D){ s.appendChild(help("Rien encore : LIFE dépose ici ce qu'il apprend de toi (deux fois par jour, à 7 h 30 et 19 h 30). En attendant, ta mémoire à toi est plus bas.")); return; }
-    const L=Array.isArray(D.fil)?D.fil:[], N=Array.isArray(D.noeuds)?D.noeuds:[], K=Array.isArray(D.liens)?D.liens:[], C=Array.isArray(D.contradictions)?D.contradictions:[];
-    s.appendChild(el("p",{className:"mut",textContent:(D.total||L.length)+" choses retenues"+(D.intime?" · "+D.intime+" intimes, jamais montrées ici":"")+(D._m?" · mis à jour le "+this.date(new Date(D._m).toISOString()):"")}));
-    /* pause */
-    const pz=el("div",{className:"omnipause"}), pb=el("button",{type:"button",className:"vbtn ghostb",textContent:D.pause?"Reprendre":"Mettre en pause"});
-    pz.append(el("span",{textContent:D.pause?"⏸ En pause : LIFE ne lit ni n'écrit rien.":"LIFE retient ce que tu lui dis."}),pb);
-    pb.onclick=()=>this.prepare(D.pause?"Reprends Omniscient":"Mets Omniscient en pause"); s.appendChild(pz);
-    /* contradictions */
-    if(C.length){ const c=el("div",{className:"omnicontra"},el("b",{textContent:"À éclaircir"})); C.slice(0,5).forEach(x=>c.appendChild(el("p",{textContent:this.date(x.date)+" · "+String(x.contenu||"")}))); s.appendChild(c); }
-    /* carte mentale : les domaines en cercle, les assistants au centre ; épaisseur du trait = nombre de choses retenues */
-    if(N.length) s.appendChild(this.carte(N,K));
-    /* questions */
-    const q=el("div",{className:"omniq"}); [["Qu'as-tu appris de moi ?","Qu'as-tu appris de moi ?"],["Dis-moi qui je suis","Dis-moi qui je suis"]].forEach(([t,m])=>{ const b=el("button",{type:"button",className:"vbtn ghostb",textContent:t}); b.onclick=()=>this.prepare(m); q.appendChild(b); });
-    s.appendChild(q);
-    /* le fil des nouveautés */
+  DOM:{vie:"Ma vie",systeme:"Le système",emploi:"Emploi",travail:"Travail",lecture:"Lecture",cuisine:"Cuisine",penderie:"Vinted"},
+  dom(k){ k=String(k||"autre"); return this.DOM[k]||k.charAt(0).toUpperCase()+k.slice(1); },
+  ong:"sait", mem:null,
+  /* la page « Omni » : en-tête, puis 4 onglets : Ce qu'il sait · Carte · À éclaircir · Ma mémoire (celle de l'app) */
+  monte(z,mem){ this.z=z; this.mem=mem; this.rend(); },
+  rend(){ const z=this.z; if(!z) return; z.textContent=""; const D=this.d, L=D&&Array.isArray(D.fil)?D.fil:[], N=D&&Array.isArray(D.noeuds)?D.noeuds:[], K=D&&Array.isArray(D.liens)?D.liens:[], C=D&&Array.isArray(D.contradictions)?D.contradictions:[];
+    /* en-tête : ce qu'il sait en un coup d'œil, la pause, les deux questions */
+    const t=el("div",{className:"omnihaut"});
+    t.appendChild(el("p",{className:"omnisum",textContent:D?(D.total||L.length)+" choses que LIFE sait de toi"+(D.intime?" (+ "+D.intime+" intimes, jamais montrées)":""):"LIFE n'a encore rien déposé ici."}));
+    if(D){ const pb=el("button",{type:"button",className:"vbtn ghostb",textContent:D.pause?"Reprendre":"Mettre en pause"}); pb.onclick=()=>this.prepare(D.pause?"Reprends Omniscient":"Mets Omniscient en pause");
+      const q1=el("button",{type:"button",className:"vbtn ghostb",textContent:"Qu'as-tu appris de moi ?"}), q2=el("button",{type:"button",className:"vbtn ghostb",textContent:"Dis-moi qui je suis"});
+      q1.onclick=()=>this.prepare("Qu'as-tu appris de moi ?"); q2.onclick=()=>this.prepare("Dis-moi qui je suis"); t.appendChild(el("div",{className:"omniq"},pb,q1,q2));
+      if(D.pause) t.appendChild(el("p",{className:"omnipz",textContent:"En pause : LIFE ne lit ni n'écrit rien."})); }
+    z.appendChild(t);
+    const O=[["sait","Ce qu'il sait"],["carte","Carte"],["eclair","À voir"+(C.length?" ("+C.length+")":"")],["mem","Mémoire"]], seg=el("div",{className:"seg omniseg",role:"tablist"});
+    O.forEach(([k,n])=>{ const b=el("button",{type:"button",role:"tab",textContent:n}); b.setAttribute("aria-selected",String(this.ong===k)); b.onclick=()=>{ this.ong=k; this.rend(); }; seg.appendChild(b); });
+    z.appendChild(seg); const pan=el("div",{className:"omnipan"}); z.appendChild(pan);
+    if(this.ong==="mem"){ if(this.mem) pan.appendChild(this.mem); return; }
+    if(!D){ pan.appendChild(help("Deux fois par jour (7 h 30 et 19 h 30), LIFE dépose ici ce qu'il apprend de toi.")); return; }
+    if(this.ong==="carte"){ if(N.length){ pan.appendChild(help("Un point par sujet et par assistant ; touche un sujet pour voir ce qu'il en sait.")); pan.appendChild(this.carte(N,K)); } else pan.appendChild(help("Pas encore de carte.")); return; }
+    if(this.ong==="eclair"){ if(!C.length){ pan.appendChild(help("Rien à éclaircir : rien de contradictoire dans ce qu'il sait.")); return; }
+      C.slice(0,5).forEach(x=>pan.appendChild(el("div",{className:"omnicontra"},el("small",{className:"mono",textContent:this.date(x.date)}),el("p",{textContent:String(x.contenu||"")})))); return; }
+    /* Ce qu'il sait : regroupé par sujet, le plus fourni d'abord */
     const F=L.filter(x=>!this.filtre||x.domaine===this.filtre||x.assistant===this.filtre);
-    if(this.filtre){ const b=el("button",{type:"button",className:"vbtn ghostb",textContent:"✕ "+this.filtre+" · tout revoir"}); b.onclick=()=>{ this.filtre=null; this.rend(); }; s.appendChild(b); }
-    if(!F.length){ s.appendChild(help("Rien dans le fil pour l'instant.")); return; }
-    const ul=el("ul",{className:"omnifil"}); F.slice(0,80).forEach(x=>{ const st=this.STAT[String(x.statut||"").toLowerCase()]||String(x.statut||"");
-      const li=el("li",{},el("div",{className:"omnitete"},el("span",{className:"omnist s-"+st.replace(/[^a-zà-ü]/gi,""),textContent:st||"—"}),el("small",{className:"mono",textContent:[this.date(x.date),x.assistant,x.domaine].filter(Boolean).join(" · ")})),
-        el("p",{textContent:String(x.contenu||"")}));
-      if(x.source) li.appendChild(el("small",{className:"mut",textContent:"parce que : "+String(x.source)}));
-      if(x.id){ const o=el("button",{type:"button",className:"vbtn ghostb omnioub",textContent:"Oublie ça"}); o.setAttribute("aria-label","Oublie ça : "+String(x.contenu||"").slice(0,60)); o.onclick=()=>this.prepare("oublie "+x.id); li.appendChild(o); }
-      ul.appendChild(li); }); s.appendChild(ul); },
+    if(this.filtre){ const b=el("button",{type:"button",className:"vbtn ghostb",textContent:"✕ "+this.dom(this.filtre)+" · tout revoir"}); b.onclick=()=>{ this.filtre=null; this.rend(); }; pan.appendChild(b); }
+    const G={}; F.forEach(x=>{ const k=String(x.domaine||"autre"); (G[k]=G[k]||[]).push(x); });
+    Object.keys(G).sort((a,b)=>G[b].length-G[a].length).forEach(k=>{ const d=el("details",{className:"omnigr"}); d.open=Object.keys(G).length<=3||k===this.filtre;
+      d.appendChild(el("summary",{},el("b",{textContent:this.dom(k)}),el("span",{className:"omnin2",textContent:String(G[k].length)})));
+      const ul=el("ul",{className:"omnifil"}); G[k].forEach(x=>{ const st=this.STAT[String(x.statut||"").toLowerCase()]||String(x.statut||"");
+        const li=el("li",{},el("p",{className:"omnic",textContent:String(x.contenu||"")}),el("small",{className:"omnimeta",textContent:[st,this.date(x.date),x.source?"d'après "+String(x.source):""].filter(Boolean).join(" · ")}));
+        if(x.id){ const o=el("button",{type:"button",className:"omnioub",textContent:"Oublie ça"}); o.setAttribute("aria-label","Oublie ça : "+String(x.contenu||"").slice(0,60)); o.onclick=()=>this.prepare("oublie "+x.id); li.appendChild(o); }
+        ul.appendChild(li); }); d.appendChild(ul); pan.appendChild(d); });
+    if(!F.length) pan.appendChild(help("Rien pour l'instant.")); },
   carte(N,K){ const W=320, H=240, cx=W/2, cy=H/2, dom=N.filter(x=>x.genre==="domaine"), as=N.filter(x=>x.genre!=="domaine"), P={};
     dom.forEach((x,i)=>{ const a=2*Math.PI*i/Math.max(1,dom.length)-Math.PI/2; P[x.id]=[cx+Math.cos(a)*(W/2-46),cy+Math.sin(a)*(H/2-26)]; });
     as.forEach((x,i)=>{ const a=2*Math.PI*i/Math.max(1,as.length)+Math.PI/4; P[x.id]=[cx+Math.cos(a)*(as.length>1?38:0),cy+Math.sin(a)*(as.length>1?26:0)]; });
@@ -6545,16 +6564,19 @@ const OMNI={ d:null, filtre:null, z:null,
     const mk2=(t,at)=>{ const e=document.createElementNS(NS,t); Object.entries(at).forEach(([k,v])=>e.setAttribute(k,v)); return e; };
     K.forEach(l=>{ const a=P[l.de], b=P[l.vers]; if(a&&b) svg.appendChild(mk2("line",{x1:a[0],y1:a[1],x2:b[0],y2:b[1],"stroke-width":(1+4*(+l.n||1)/mk).toFixed(1),class:"omnil"})); });
     N.forEach(x=>{ const p=P[x.id]; if(!p) return; const r=(6+10*Math.sqrt((+x.n||1)/mx)).toFixed(1), g=mk2("g",{class:"omnin "+(x.genre==="domaine"?"d":"a")+(this.filtre===x.id?" on":"")});
-      g.appendChild(mk2("circle",{cx:p[0],cy:p[1],r})); const t=mk2("text",{x:p[0],y:+p[1]+(+r)+11,"text-anchor":"middle"}); t.textContent=String(x.id).slice(0,18); g.appendChild(t);
+      g.appendChild(mk2("circle",{cx:p[0],cy:p[1],r})); const t=mk2("text",{x:p[0],y:+p[1]+(+r)+11,"text-anchor":"middle"}); t.textContent=(x.genre==="domaine"?this.dom(x.id):String(x.id)).slice(0,18); g.appendChild(t);
       g.setAttribute("tabindex","0"); g.setAttribute("role","button"); g.setAttribute("aria-label",x.id+", "+(x.n||0)+" choses retenues"+(this.filtre===x.id?", filtre actif":""));
-      const f=()=>{ this.filtre=this.filtre===x.id?null:x.id; this.rend(); }; g.addEventListener("click",f); g.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); f(); } });
+      const f=()=>{ this.filtre=this.filtre===x.id?null:x.id; if(this.filtre&&x.genre==="domaine") this.ong="sait"; this.rend(); }; g.addEventListener("click",f); g.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); f(); } });
       svg.appendChild(g); });
     return el("div",{className:"omnicw"},svg); } };
 /* LIFE dit qu'il est prêt à recevoir un message préparé */
 window.addEventListener("message",e=>{ if(e.origin===location.origin&&e.data&&e.data.life==="pret"){ LIFEP.pret=true; const a=LIFEP.attente; LIFEP.attente=null; if(a) setTimeout(a,50); } });
-/* la page du cerveau : « Ce que LIFE a appris de moi » en tête, puis la mémoire de l'app (recherche, retenir, souvenirs) */
+/* la page du cerveau s'appelle « Omni » : ce que LIFE sait de toi, en onglets ; la mémoire de l'app devient l'onglet « Ma mémoire » */
 { const e=MEMP.ecoute.bind(MEMP); MEMP.ecoute=function(){ e(); if(!OMNI.sub&&db){ OMNI.sub=true; db.doc("meta/omniscient").onSnapshot(x=>OMNI.charge(x.exists?x.data():null),()=>{}); } };
-  const o=MEMP.ouvre.bind(MEMP); MEMP.ouvre=function(){ o(); const z=$("memPersoPage"), c=z&&z.querySelector(".card"); if(c&&!z.querySelector(".omni")) c.before(OMNI.section()); }; }
+  const o=MEMP.ouvre.bind(MEMP); MEMP.ouvre=function(){ o(); const p=$("memPersoPage"); if(!p) return; const inn=p.querySelector(".page-in"), h=inn&&inn.querySelector("h2"); if(!inn) return;
+    if(h) h.textContent="Omni"; p.setAttribute("aria-label","Omni");
+    const mem=el("div",{className:"omnimem"}); [...inn.children].filter(x=>x!==h&&x!==inn.firstElementChild).forEach(x=>mem.appendChild(x));
+    const z=el("div",{className:"omni"}); inn.appendChild(z); OMNI.monte(z,mem); }; }
 
 /* ===== Version 205 : « Mes assistants » (Outils, sous l'Atelier) : les nouveaux assistants, leur état et ce qu'ils ont préparé =====
    meta/assistants (lecture seule, posé par le système) : { liste:[{ id, nom, groupe, statut: specifie|brouillon|actif|pause,
@@ -7708,8 +7730,8 @@ function start(){
    C'est elle qui fait foi : une copie gardée sur l'appareil, ou un fichier en ligne, n'est exécuté que si son texte a exactement
    cette empreinte. Une empreinte rangée dans le stockage de l'appareil n'est plus jamais utilisée (qui peut écrire l'un peut écrire
    l'autre). */
-const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=205;
-const PERSO_EMP="73aeee2c2a49999adc6178677af287c8280bbff4c859d1990a830a2fe8e5f727", PERSO_GIT="8bbe19c2d3016884a240ad63c296169f99e78eaf", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
+const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=206;
+const PERSO_EMP="1e90299f254cacd3644e83a9856566a84d583b659abe3377629304ff3ba7e973", PERSO_GIT="9fb4bf9685edfba752d5b081075fdc8c2007af4f", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
 try{ ["carte-de-vie-perso-sha","carte-de-vie-perso-suivant-sha"].forEach(k=>localStorage.removeItem(k)); }catch{ /* stockage bloqué */ }
 /* le module n'est jamais exécuté deux fois (il pose des minuteries et des écouteurs) */
 let persoFait=false;
@@ -7810,7 +7832,7 @@ function persoDepotUI(){ const pg=document.getElementById("syncLinked"); if(!pg|
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=205; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=206; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0="carte-de-vie-v"+APP_V, rec=false;
