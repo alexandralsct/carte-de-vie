@@ -41,7 +41,13 @@ const ouvre = async (vp, theme = 'clair', profil = TEL) => {
     ['hRap', 'compagnon', 'mouvements'].forEach(k => localStorage.setItem(k, '0')); localStorage.setItem('carte-de-vie-vu', '1'); localStorage.setItem('theme', theme); } }, [JSON.stringify(DEMO), theme]);
   const p = await ctx.newPage(); const err = []; p.on('pageerror', e => err.push(e.message));
   await p.goto(URL); if (CARTE) await p.setInputFiles('#impFile', CARTE); await p.waitForTimeout(1800); return { ctx, p, err, cdp: await ctx.newCDPSession(p) }; };
-const csp = async (p, tag) => { const v = await p.evaluate(() => window.__csp || []); ok(!v.length, tag + ' : aucune violation de la règle de sécurité (CSP)' + (v.length ? ' : ' + v.slice(0, 3).join(' / ') : '')); };
+const csp = async (p, tag) => { const v = await p.evaluate(() => window.__csp || []); ok(!v.length, tag + ' : aucune violation de la règle de sécurité (CSP)' + (v.length ? ' : ' + v.slice(0, 3).join(' / ') : ''));
+  /* seconde règle posée à l'exécution : connexions limitées aux adresses exactes (ici aucune adresse personnelle : un domaine .cloud
+     quelconque et un Apps Script quelconque, permis par la première règle, sont bloqués) */
+  const s = await p.evaluate(async () => { const n = document.querySelectorAll('meta[http-equiv="Content-Security-Policy"]').length;
+    const t = u => fetch(u).then(() => 'passe', e => 'bloque'); const a = await t('https://quelconque.cloud/x'), b = await t('https://script.google.com/macros/s/quelconque/exec');
+    await new Promise(r => setTimeout(r, 400)); const v = (window.__csp || []).filter(x => /connect-src/.test(x)).length; return { n, a, b, v }; });
+  ok(s.n === 2 && s.a === 'bloque' && s.b === 'bloque' && s.v >= 2, tag + ' : seconde règle de sécurité à l\'exécution (' + s.n + ' règles) : domaine .cloud et Apps Script quelconques bloqués ' + JSON.stringify(s)); };
 const item = (p, n) => p.evaluate(n => { const x = [...document.querySelectorAll('.node')].find(x => { const t = x.querySelector('b'); return t && t.textContent.replace(/\s+/g, ' ').trim() === n; }); if (x) x.click(); return !!x; }, n);
 const ferme = p => p.evaluate(() => document.getElementById('closeBtn').click());
 const sel = p => p.evaluate(() => [...document.querySelectorAll('#pane .rpt')].findIndex(b => b.getAttribute('aria-selected') === 'true'));

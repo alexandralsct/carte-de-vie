@@ -1,7 +1,9 @@
 /* Tests de la synchronisation avec un faux GitHub (aucun réseau, aucune donnée réelle), en deux parties : App téléphone puis App ordinateur.
    Usage : python3 -m http.server 8767 (à la racine du dépôt), puis node tests/synchro.mjs
    Vérifie : lecture d'un fichier de plus de 1 Mo (synchro et « Mémoire »), envoi après une modification (format du fichier, heures
-   _f et _h), fusion avec une modification faite en même temps ailleurs, reprise après un conflit 409, import d'une sauvegarde. */
+   _f et _h), fusion avec une modification faite en même temps ailleurs, reprise après un conflit 409, import d'une sauvegarde
+   (fusion avec confirmation : les documents créés après elle sont gardés), horloge de l'appareil en retard de 2 jours (recalée sur
+   l'heure du serveur), stockage de l'appareil plein (rien de perdu au rechargement). */
 const { chromium, devices } = await import(process.env.PLAYWRIGHT || 'playwright');
 const URL = process.env.URL || 'http://localhost:8767/index.html';
 const b = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
@@ -39,7 +41,7 @@ for (const [nom, opt] of PROFILS) {
   await ctx.route('https://api.github.com/**', route(D));
   await ctx.addInitScript(() => { if (sessionStorage.getItem('init')) return; sessionStorage.setItem('init', '1'); localStorage.clear();
     localStorage.setItem('carte-de-vie-sync', JSON.stringify({ repo: 'exemple/donnees', token: 'jeton-fictif' })); ['hRap', 'compagnon', 'mouvements'].forEach(k => localStorage.setItem(k, '0')); localStorage.setItem('carte-de-vie-vu', '1'); });
-  const p = await ctx.newPage(); const err = []; p.on('pageerror', e => err.push(e.message));
+  const p = await ctx.newPage(); const err = []; p.on('pageerror', e => err.push(e.message)); const dialogues = []; p.on('dialog', d => { dialogues.push(d.message()); d.accept(); });
   await p.goto(URL); await p.waitForFunction(() => document.querySelectorAll('.node').length >= 2, null, { timeout: 15000 }).catch(() => {});
   await p.waitForFunction(() => /Synchronisé/.test((document.getElementById('syncMsg') || {}).textContent || ''), null, { timeout: 15000 }).catch(() => {});
   ok(/Synchronisé/.test(await p.evaluate(() => document.getElementById('syncMsg').textContent)), nom + ' : fichier de plus de 1 Mo lu et synchronisé');
@@ -67,11 +69,64 @@ for (const [nom, opt] of PROFILS) {
   const mem = await p.evaluate(() => document.getElementById('memOut').textContent);
   ok(!/Impossible/.test(mem) && mem.length > 0, nom + ' : « Mémoire » lit une version de plus de 1 Mo (« ' + mem.slice(0, 60) + ' »)');
   /* import d'une sauvegarde : elle l'emporte sur ce qui a changé en ligne depuis, sans rien perdre de ce qui a été ajouté */
-  { const sauv = carte(); sauv['espaces/lecture'].name = 'Lecture (sauvegarde)'; const o = lit(D); o['espaces/lecture'].name = 'Lecture (en ligne)'; o['espaces/lecture'].tasks.push(it('t2', 'Ajoutée en ligne')); const t = Date.now() + 5; o['espaces/lecture']._m = t; o['espaces/lecture']._f = { name: t, tasks: t }; D.ecrit(o, 'en ligne');
+  { const sauv = carte(); delete sauv['meta/notes']; sauv['espaces/lecture'].name = 'Lecture (sauvegarde)'; const o = lit(D); o['espaces/lecture'].name = 'Lecture (en ligne)'; o['espaces/lecture'].tasks.push(it('t2', 'Ajoutée en ligne')); const t = Date.now() + 5; o['espaces/lecture']._m = t; o['espaces/lecture']._f = { name: t, tasks: t };
+    o['espaces/nouveau'] = { name: 'Créé après la sauvegarde', groupe: 'Soi', color: '#3E95C9', prio: 2, x: 50, y: 50, tasks: [it('n1', 'x')], ideas: [], dates: [], links: [], log: [], rub: [], _m: t, _f: { name: t } }; D.ecrit(o, 'en ligne');
     await p.setInputFiles('#impFile', { name: 'sauvegarde.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(sauv)) }); await p.waitForTimeout(800);
     const n0 = D.puts.length; await p.evaluate(() => document.getElementById('syncNow').click()); for (let i = 0; i < 30 && D.puts.length === n0; i++) await p.waitForTimeout(500);
-    const l = lit(D)['espaces/lecture']; ok(l.name === 'Lecture (sauvegarde)' && l.tasks.some(x => x.id === 't2'), nom + ' : import d\'une sauvegarde : elle l\'emporte (' + l.name + '), la tâche ajoutée en ligne est gardée'); }
+    const f2 = lit(D), l = f2['espaces/lecture']; ok(l.name === 'Lecture (sauvegarde)' && l.tasks.some(x => x.id === 't2'), nom + ' : import d\'une sauvegarde : elle l\'emporte (' + l.name + '), la tâche ajoutée en ligne est gardée');
+    ok(dialogues.some(m => /Importer cette sauvegarde/.test(m)), nom + ' : l\'import demande confirmation');
+    ok(f2['espaces/nouveau'] && !f2['espaces/nouveau']._del && f2['meta/notes'] && !f2['meta/notes']._del && f2['meta/notes'].liste[0].texte.length === 1100000, nom + ' : import : un espace créé après la sauvegarde et un document absent de la sauvegarde ne sont pas supprimés'); }
   ok(!err.length, nom + ' : aucune erreur JavaScript' + (err.length ? ' : ' + err.slice(0, 2).join(' / ') : ''));
   await ctx.close();
+}
+/* horloge de l'appareil en retard de 2 jours : recalée sur l'heure du serveur (réponse du site, puis date du commit) ; ce qui est
+   écrit porte l'heure du serveur, et l'app le signale */
+for (const [nom, opt] of PROFILS) {
+  console.log('\n== ' + nom + ' : horloge en retard de 2 jours');
+  const D = depot(); D.ecrit(carte(), 'départ'); const ctx = await b.newContext(Object.assign({}, opt, { serviceWorkers: 'block', locale: 'fr-FR', timezoneId: 'Europe/Paris' }));
+  await ctx.route('https://api.github.com/**', async rt => { if (rt.request().method() === 'PUT') { const r = await rt.fetch().catch(() => null); }
+    const f = route(D); if (rt.request().method() !== 'PUT') return f(rt); const corps = JSON.parse(rt.request().postData()); const texte = Buffer.from(corps.content, 'base64').toString('utf8'); D.puts.push(texte);
+    D.versions.unshift({ sha: 'v' + (D.versions.length + 1) + 'c'.repeat(38), texte, msg: corps.message, date: new Date().toISOString() });
+    return rt.fulfill({ status: 200, contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify({ content: { sha: D.versions[0].sha }, commit: { committer: { date: new Date().toISOString() } } }) }); });
+  await ctx.addInitScript(() => { const V = Date, off = -2 * 864e5; class F extends V { constructor(...a) { if (a.length) super(...a); else super(V.now() + off); } static now() { return V.now() + off; } } window.Date = F;
+    if (sessionStorage.getItem('init')) return; sessionStorage.setItem('init', '1'); localStorage.clear();
+    localStorage.setItem('carte-de-vie-sync', JSON.stringify({ repo: 'exemple/donnees', token: 'jeton-fictif' })); ['hRap', 'compagnon', 'mouvements'].forEach(k => localStorage.setItem(k, '0')); localStorage.setItem('carte-de-vie-vu', '1'); });
+  const p = await ctx.newPage(); const err = []; p.on('pageerror', e => err.push(e.message));
+  await p.goto(URL); await p.waitForFunction(() => /Synchronisé/.test((document.getElementById('syncMsg') || {}).textContent || ''), null, { timeout: 15000 }).catch(() => {}); await p.waitForTimeout(1500);
+  await p.evaluate(() => { const x = [...document.querySelectorAll('.node')].find(x => (x.querySelector('b') || {}).textContent?.trim() === 'Sport'); if (x) x.click(); }); await p.waitForTimeout(600);
+  await p.evaluate(() => { const t = document.querySelector('#pane .rcard[data-rid="p2"], #pane .mtile[data-rid="p2"]'); if (t) t.click(); }); await p.waitForTimeout(500);
+  await p.evaluate(() => { const c = [...document.querySelectorAll('.card.rub.obj')].find(x => x.offsetParent) || document.querySelector('.card.rub.obj'); const bt = c && c.querySelector('.objbtn.plus'); if (bt) bt.click(); });
+  const n0 = D.puts.length; await p.evaluate(() => document.getElementById('syncNow').click()); for (let i = 0; i < 30 && D.puts.length === n0; i++) await p.waitForTimeout(500);
+  for (let i = 0; i < 10 && !/retarde/.test(await p.evaluate(() => document.getElementById('syncMsg').textContent)); i++) await p.waitForTimeout(500);
+  const sp = lit(D)['espaces/sport'], ecart = Math.round((Date.now() - sp._f.rub) / 60e3), msg = await p.evaluate(() => document.getElementById('syncMsg').textContent);
+  ok(sp.rub.find(r => r.id === 'p2').actuel === 25 && Math.abs(ecart) < 5, nom + ' : la modification est datée à l\'heure du serveur (écart ' + ecart + ' min), pas 2 jours plus tôt');
+  ok(/retarde de 2 jours/.test(msg), nom + ' : l\'app signale l\'horloge décalée (« ' + msg.slice(0, 70) + '… »)');
+  ok(!err.length, nom + ' : aucune erreur JavaScript' + (err.length ? ' : ' + err.slice(0, 2).join(' / ') : '')); await ctx.close();
+}
+/* stockage de l'appareil plein (quota partagé rempli par une autre app du même site) : la modification est gardée dans la réserve,
+   signalée, et retrouvée au rechargement ; quand la place revient, la réserve est réécrite dans le stockage normal puis effacée */
+for (const [nom, opt] of PROFILS) {
+  console.log('\n== ' + nom + ' : stockage plein');
+  const ctx = await b.newContext(Object.assign({}, opt, { serviceWorkers: 'block', locale: 'fr-FR', timezoneId: 'Europe/Paris' }));
+  await ctx.addInitScript(c => { if (sessionStorage.getItem('init')) return; sessionStorage.setItem('init', '1'); localStorage.clear(); localStorage.setItem('carte-de-vie-v1', c);
+    ['hRap', 'compagnon', 'mouvements'].forEach(k => localStorage.setItem(k, '0')); localStorage.setItem('carte-de-vie-vu', '1'); }, JSON.stringify((({ ['meta/notes']: _, ...r }) => r)(carte())));
+  const p = await ctx.newPage(); const err = []; p.on('pageerror', e => err.push(e.message));
+  await p.goto(URL); await p.waitForFunction(() => document.querySelectorAll('.node').length >= 2, null, { timeout: 15000 }).catch(() => {});
+  /* une autre app remplit le stockage commun */
+  await p.evaluate(() => { let n = 4e6; const s = 'x'.repeat(1e5); let i = 0; while (n >= 1) { try { localStorage.setItem('autre-app-' + i, s.slice(0, n > 1e5 ? 1e5 : n)); i++; } catch { n = Math.floor(n / 2); } } });
+  await p.evaluate(() => { const x = [...document.querySelectorAll('.node')].find(x => (x.querySelector('b') || {}).textContent?.trim() === 'Sport'); if (x) x.click(); }); await p.waitForTimeout(600);
+  await p.evaluate(() => { const t = document.querySelector('#pane .rcard[data-rid="p2"], #pane .mtile[data-rid="p2"]'); if (t) t.click(); }); await p.waitForTimeout(500);
+  await p.evaluate(() => { const c = [...document.querySelectorAll('.card.rub.obj')].find(x => x.offsetParent) || document.querySelector('.card.rub.obj'); const bt = c && c.querySelector('.objbtn.plus'); if (bt) bt.click(); });
+  await p.waitForTimeout(1500);
+  const band = await p.evaluate(() => { const e = document.getElementById('stockPlein'); return !!e && !e.hidden && /plein/.test(e.textContent); });
+  const enLS = await p.evaluate(() => JSON.parse(localStorage.getItem('carte-de-vie-v1'))['espaces/sport'].rub.find(r => r.id === 'p2').actuel);
+  ok(band && enLS === 20, nom + ' : stockage plein détecté et signalé par un bandeau (le stockage normal n\'a pas pu être écrit : ' + enLS + ' km)');
+  await p.reload(); await p.waitForFunction(() => document.querySelectorAll('.node').length >= 2, null, { timeout: 15000 }).catch(() => {}); await p.waitForTimeout(1500);
+  const apres = await p.evaluate(() => { const c = [...document.querySelectorAll('.node')].find(x => (x.querySelector('b') || {}).textContent?.trim() === 'Sport'); if (c) c.click(); return new Promise(r => setTimeout(() => r(document.body.innerText.includes('25')), 700)); });
+  ok(apres, nom + ' : après rechargement, la modification faite pendant que le stockage était plein est là (25 km)');
+  await p.evaluate(() => Object.keys(localStorage).filter(k => k.startsWith('autre-app-')).forEach(k => localStorage.removeItem(k))); await p.reload(); await p.waitForTimeout(2500);
+  const fin = await p.evaluate(() => ({ v: JSON.parse(localStorage.getItem('carte-de-vie-v1'))['espaces/sport'].rub.find(r => r.id === 'p2').actuel, c: /cdvSecours=1/.test(document.cookie) }));
+  ok(fin.v === 25 && !fin.c, nom + ' : la place revenue, la réserve est réécrite dans le stockage normal (' + fin.v + ' km) puis effacée');
+  ok(!err.length, nom + ' : aucune erreur JavaScript' + (err.length ? ' : ' + err.slice(0, 2).join(' / ') : '')); await ctx.close();
 }
 console.log(ko ? '\n' + ko + ' échec(s)' : '\nTout est bon.'); await b.close(); process.exit(ko ? 1 : 0);

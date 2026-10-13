@@ -1,13 +1,25 @@
 {
+ "id": "./",
  "name": "Ma carte de vie",
  "short_name": "Carte de vie",
+ "description": "Ma carte de vie : mes espaces, mes rubriques et mes jours, sur le téléphone et l'ordinateur.",
  "start_url": "./index.html",
  "scope": "./",
  "display": "standalone",
+ "display_override": [
+  "standalone",
+  "minimal-ui"
+ ],
  "orientation": "any",
  "background_color": "#f4eee4",
  "theme_color": "#f4eee4",
  "lang": "fr",
+ "dir": "ltr",
+ "categories": [
+  "productivity",
+  "lifestyle"
+ ],
+ "prefer_related_applications": false,
  "icons": [
   {
    "src": "icon-192.png",
@@ -35,7 +47,8 @@
    "title": "titre",
    "text": "texte",
    "url": "lien"
-  }
+  },
+  "enctype": "application/x-www-form-urlencoded"
  },
  "shortcuts": [
   {

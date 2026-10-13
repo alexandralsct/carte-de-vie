@@ -1,6 +1,8 @@
 {
+ "id": "./index.html?test=1",
  "name": "Ma carte de vie · test",
  "short_name": "Carte test",
+ "description": "Version de test de Ma carte de vie, avec ses propres données sur l'appareil.",
  "start_url": "./index.html?test=1",
  "scope": "./",
  "display": "standalone",
@@ -28,5 +30,5 @@
    "purpose": "maskable"
   }
  ],
- "id": "./index.html?test=1"
+ "dir": "ltr"
 }

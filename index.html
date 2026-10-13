@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-AWVSlBezbR1Bf8UyEzFn/zV88igavV/IFB8WPQX9U48=' 'sha256-GCQZtxCBw1ine3VduMwdd7bkJm/SDOuRDaOFUgecvgU=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-T2xi708MIq6x/8b9l0GxK/j7vkoc6iUykyhCMfxV7jk=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-AWVSlBezbR1Bf8UyEzFn/zV88igavV/IFB8WPQX9U48=' 'sha256-oE4ywJdRH1RjjoCsKajnU5V8UHzUAl7QFR9grRRQZXU=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-QId7VqTzG4wNNVKOWp4EG5zA8/d6IA9TTHQTNNuq93U=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f4eee4">
@@ -2283,7 +2283,7 @@ html.klein .node .ico svg,html.klein .node .ico{color:#002fa7!important;--c:#002
       <li class="go"><button class="rowbtn" id="syncBtn"><span><b>Synchronisation</b><small id="syncSmall">Relier tes appareils à GitHub</small></span><i aria-hidden="true">→</i></button></li>
       <li class="go"><button class="rowbtn" id="iaSet"><span><b>Intelligence artificielle</b><small>Suggestions et feedback sur ta carte</small></span><i aria-hidden="true">→</i></button></li>
       <li class="go"><button class="rowbtn" id="expBtn"><span><b>Exporter</b><small>Télécharger une sauvegarde de ta carte</small></span><i aria-hidden="true">↓</i></button></li>
-      <li class="go"><label class="rowbtn" for="impFile" tabindex="0"><span><b>Importer</b><small>Remplacer ta carte par une sauvegarde</small></span><i aria-hidden="true">↑</i></label></li>
+      <li class="go"><label class="rowbtn" for="impFile" tabindex="0"><span><b>Importer</b><small>Reprendre une sauvegarde (ce qui a été créé depuis est gardé)</small></span><i aria-hidden="true">↑</i></label></li>
       <li class="go"><button class="rowbtn" id="effBtn"><span><b>Effacer cet appareil</b><small>Retire la carte, ses réglages et sa clé de cet appareil (rien n'est effacé en ligne)</small></span><i aria-hidden="true">✕</i></button></li>
       <li class="go"><button class="rowbtn" id="avisBtn"><span><b>Donner mon avis</b><small>Ce que tu aimes, un bug, une idée : envoie-le en un geste</small></span><i aria-hidden="true">✉︎</i></button></li>
       <li class="go"><button class="rowbtn" id="baseBtn"><span><b>Modifier les réglages de base</b><small id="baseSmall"></small></span><i aria-hidden="true">✎</i></button></li>
@@ -6766,7 +6766,7 @@ function semPasserelle(c){ const o=PASS.lit(), d=el("details",{className:"sempas
   const u=el("input",{type:"url",placeholder:"Adresse de l'application web (https://script.google.com/…/exec)",value:o.url||""}), k=el("input",{type:"password",placeholder:"La clé choisie (CLE)",value:o.cle||""}), msg=el("p",{className:"mut"});
   u.setAttribute("aria-label","Adresse de la passerelle"); k.setAttribute("aria-label","Clé de la passerelle");
   const go=el("button",{type:"submit",className:"vbtn",textContent:"Enregistrer et relire"}), f=el("form",{className:"semform"},u,k,go);
-  f.onsubmit=async e=>{ e.preventDefault(); PASS.ecrit({url:u.value.trim(),cle:k.value.trim(),t:0}); if(!PASS.ok()){ msg.textContent="L'adresse doit commencer par https://script.google.com/ et la clé ne peut pas être vide."; return; }
+  f.onsubmit=async e=>{ e.preventDefault(); PASS.ecrit({url:u.value.trim(),cle:k.value.trim(),t:0}); if(PASS.ok()&&typeof cspPermet==="function"&&!cspPermet(PASS.lit().url)){ msg.textContent="Adresse enregistrée : l'app se relance pour l'autoriser."; setTimeout(()=>location.reload(),1200); return; } if(!PASS.ok()){ msg.textContent="L'adresse doit commencer par https://script.google.com/ et la clé ne peut pas être vide."; return; }
     msg.textContent="Je relis ton tableau…"; try{ await PASS.recopie(); await PASS.relire(true); msg.textContent="C'est branché."; renderPane(cats.get(c.id)); }catch(x){ msg.textContent="La passerelle ne répond pas ("+String(x.message||x).slice(0,60)+") : vérifie l'adresse, la clé, et que le déploiement est accessible à « Tout le monde »."; } };
   const re=el("button",{type:"button",className:"vbtn ghostb",textContent:"Relire et recopier maintenant"}); re.onclick=async()=>{ msg.textContent="…"; try{ const n=await PASS.recopie(); await PASS.relire(true); msg.textContent=(n?n+" moment(s) recopié(s) · ":"")+"tableau relu."; renderPane(cats.get(c.id)); }catch(x){ msg.textContent="Échec : "+String(x.message||x).slice(0,80); } };
   const ol=el("ol",{className:"sempas"}); ["Ouvre ton tableau « Tracking Planning » → Extensions → Apps Script.","Colle le code de la passerelle (bouton ci-dessous), puis enregistre.","Paramètres du projet (roue dentée) → Propriétés du script → ajoute CLE avec un mot de passe à toi.","Déployer → Nouveau déploiement → type « Application web » ; exécuter en tant que : moi ; accès : tout le monde. Autorise, puis copie l'adresse qui finit par /exec.","Colle l'adresse et ta clé ici. Fais-le sur chaque appareil (elles ne quittent pas l'appareil)."].forEach(t=>ol.appendChild(el("li",{textContent:t})));
@@ -7117,7 +7117,20 @@ $("onbGo").onclick=()=>{ const all=[]; onbG.forEach(G=>G.it.forEach(([n,ic])=>{ 
      ou s'il figure dans l'ancien _x et n'a pas été modifié depuis la dernière écriture du côté qui l'a retiré ;
    - aucun plafond sur _x ni _xt (l'ancien plafond de 1 500 faisait revenir les plus vieux éléments supprimés) ;
    - horloge hybride : une heure d'écriture n'est jamais inférieure à la plus grande heure déjà vue (bornée à un jour d'avance),
-     pour qu'un appareil dont l'horloge avance ne l'emporte pas sur une modification faite après avoir vu la sienne.
+     pour qu'un appareil dont l'horloge avance ne l'emporte pas sur une modification faite après avoir vu la sienne ;
+   - horloge recalée sur l'heure du serveur (recale) : un appareil dont l'horloge est décalée de plus de 5 minutes écrit à l'heure
+     du serveur, et non à la sienne ;
+   - écriture causale : une modification (champ, élément, retrait, suppression d'un document) porte toujours une heure plus grande
+     que celle de la version qu'elle modifie : ce qui est fait après avoir reçu une version l'emporte sur elle, même si l'horloge
+     de l'appareil retarde ou si celle d'un autre avance ;
+   - listes sans id (V.200) : listes de valeurs simples (jours cochés, identifiants…) et listes d'objets datés sans id (journal log
+     {t, m}, relevés {d, …}) fusionnées par union : un ajout de chaque côté est gardé ; un retrait fait par l'app est daté dans _xt
+     (« chemin|=valeur », « chemin|#empreinte ») ; un ajout daté (« chemin|+=valeur ») l'emporte sur un retrait plus ancien.
+     Un ajout sans trace (écrivain externe) est gardé s'il est daté et pas plus ancien que la liste qui l'emporte (une liste tronquée
+     ne fait pas revenir ses vieilles lignes) ; un élément sans id ajouté à une liste d'éléments à id reçoit un id tiré de son contenu ;
+   - dictionnaires imbriqués (objets hors éléments) : une clé ajoutée par l'app de chaque côté est gardée (« chemin|+.clé »),
+     une clé retirée par l'app ne revient pas (« chemin|.clé »).
+   Ces traces (=, #, .) sont purgées après 180 jours.
    Testé par tests/fusion.mjs (dépôt public), qui extrait ce bloc tel quel de index.html. */
 const META=k=>k==="_m"||k==="_f"||k==="_x"||k==="_xt";
 const estObj=v=>v!==null&&typeof v==="object"&&!Array.isArray(v);
@@ -7135,8 +7148,15 @@ function egalPropre(a,b){ const ks=new Set([...Object.keys(a),...Object.keys(b)]
     if(estObj(x)&&estObj(y)){ if(!egalPropre(x,y)) return false; continue; }
     if(!egal(x,y)) return false; } return true; }
 /* horloge hybride : jamais en arrière de la plus grande heure vue */
-function creeHorloge(base){ let max=0; return { now(){ const t=Math.max(base(),max+1); max=t; return t; }, vu(t){ t=+t; if(t>max&&t<=base()+864e5) max=t; }, max:()=>max }; }
+function creeHorloge(base){ let max=0, ecart=0; const b=()=>base()+ecart;
+  return { now(){ const t=Math.max(b(),max+1); max=t; return t; }, vu(t){ t=+t; if(t>max&&t<=b()+864e5) max=t; }, max:()=>max,
+    /* heure du serveur (ms) lue au moment local tl : au-delà de 5 minutes d'écart, l'horloge de l'appareil est corrigée */
+    recale(ts,tl){ ts=+ts; if(!(ts>1e12)) return ecart; const e=Math.round(ts-(tl===undefined?base():+tl)); ecart=Math.abs(e)>3e5?e:0; return ecart; }, ecart:()=>ecart }; }
 const HORLOGE=creeHorloge(()=>Date.now());
+/* heure du serveur : ts (ms) lue entre t0 et t1 (heures de l'appareil) ; seuil : écart minimal pris en compte */
+function recaleServeur(ts,t0,t1,seuil){ if(!(ts>1e12)) return; const tl=(t0+t1)/2, e=ts-tl; if(Math.abs(e)<(seuil||0)) return; HORLOGE.recale(ts,tl); }
+const alerteHorloge=()=>{ const e=HORLOGE.ecart(); if(Math.abs(e)<36e5) return ""; const h=Math.round(Math.abs(e)/36e5), txt=h>=48?Math.round(h/24)+" jours":h+" h";
+  return " · L'horloge de cet appareil "+(e>0?"retarde":"avance")+" de "+txt+" : corrige-la dans les réglages du téléphone ou de l'ordinateur (l'app compense en attendant)."; };
 const vuDoc=(H,d)=>{ if(!estObj(d)) return; H.vu(d._m); if(estObj(d._f)) Object.keys(d._f).forEach(k=>H.vu(d._f[k])); };
 const ftime=(o,k)=>!o||!aCle(o,k)?-1:(estObj(o._f)&&typeof o._f[k]==="number"?o._f[k]:(+o._m||0));
 const plusRecent=(a,b,ta,tb)=>ta!==tb?ta>tb:(egal(a,b)||JSON.stringify(a)>=JSON.stringify(b));
@@ -7147,15 +7167,45 @@ const elemGagne=(a,b,ta,tb)=>{ const ha=htime(a), hb=htime(b); return ha!==hb?ha
    suppressions qui n'avaient laissé aucune trace) */
 const unionAncienne=ch=>{ const s=ch.split("/"); return s.length===1||(s.length===3&&s[2]==="items"); };
 const retire=(C,ch,x)=>{ const k=ch+"|"+String(x.id); return aCle(C.xt,k)&&C.xt[k]>htime(x); };
+/* listes sans id */
+const prim=v=>v===null||typeof v==="string"||typeof v==="number"||typeof v==="boolean";
+const listePrim=a=>Array.isArray(a)&&a.every(prim);
+const tEnt=x=>x.t!==undefined?x.t:x.d!==undefined?x.d:x.date;
+const listeDatee=a=>Array.isArray(a)&&a.every(x=>estObj(x)&&x.id==null&&(typeof tEnt(x)==="string"||typeof tEnt(x)==="number"));
+const mixte=a=>Array.isArray(a)&&a.length>0&&a.every(estObj)&&a.some(x=>x.id!=null)&&a.some(x=>x.id==null);
+function empreinteTxt(t){ let h=2166136261; for(let i=0;i<t.length;i++){ h^=t.charCodeAt(i); h=Math.imul(h,16777619)>>>0; } return h.toString(36); }
+const cleVal=(v,dat)=>dat?"#"+empreinteTxt(JSON.stringify(v)):"="+JSON.stringify(v);
+const cmpT=(x,y)=>typeof x==="number"&&typeof y==="number"?x-y:String(x)<String(y)?-1:String(x)>String(y)?1:0;
+const estDate=v=>typeof v==="string"&&/^\d{4}-\d{2}-\d{2}/.test(v);
+const normIds=a=>a.map(x=>x.id!=null?x:Object.assign({id:"z"+empreinteTxt(JSON.stringify(x))},x));
+/* union de deux listes sans id : W l'emporte (ordre gardé), L apporte ce qui lui est propre, remis après son voisin d'origine */
+function fusionEnsemble(a,b,aG,ch,C,dat){ const W=aG?a:b, L=aG?b:a, k=x=>cleVal(x,dat);
+  const rm=c=>C.xt[ch+"|"+c], aj=c=>C.xt[ch+"|+"+c]||0, retireV=c=>rm(c)!==undefined&&rm(c)>aj(c);
+  const tW=dat?W.map(tEnt):W.filter(estDate), minW=tW.length?tW.reduce((m,x)=>cmpT(x,m)<0?x:m):undefined;
+  const kW=new Set(W.map(k)), out=W.filter(x=>!retireV(k(x)));
+  const garde=x=>{ const c=k(x); if(retireV(c)) return false; if(aj(c)>0) return true; const t=dat?tEnt(x):estDate(x)?x:undefined;
+    return t!==undefined&&minW!==undefined&&cmpT(t,minW)>=0; };
+  const suiv=new Map(); let prec="\u0000"; const vus=new Set();
+  for(const x of L){ const c=k(x); if(kW.has(c)){ prec=c; continue; } if(vus.has(c)||!garde(x)) continue; vus.add(c); if(!suiv.has(prec)) suiv.set(prec,[]); suiv.get(prec).push(x); prec=c; }
+  if(!suiv.size) return out.length===W.length?W:out;
+  const res=[], emet=c0=>{ const st=[[c0,0]]; while(st.length){ const t=st[st.length-1], Q=suiv.get(t[0]); if(!Q||t[1]>=Q.length){ st.pop(); continue; } const y=Q[t[1]++]; res.push(y); st.push([k(y),0]); } };
+  emet("\u0000"); for(const x of out){ res.push(x); emet(k(x)); } return res; }
 function fusionVal(a,b,aG,ta,tb,ch,C){ if(egal(a,b)) return aG?a:b;
-  if(Array.isArray(a)&&Array.isArray(b)&&avecIds(a)&&avecIds(b)) return fusionListe(a,b,ta,tb,ch,C);
+  if(Array.isArray(a)&&Array.isArray(b)){
+    if((mixte(a)||mixte(b))&&(mixte(a)||avecIds(a))&&(mixte(b)||avecIds(b))) return fusionListe(normIds(a),normIds(b),ta,tb,ch,C);
+    if(avecIds(a)&&avecIds(b)&&(a.length||b.length)&&!(listePrim(a)&&listePrim(b))) return fusionListe(a,b,ta,tb,ch,C);
+    if(listePrim(a)&&listePrim(b)) return fusionEnsemble(a,b,aG,ch,C,false);
+    if(listeDatee(a)&&listeDatee(b)) return fusionEnsemble(a,b,aG,ch,C,true); }
   if(estObj(a)&&estObj(b)) return fusionObj(a,b,aG,ta,tb,ch,C,false);
   return aG?a:b; }
 /* deux versions d'un objet (élément de liste si elem) : clés du plus récent ; clés communes fusionnées ; une sous-liste à id
    présente d'un seul côté est gardée pour ses éléments non retirés */
 function fusionObj(a,b,aG,ta,tb,ch,C,elem){ const W=aG?a:b, L=aG?b:a, base=elem?ch+"/"+String(a.id):ch, o={};
   for(const k of Object.keys(W)){ if(aCle(L,k)) o[k]=k==="_h"?Math.max(htime(a),htime(b)):fusionVal(a[k],b[k],aG,ta,tb,base+"/"+k,C); else o[k]=W[k]; }
-  for(const k of Object.keys(L)){ if(aCle(W,k)) continue; const v=L[k]; if(Array.isArray(v)&&v.length&&avecIds(v)){ const c=base+"/"+k, u=unionAncienne(c), r=v.filter(x=>!retire(C,c,x)&&(u||htime(x)>0)); if(r.length) o[k]=r; } }
+  for(const k of Object.keys(L)){ if(aCle(W,k)) continue; const v=L[k]; if(Array.isArray(v)&&v.length&&avecIds(v)){ const c=base+"/"+k, u=unionAncienne(c), r=v.filter(x=>!retire(C,c,x)&&(u||htime(x)>0)); if(r.length) o[k]=r; }
+    else if(!elem){ const aj=C.xt[base+"|+."+k]||0, rm=C.xt[base+"|."+k]; if(aj>0&&!(rm>aj)) o[k]=v; } }
+  /* dictionnaire : une clé retirée par l'app après son dernier ajout ne revient pas */
+  if(!elem) for(const k of Object.keys(o)){ const rm=C.xt[base+"|."+k]; if(rm!==undefined&&rm>(C.xt[base+"|+."+k]||0)&&!(aCle(W,k)&&aCle(L,k)&&!egal(W[k],L[k]))) delete o[k]; }
   return o; }
 function fusionListe(A,B,ta,tb,ch,C){ const aBase=plusRecent(A,B,ta,tb), P=aBase?A:B, Q=aBase?B:A, tP=aBase?ta:tb;
   const iQ=new Map(Q.map(y=>[String(y.id),y])), iP=new Set(P.map(x=>String(x.id)));
@@ -7181,30 +7231,44 @@ function mergeDoc(r,l){ if(!estObj(r)) return l; if(!estObj(l)) return r; if(r==
   out._m=Math.max(+r._m||0,+l._m||0); out._f=f; if(C.X.size) out._x=[...C.X]; if(Object.keys(C.xt).length) out._xt=C.xt; return out; }
 /* écriture d'un document par l'app : _m ; _f des champs vraiment changés ; _h des éléments changés ou arrivés dans une liste ;
    _xt des éléments sortis d'une liste. vieux : la dernière version écrite (copie sûre), nouveau : le document voulu. */
+/* écriture causale : toujours après l'heure de ce qu'on modifie */
+const apresT=(now,t)=>Math.max(now,(+t||0)+1);
+/* retraits et ajouts dans une liste sans id (valeurs simples ou objets datés) */
+function marqueEnsemble(o,n,now,ch,xt){ if(!Array.isArray(o)||egal(o,n)) return;
+  const dat=!listePrim(n)||!listePrim(o); if(dat&&!(listeDatee(n)&&listeDatee(o))) return;
+  const k=x=>cleVal(x,dat), ko=new Set(o.map(k)), kn=new Set(n.map(k));
+  o.forEach(x=>{ const c=k(x); if(!kn.has(c)) xt[ch+"|"+c]=apresT(now,xt[ch+"|+"+c]); });
+  n.forEach(x=>{ const c=k(x); if(!ko.has(c)&&(!dat||aCle(xt,ch+"|"+c))) xt[ch+"|+"+c]=apresT(now,xt[ch+"|"+c]); }); }
 function marque(o,n,now,ch,xt){
-  if(Array.isArray(n)&&avecIds(n)){ const V=avecIds(o)?o:[], iv=new Map(V.map(x=>[String(x.id),x])), vus=new Set();
+  if(Array.isArray(n)&&avecIds(n)&&!(n.length===0&&listePrim(o)&&o.length)){ const V=avecIds(o)?o:[], iv=new Map(V.map(x=>[String(x.id),x])), vus=new Set();
     const res=n.map(x=>{ const id=String(x.id), ox=iv.get(id); vus.add(id); const y=Object.assign({},x);
-      if(!ox){ y._h=now; return y; }
+      if(!ox){ y._h=apresT(now,x._h); return y; }
       Object.keys(y).forEach(k=>{ if(k==="_h") return; const a=ox[k], b=y[k];
-        if(Array.isArray(b)&&avecIds(b)) y[k]=marque(a,b,now,ch+"/"+id+"/"+k,xt); else if(estObj(b)&&estObj(a)) y[k]=marqueObj(a,b,now,ch+"/"+id+"/"+k,xt); });
-      Object.keys(ox).forEach(k=>{ if(!aCle(y,k)&&avecIds(ox[k])) ox[k].forEach(z=>{ xt[ch+"/"+id+"/"+k+"|"+String(z.id)]=now; }); });
-      if(!egalPropre(ox,y)) y._h=now; else if(typeof ox._h==="number") y._h=ox._h; else delete y._h;
+        if(Array.isArray(b)&&avecIds(b)&&b.length) y[k]=marque(a,b,now,ch+"/"+id+"/"+k,xt); else if(Array.isArray(b)) { if(avecIds(b)&&avecIds(a)) y[k]=marque(a,b,now,ch+"/"+id+"/"+k,xt); else marqueEnsemble(a,b,now,ch+"/"+id+"/"+k,xt); } else if(estObj(b)&&estObj(a)) y[k]=marqueObj(a,b,now,ch+"/"+id+"/"+k,xt); });
+      Object.keys(ox).forEach(k=>{ if(!aCle(y,k)&&avecIds(ox[k])) ox[k].forEach(z=>{ xt[ch+"/"+id+"/"+k+"|"+String(z.id)]=apresT(now,htime(z)); }); });
+      if(!egalPropre(ox,y)) y._h=apresT(now,ox._h); else if(typeof ox._h==="number") y._h=ox._h; else delete y._h;
       return y; });
-    V.forEach(x=>{ const id=String(x.id); if(!vus.has(id)) xt[ch+"|"+id]=now; });
+    V.forEach(x=>{ const id=String(x.id); if(!vus.has(id)) xt[ch+"|"+id]=apresT(now,htime(x)); });
     return res; }
+  if(Array.isArray(n)){ marqueEnsemble(o,n,now,ch,xt); return n; }
   if(estObj(n)&&estObj(o)) return marqueObj(o,n,now,ch,xt);
   return n; }
 function marqueObj(o,n,now,ch,xt){ const y=Object.assign({},n);
-  Object.keys(y).forEach(k=>{ const a=o[k], b=y[k]; if(Array.isArray(b)&&avecIds(b)) y[k]=marque(a,b,now,ch+"/"+k,xt); else if(estObj(a)&&estObj(b)) y[k]=marqueObj(a,b,now,ch+"/"+k,xt); });
-  Object.keys(o).forEach(k=>{ if(!aCle(y,k)&&avecIds(o[k])) o[k].forEach(z=>{ xt[ch+"/"+k+"|"+String(z.id)]=now; }); });
+  Object.keys(y).forEach(k=>{ const a=o[k], b=y[k]; if(Array.isArray(b)) y[k]=marque(a,b,now,ch+"/"+k,xt); else if(estObj(a)&&estObj(b)) y[k]=marqueObj(a,b,now,ch+"/"+k,xt);
+    if(!aCle(o,k)) xt[ch+"|+."+k]=apresT(now,xt[ch+"|."+k]); });
+  Object.keys(o).forEach(k=>{ if(aCle(y,k)) return; if(avecIds(o[k])) o[k].forEach(z=>{ xt[ch+"/"+k+"|"+String(z.id)]=apresT(now,htime(z)); }); xt[ch+"|."+k]=apresT(now,xt[ch+"|+."+k]); });
   return y; }
+/* traces des listes sans id et des dictionnaires (=, #, .) : purgées après 180 jours */
+const purge=(xt,now)=>{ Object.keys(xt).forEach(k=>{ if(/\|\+?[=#.]/.test(k)&&xt[k]<now-180*864e5) delete xt[k]; }); };
 function estampille(vieux,nouveau,now){ vieux=estObj(vieux)&&!vieux._del?vieux:null;
   const out={}, f=Object.assign({},vieux&&estObj(vieux._f)?vieux._f:{}), xt=Object.assign({},vieux&&estObj(vieux._xt)?vieux._xt:{});
   Object.keys(nouveau).forEach(k=>{ if(META(k)) return; const n=nouveau[k];
     if(vieux&&aCle(vieux,k)&&egal(vieux[k],n)){ out[k]=n; if(typeof f[k]!=="number") f[k]=+vieux._m||0; return; }
-    out[k]=marque(vieux?vieux[k]:undefined,n,now,k,xt); f[k]=now; });
-  Object.keys(f).forEach(k=>{ if(!aCle(out,k)) delete f[k]; });
-  out._m=now; out._f=f; if(vieux&&Array.isArray(vieux._x)&&vieux._x.length) out._x=vieux._x.slice(); if(Object.keys(xt).length) out._xt=xt; return out; }
+    out[k]=marque(vieux?vieux[k]:undefined,n,now,k,xt); f[k]=apresT(now,vieux?ftime(vieux,k):0); });
+  Object.keys(f).forEach(k=>{ if(!aCle(out,k)) delete f[k]; }); purge(xt,now);
+  out._m=Math.max(now,...Object.values(f).map(v=>+v||0)); out._f=f; if(vieux&&Array.isArray(vieux._x)&&vieux._x.length) out._x=vieux._x.slice(); if(Object.keys(xt).length) out._xt=xt; return out; }
+/* suppression d'un document : après sa dernière modification connue */
+const supprime=(vieux,now)=>({_del:true,_m:apresT(now,estObj(vieux)?tDel(vieux):0)});
 /* import d'une sauvegarde, ou « garder ce qui est sur cet appareil » : tout ce document devient la version la plus récente */
 const toutDate=(v,now)=>Array.isArray(v)?v.map(x=>estObj(x)&&x.id!=null?Object.assign(toutDateObj(x,now),{_h:now}):toutDate(x,now)):estObj(v)?toutDateObj(v,now):v;
 const toutDateObj=(o,now)=>{ const y={}; Object.keys(o).forEach(k=>{ y[k]=k==="_h"?o[k]:toutDate(o[k],now); }); return y; };
@@ -7229,12 +7293,23 @@ const appV=()=>{ try{ return APP_V; }catch(_){ return 0; } };
 const versionTropVieille=data=>{ const min=+(((data||{})["meta/app"])||{}).min||0, v=appV(); return !!(v&&min>v); };
 const proprioConnu=()=>{ let p=""; try{ const c=JSON.parse(localStorage.getItem("carte-de-vie-sync")||"null"); p=(c&&c.repo)||localStorage.getItem("carte-de-vie-proprio")||""; }catch{ p=""; } return String(p).split("/")[0].toLowerCase(); };
 const retiensProprio=repo=>{ try{ localStorage.setItem("carte-de-vie-proprio",String(repo).split("/")[0].toLowerCase()); }catch{ /* stockage bloqué */ } };
-function localDb(){ const KEY="carte-de-vie-v1", CKEY="carte-de-vie-sync"; let store={}, brut0=null; try{ brut0=localStorage.getItem(KEY); store=JSON.parse(brut0||"{}")||{}; }catch(_){ store={}; brut0=null; }
+const SECOURS={ db:()=>new Promise((ok,ko)=>{ try{ const q=indexedDB.open("carte-de-vie-secours",1); q.onupgradeneeded=()=>q.result.createObjectStore("c"); q.onsuccess=()=>ok(q.result); q.onerror=()=>ko(q.error); }catch(e){ ko(e); } }),
+  marque:on=>{ try{ document.cookie="cdvSecours="+(on?"1; max-age=31536000":"; max-age=0")+"; path=/; SameSite=Strict"; }catch{ /* cookies bloqués */ } },
+  marqueVue:()=>{ try{ return /(^|;\s*)cdvSecours=1/.test(document.cookie); }catch{ return false; } },
+  ecrit(t){ this.marque(true); return this.db().then(b=>new Promise((ok,ko)=>{ const x=b.transaction("c","readwrite"); x.objectStore("c").put({t:Date.now(),texte:t},"carte"); x.oncomplete=()=>{ b.close(); ok(true); }; x.onerror=()=>{ b.close(); ko(x.error); }; })); },
+  lit(){ if(!this.marqueVue()) return Promise.resolve(null); return this.db().then(b=>new Promise(ok=>{ const q=b.transaction("c").objectStore("c").get("carte"); q.onsuccess=()=>{ b.close(); ok(q.result||null); }; q.onerror=()=>{ b.close(); ok(null); }; })).catch(()=>null); },
+  efface(){ if(!this.marqueVue()) return; this.marque(false); this.db().then(b=>{ const x=b.transaction("c","readwrite"); x.objectStore("c").delete("carte"); x.oncomplete=()=>b.close(); }).catch(()=>{}); } };
+let secoursTexte=null;
+function localDb(){ const KEY="carte-de-vie-v1", CKEY="carte-de-vie-sync"; let store={}, brut0=null; try{ brut0=secoursTexte||localStorage.getItem(KEY); store=JSON.parse(brut0||"{}")||{}; }catch(_){ store={}; brut0=null; }
   Object.keys(store).forEach(k=>vuDoc(HORLOGE,store[k]));
   const vu=new Map(); let base0=null; const ancien=p=>{ if(vu.has(p)){ const t=vu.get(p); return t?JSON.parse(t):null; } if(base0===null){ try{ base0=JSON.parse(brut0||"{}")||{}; }catch{ base0={}; } brut0=null; } return base0[p]||null; };
   const note=p=>{ vu.set(p,store[p]?JSON.stringify(store[p]):""); };
   const subs=[], clone=o=>JSON.parse(JSON.stringify(o)), live=k=>store[k]&&!store[k]._del;
-  let persistT=null; const persistNow=()=>{ clearTimeout(persistT); persistT=null; if(window._efface) return; try{ localStorage.setItem(KEY,JSON.stringify(store)); }catch(_){ $("saved").textContent="Stockage de l'appareil plein ou bloqué."; } };
+  let persistT=null, plein=false; const bandeau=on=>{ let b=document.getElementById("stockPlein"); if(on&&!b){ b=document.createElement("p"); b.id="stockPlein"; b.className="nosync"; b.setAttribute("role","alert"); const h=document.querySelector("header > div"); if(h) h.appendChild(b); }
+    if(b){ b.hidden=!on; if(on) b.textContent="⚠︎ Le stockage de cet appareil est plein : tes modifications sont gardées dans une réserve de l'appareil"+(cfg?" et envoyées en ligne dès que possible.":". Relie la synchro ou exporte une sauvegarde, et libère de la place."); } };
+  const persistNow=()=>{ clearTimeout(persistT); persistT=null; if(window._efface) return; const t=JSON.stringify(store);
+    try{ localStorage.setItem(KEY,t); if(plein||secoursTexte!==null){ plein=false; secoursTexte=null; bandeau(false); } SECOURS.efface(); }
+    catch(_){ plein=true; $("saved").textContent="Stockage de l'appareil plein : modification gardée dans la réserve."; bandeau(true); SECOURS.ecrit(t).catch(()=>{ $("saved").textContent="Stockage de l'appareil plein ou bloqué : exporte une sauvegarde."; }); if(cfg&&api.dirty) setTimeout(()=>api.sync(),0); } };
   const persist=()=>{ clearTimeout(persistT); if(document.hidden) return persistNow(); persistT=setTimeout(persistNow,800); };
   addEventListener("pagehide",()=>{ if(persistT) persistNow(); }); addEventListener("beforeunload",()=>{ if(persistT) persistNow(); }); document.addEventListener("visibilitychange",()=>{ if(document.hidden&&persistT) persistNow(); });
   const notify=()=>subs.slice().forEach(f=>f());
@@ -7242,7 +7317,7 @@ function localDb(){ const KEY="carte-de-vie-v1", CKEY="carte-de-vie-sync"; let s
   const doc=path=>({ id:path.split("/").pop(), path,
     set:d=>{ store[path]=estampille(ancien(path),clone(d),HORLOGE.now()); note(path); save(); return Promise.resolve(); },
     update:d=>{ if(!live(path)) return Promise.reject({code:"invalid_argument"}); store[path]=estampille(ancien(path),Object.assign({},store[path],clone(d)),HORLOGE.now()); note(path); save(); return Promise.resolve(); },
-    delete:()=>{ store[path]={_del:true,_m:HORLOGE.now()}; note(path); save(); return Promise.resolve(); },
+    delete:()=>{ store[path]=supprime(ancien(path),HORLOGE.now()); note(path); save(); return Promise.resolve(); },
     onSnapshot:f=>{ let vu, deja=false; const fire=()=>{ const cur=store[path]; if(deja&&cur===vu) return; deja=true; vu=cur; f({id:path.split("/").pop(),exists:!!live(path),data:()=>store[path]}); }; subs.push(fire); setTimeout(fire,0); return ()=>{}; } });
   /* --- synchronisation avec un fichier carte.json dans un dépôt GitHub privé --- */
   let cfg=null; try{ cfg=JSON.parse(localStorage.getItem(CKEY)||"null"); }catch(_){} if(cfg&&!repoOk(cfg.repo)) cfg=null;
@@ -7254,7 +7329,11 @@ function localDb(){ const KEY="carte-de-vie-v1", CKEY="carte-de-vie-sync"; let s
       if(r.status===404) return {data:null,sha:null}; if(!r.ok) throw {status:r.status}; const etag=r.headers.get("ETag"), garde=(o,t)=>{ if(etag&&o.data) der={repo:cfg.repo,etag,texte:t,sha:o.sha}; return o; };
       return r.json().then(j=>{ /* au-delà de 1 Mo, GitHub ne renvoie pas le contenu : on lit alors le fichier brut */ if(!j.content&&j.size>0) return fetch(url(),{headers:Object.assign(hdr(),{Accept:"application/vnd.github.raw"}),cache:"no-store"}).then(r2=>{ if(!r2.ok) throw {status:r2.status}; return r2.text(); }).then(t=>garde({data:JSON.parse(t)||{},sha:j.sha},t));
       let d={}, t=""; try{ t=b64d(j.content); d=JSON.parse(t)||{}; }catch(_){ throw {status:"lecture"}; } return garde({data:d,sha:j.sha},t); }); }); };
-  const push=(sha)=>fetch(url(),{method:"PUT",headers:hdr(),body:JSON.stringify(Object.assign({message:"Carte mise à jour depuis l'application",content:b64e(JSON.stringify(store,null,1))},sha?{sha}:{}))}).then(r=>{ if(!r.ok) throw {status:r.status}; der=null; });
+  const push=(sha)=>{ const t0=Date.now(); return fetch(url(),{method:"PUT",headers:hdr(),body:JSON.stringify(Object.assign({message:"Carte mise à jour depuis l'application",content:b64e(JSON.stringify(store,null,1))},sha?{sha}:{}))}).then(r=>{ if(!r.ok) throw {status:r.status}; der=null;
+    /* heure du serveur : date du commit créé par cet envoi */
+    const t1=Date.now(); return r.json().then(j=>{ const c=j&&j.commit&&(j.commit.committer||j.commit.author); if(c&&c.date) recaleServeur(Date.parse(c.date)+500,t0,t1,0); },()=>{}); }); };
+  /* au lancement : l'heure d'une réponse du site (même origine), prise en compte seulement au-delà d'une heure d'écart */
+  if(!window.claude) setTimeout(()=>{ const t0=Date.now(); fetch("manifest.webmanifest?horloge="+t0,{cache:"no-store"}).then(r=>{ const t1=Date.now(), d=Date.parse(r.headers.get("Date")||""); if(r.ok&&t1-t0<1e4) recaleServeur(d+500,t0,t1,36e5); }).catch(()=>{}); },1200);
   const merge=(remote)=>{ let changedLocal=false, needPush=false; const out={}; Object.keys(remote).forEach(k=>vuDoc(HORLOGE,remote[k]));
     new Set([...Object.keys(remote),...Object.keys(store)]).forEach(k=>{ const r=remote[k], l=store[k], jr=r===undefined?undefined:JSON.stringify(r), jl=l===undefined?undefined:JSON.stringify(l);
       if(jr!==undefined&&jr===jl){ out[k]=l; return; } const m=mergeDoc(r,l), js=JSON.stringify(m); out[k]=m; if(js!==jl){ changedLocal=true; vu.set(k,js); } if(js!==jr) needPush=true; });
@@ -7264,7 +7343,7 @@ function localDb(){ const KEY="carte-de-vie-v1", CKEY="carte-de-vie-sync"; let s
   document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden") tout(); }); addEventListener("pagehide",tout);
   const api={ doc, dirty:false, cfg:()=>cfg,
     collection:name=>({ doc:id=>doc(name+"/"+(id||uid())), onSnapshot:f=>{ const fire=()=>f({docs:Object.keys(store).filter(k=>k.startsWith(name+"/")&&live(k)).sort().map(k=>({id:k.slice(name.length+1),data:()=>store[k]}))}); subs.push(fire); setTimeout(fire,0); return ()=>{}; } }),
-    dump:()=>JSON.stringify(store,null,1), load:o=>{ const now=HORLOGE.now(); Object.keys(store).forEach(k=>{ if(!(k in o)) o[k]={_del:true,_m:now}; }); Object.keys(o).forEach(k=>{ o[k]=restampe(o[k],now); }); store=o; Object.keys(store).forEach(note); save(); },
+    dump:()=>JSON.stringify(store,null,1), load:o=>{ const now=HORLOGE.now(); Object.keys(o).forEach(k=>{ if(!o[k]||typeof o[k]!=="object"||o[k]._del) return; store[k]=restampe(o[k],now); note(k); }); save(); },
     hasLocal:()=>Object.keys(store).some(live),
     queue:()=>{ if(!cfg) return; clearTimeout(timer); const t=Date.now(); if(!premier) premier=t; timer=setTimeout(()=>{ premier=0; api.sync(); },Math.max(0,Math.min(8000,premier+30000-t))); },
     sync:()=>{ if(!cfg) return Promise.resolve("off"); if(busy){ again=true; return Promise.resolve("busy"); } busy=true; say("Synchronisation…"); const g0=gen;
@@ -7272,7 +7351,7 @@ function localDb(){ const KEY="carte-de-vie-v1", CKEY="carte-de-vie-sync"; let s
           /* protection de la carte : une version de l'app plus ancienne que celle déjà utilisée n'écrit rien ; et jamais d'envoi qui ferait fondre la carte */
           if(versionTropVieille(data)) throw {status:"version"}; if(avant>200000&&JSON.stringify(store).length<avant*0.6) throw {status:"retrait"};
           if(m.needPush||data===null) return push(sha).then(()=>{ const am=+((store["meta/app"]||{}).min)||0; if(appV()>am) setTimeout(()=>doc("meta/app").set({min:appV()}),0); }); })
-        .then(()=>{ if(gen===g0) api.dirty=false; api.synced=true; if(window._autoArr) setTimeout(window._autoArr,0); say("Synchronisé à "+new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})); return "ok"; },
+        .then(()=>{ if(gen===g0) api.dirty=false; api.synced=true; if(window._autoArr) setTimeout(window._autoArr,0); say("Synchronisé à "+new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})+alerteHorloge()); return "ok"; },
               e=>{ const st=e&&e.status; if(st==="version"||st==="retrait"){ say(st==="version"?"Une version plus récente de l'app a déjà été utilisée : ferme complètement l'app et rouvre-la. En attendant, rien n'est envoyé, pour protéger ta carte.":"Envoi bloqué : il aurait effacé une partie de ta carte. Ferme et rouvre l'app, puis réessaie."); return st; } if(st===409||st===422){ again=true; return "retry"; } say(st===401||st===403?"Clé d'accès refusée : vérifie-la dans Synchro.":st===404?"Dépôt introuvable : vérifie son nom dans Synchro.":"Hors ligne : les modifications partiront au retour du réseau."); return "err:"+(st||"net"); })
         .then(res=>{ busy=false; if(again){ again=false; api.queue(); } return res; }); },
     connect:(repo,token,keep)=>{ if(!repoOk(repo)) return Promise.reject({status:404}); const avant=cfg; cfg={repo,token}; der=null; return pull().then(({data})=>{ const remoteHas=data&&Object.keys(data).some(k=>!data[k]._del);
@@ -7285,6 +7364,7 @@ function localDb(){ const KEY="carte-de-vie-v1", CKEY="carte-de-vie-sync"; let s
     version:sha=>fetch(url()+"?ref="+encodeURIComponent(sha),{headers:hdr(),cache:"no-store"}).then(r=>{ if(!r.ok) throw {status:r.status}; return r.json(); }).then(j=>{
       if(!j.content&&j.size>0) return fetch(url()+"?ref="+encodeURIComponent(sha),{headers:Object.assign(hdr(),{Accept:"application/vnd.github.raw"}),cache:"no-store"}).then(r2=>{ if(!r2.ok) throw {status:r2.status}; return r2.text(); }).then(t=>JSON.parse(t));
       return JSON.parse(b64d(j.content)); }) };
+  if(secoursTexte!==null) setTimeout(persistNow,500);
   setTimeout(()=>api.sync(),300); setInterval(()=>{ if(document.visibilityState==="visible") api.sync(); },60000); document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") api.sync(); }); addEventListener("online",()=>api.sync());
   return api; }
 /* --- dans Claude : les données restent dans la base de la page, la synchro GitHub et l'IA s'ajoutent --- */
@@ -7294,7 +7374,7 @@ function claudeDb(d){ const CKEY="carte-de-vie-sync"; let cfg=null; try{ cfg=JSO
   d.collection("espaces").onSnapshot(s=>{ Object.keys(store).forEach(k=>{ if(k.startsWith("espaces/")) delete store[k]; }); s.docs.forEach(x=>{ store["espaces/"+x.id]=x.data(); }); },()=>{});
   const after=p=>p.then(v=>{ api.dirty=true; api.queue(); return v; });
   const doc=path=>{ const r=d.doc(path); return { id:r.id, path,
-    set:x=>after(r.set(stamp(x,path))), update:x=>after(r.update(stamp(Object.assign({},store[path]||{},x),path))), delete:()=>after(r.set({_del:true,_m:HORLOGE.now()})),
+    set:x=>after(r.set(stamp(x,path))), update:x=>after(r.update(stamp(Object.assign({},store[path]||{},x),path))), delete:()=>after(r.set(supprime(store[path],HORLOGE.now()))),
     onSnapshot:(f,e)=>r.onSnapshot(s=>{ const v=s.exists?s.data():undefined; f({id:s.id,exists:!!(v&&!v._del),data:()=>v}); },e) }; };
   const b64e=t=>btoa(unescape(encodeURIComponent(t))), b64d=t=>decodeURIComponent(escape(atob(String(t||"").replace(/\s/g,""))));
   const url=()=>"https://api.github.com/repos/"+cfg.repo+"/contents/carte.json", hdr=()=>({Authorization:"Bearer "+cfg.token,Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"});
@@ -7309,13 +7389,13 @@ function claudeDb(d){ const CKEY="carte-de-vie-sync"; let cfg=null; try{ cfg=JSO
   const api={ doc, dirty:false, cfg:()=>cfg,
     collection:name=>({ doc:id=>doc(name+"/"+(id||uid())), onSnapshot:(f,e)=>d.collection(name).onSnapshot(s=>f({docs:s.docs.filter(x=>!(x.data()||{})._del)}),e) }),
     dump:()=>JSON.stringify(store,null,1),
-    load:o=>{ const now=HORLOGE.now(); Object.keys(store).forEach(k=>{ if(!(k in o)) o[k]={_del:true,_m:now}; }); return Promise.all(Object.keys(o).map(k=>d.doc(k).set(restampe(o[k],now))))
+    load:o=>{ const now=HORLOGE.now(); return Promise.all(Object.keys(o).filter(k=>o[k]&&typeof o[k]==="object"&&!o[k]._del).map(k=>d.doc(k).set(restampe(o[k],now))))
       .then(()=>{ api.dirty=true; api.queue(); }); },
     hasLocal:()=>Object.keys(store).some(live),
     queue:()=>{ if(!cfg) return; clearTimeout(timer); timer=setTimeout(()=>api.sync(),2500); },
     sync:()=>{ if(!cfg) return Promise.resolve("off"); if(busy){ again=true; return Promise.resolve("busy"); } busy=true; say("Synchronisation…");
       return pull().then(({data,sha})=>merge(data||{}).then(m=>{ if(versionTropVieille(data)) throw {status:"version"}; if(m.needPush||data===null) return push(sha,m.out); }))
-        .then(()=>{ api.dirty=false; api.synced=true; if(window._autoArr) setTimeout(window._autoArr,0); say("Synchronisé à "+new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})); return "ok"; },
+        .then(()=>{ api.dirty=false; api.synced=true; if(window._autoArr) setTimeout(window._autoArr,0); say("Synchronisé à "+new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})+alerteHorloge()); return "ok"; },
               e=>{ const st=e&&e.status; if(st==="version"||st==="retrait"){ say(st==="version"?"Une version plus récente de l'app a déjà été utilisée : ferme complètement l'app et rouvre-la. En attendant, rien n'est envoyé, pour protéger ta carte.":"Envoi bloqué : il aurait effacé une partie de ta carte. Ferme et rouvre l'app, puis réessaie."); return st; } if(st===409||st===422){ again=true; return "retry"; } say(st===401||st===403?"Clé d'accès refusée : vérifie-la dans Synchro.":st===404?"Dépôt introuvable : vérifie son nom dans Synchro.":"GitHub injoignable depuis Claude pour le moment. Tes modifications restent enregistrées ici."); return "err:"+(st||"net"); })
         .then(res=>{ busy=false; if(again){ again=false; api.queue(); } return res; }); },
     connect:(repo,token,keep)=>{ if(!repoOk(repo)) return Promise.reject({status:404}); const avant=cfg; cfg={repo,token}; return pull().then(({data})=>{ const remoteHas=data&&Object.keys(data).some(k=>!data[k]._del);
@@ -7351,7 +7431,7 @@ function iaKeySetup(){ const AK="carte-de-vie-ia"; let key=""; try{ key=localSto
   setKey(key); }
 function start(){
   const CL=!!(window.claude&&window.claude.use); if(CL) document.documentElement.classList.add("claude");
-  (CL?window.claude.use("db").then(d=>d?claudeDb(d):localDb(),()=>localDb()):Promise.resolve(localDb())).then(d=>{
+  (CL?window.claude.use("db").then(d=>d?claudeDb(d):localDb(),()=>localDb()):SECOURS.lit().then(x=>{ if(x&&x.texte){ secoursTexte=x.texte; } return localDb(); })).then(d=>{
     if(CL) window.claude.use("sample").then(x=>{ sampler=x; renderIa(); },()=>{}); else iaKeySetup();
     db=d; col=db.collection("espaces"); $("addBtn").hidden=false;
     (function(){ const pg=$("syncPage"), st=$("syncState"), ch=$("syncChoice");
@@ -7407,7 +7487,10 @@ function start(){
     $("expBtn").onclick=()=>{ const name="carte-de-vie-"+today()+".json";
       if(CL) return window.claude.use("downloads").then(dl=>dl?dl.save({filename:name,data:db.dump()}):null).catch(()=>{});
       const a=el("a",{href:URL.createObjectURL(new Blob([db.dump()],{type:"application/json"})),download:name}); document.body.appendChild(a); a.click(); a.remove(); };
-    $("impFile").addEventListener("change",e=>{ const f=e.target.files[0]; if(!f) return; f.text().then(t=>{ const o=JSON.parse(t); if(!o||typeof o!=="object"||Array.isArray(o)) throw 0; return db.load(o); }).then(()=>{ $("impMsg").textContent="Données importées."; }).catch(()=>{ $("impMsg").textContent="Ce fichier n'est pas une sauvegarde de la carte."; }); e.target.value=""; });
+    $("impFile").addEventListener("change",e=>{ const f=e.target.files[0]; if(!f) return; f.text().then(t=>{ const o=JSON.parse(t); if(!o||typeof o!=="object"||Array.isArray(o)) throw 0;
+      const n=Object.keys(o).filter(k=>o[k]&&typeof o[k]==="object"&&!o[k]._del).length, esp=Object.keys(o).filter(k=>/^espaces\//.test(k)&&o[k]&&!o[k]._del).length;
+      if(!confirm("Importer cette sauvegarde ("+esp+" espace"+(esp>1?"s":"")+", "+n+" document"+(n>1?"s":"")+") ?\n\nPour ce qu'elle contient, la version de la sauvegarde remplace la tienne. Ce qui a été créé depuis (espaces, éléments ajoutés) est gardé : rien n'est supprimé.")) throw "annule";
+      return db.load(o); }).then(()=>{ $("impMsg").textContent="Sauvegarde importée : ce qui a été créé depuis est gardé."; }).catch(e=>{ $("impMsg").textContent=e==="annule"?"Import annulé : rien n'a changé.":"Ce fichier n'est pas une sauvegarde de la carte."; }); e.target.value=""; });
     db.doc("meta/layout").onSnapshot(x=>{ if(x.exists&&!grpDrag){ const d=x.data(); if(typeof d.sx==="number"&&typeof d.sy==="number") ms={x:d.sx,y:d.sy}; if(typeof d.mx==="number"&&typeof d.my==="number"){ mp={x:d.mx,y:d.my}; placeMoi(); renderBoard(); } else placeMoiS(); } },()=>{});
     db.doc("meta/compagnon").onSnapshot(x=>{ if(x.exists&&window._compagnon) window._compagnon(x.data()); },()=>{});
     window._baseSync=B=>db.doc("meta/base").set({p:B.p,j:B.j}).catch(()=>{});
@@ -7434,9 +7517,16 @@ function start(){
     },()=>{ state.hidden=false; state.firstElementChild.textContent="La connexion aux données s'est interrompue. Recharge la page."; });
   });
 }
-/* compléments personnels : un module gardé dans le dépôt de données de la propriétaire, jamais dans ce code public.
-   Il n'est lu que pour un dépôt de son compte, avec sa clé ; ailleurs l'app reste générique. */
-const PERSO_K="carte-de-vie-perso", PERSO_SHA="carte-de-vie-perso-sha", PERSO_K2="carte-de-vie-perso-suivant", PERSO_SHA2="carte-de-vie-perso-suivant-sha", PERSO_V=199;
+/* compléments personnels : un module gardé dans un dépôt privé de la propriétaire, jamais dans ce code public.
+   Il n'est lu que pour un dépôt de son compte, avec sa clé ; ailleurs l'app reste générique.
+   Sécurité (audit d'experts du 13/10, après-midi) : l'empreinte SHA-256 attendue du module, et celle de la carte régionale qu'il charge,
+   sont écrites ICI, dans le code publié, au moment de la construction (le module et l'app sont publiés ensemble, même version).
+   C'est elle qui fait foi : une copie gardée sur l'appareil, ou un fichier en ligne, n'est exécuté que si son texte a exactement
+   cette empreinte. Une empreinte rangée dans le stockage de l'appareil n'est plus jamais utilisée (qui peut écrire l'un peut écrire
+   l'autre). */
+const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=200;
+const PERSO_EMP="9629281944562a5341d440c3d67c3db88d0d4c70fe00704818607db07de87145", PERSO_GIT="3b66b2c9c4d901abd4ab2c2b29579a0ca6fd007e", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
+try{ ["carte-de-vie-perso-sha","carte-de-vie-perso-suivant-sha"].forEach(k=>localStorage.removeItem(k)); }catch{ /* stockage bloqué */ }
 /* le module n'est jamais exécuté deux fois (il pose des minuteries et des écouteurs) */
 let persoFait=false;
 function persoEval(t){ if(persoFait) return false; persoFait=true; try{ eval(t); return true; }catch(err){ console.warn("module perso",err); return false; } }
@@ -7444,48 +7534,80 @@ function persoEval(t){ if(persoFait) return false; persoFait=true; try{ eval(t);
 function estProprio(r){ const o=String(r||"").split("/")[0].toLowerCase(); let h1=0xdeadbeef, h2=0x41c6ce57; for(let i=0;i<o.length;i++){ const ch=o.charCodeAt(i); h1=Math.imul(h1^ch,2654435761); h2=Math.imul(h2^ch,1597334677); }
   h1=Math.imul(h1^(h1>>>16),2246822507); h1^=Math.imul(h2^(h2>>>13),3266489909); h2=Math.imul(h2^(h2>>>16),2246822507); h2^=Math.imul(h1^(h1>>>13),3266489909);
   return String(r||"").includes("/") && (4294967296*(2097151&h2)+(h1>>>0)).toString(36)==="h7637qhg6a"; }
+/* dépôt des compléments : par défaut celui de la synchro ; réglage prévu (Réglages → Synchronisation) pour un dépôt à part, lu avec
+   une clé en lecture seule, qu'aucune routine n'écrit (voir la documentation de la propriétaire, dans son dépôt privé) */
+const persoDepot=()=>{ const c=AUD.cfg(); let d=null; try{ d=JSON.parse(localStorage.getItem(PERSO_DEPOT)||"null"); }catch{ d=null; }
+  return d&&d.repo&&d.token&&repoOk(d.repo)&&estProprio(d.repo)?{repo:d.repo,token:d.token,apart:true}:c; };
 function persoOk(){ const c=AUD.cfg(); return !!(c&&c.repo&&c.token&&repoOk(c.repo)&&estProprio(c.repo)); }
-/* empreinte git d'un texte (sha1 de « blob <taille>\0<contenu> »), celle que GitHub donne pour le fichier : un texte n'est exécuté
-   que si son empreinte est celle attendue (copie sur l'appareil comprise) ; sinon il n'est pas exécuté et c'est signalé */
+const hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");
+async function sha256(t){ try{ return hex(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t))); }catch{ return ""; } }
+/* empreinte git (sha1 de « blob <taille>\0<contenu> ») : celle que GitHub donne pour un fichier ; sert seulement à savoir, sans le
+   télécharger, si le fichier en ligne est celui attendu (le contrôle qui décide est le SHA-256 ci-dessus) */
 async function shaGit(t){ try{ const o=new TextEncoder().encode(t), e=new TextEncoder().encode("blob "+o.length+"\0"), b=new Uint8Array(e.length+o.length); b.set(e); b.set(o,e.length);
-    return [...new Uint8Array(await crypto.subtle.digest("SHA-1",b))].map(x=>x.toString(16).padStart(2,"0")).join(""); }catch{ return ""; } }
-const persoSur=async(t,sha)=>!!(t&&sha&&/^[0-9a-f]{40}$/.test(sha)&&await shaGit(t)===sha);
-const persoAlerte=()=>{ console.warn("compléments personnels : empreinte inattendue, non exécutés"); const e=document.getElementById("syncMsg"); if(e) e.textContent="Compléments personnels non chargés : leur texte ne correspond pas à l'original attendu. Ils seront relus en ligne au prochain lancement."; };
+    return hex(await crypto.subtle.digest("SHA-1",b)); }catch{ return ""; } }
+const persoSur=async t=>!!(t&&/^[0-9a-f]{64}$/.test(PERSO_EMP)&&await sha256(t)===PERSO_EMP);
+const persoAlerte=quoi=>{ console.warn("compléments personnels : empreinte inattendue, non exécutés"); window._persoRefus=(window._persoRefus||0)+1;
+  const ecrit=()=>{ let e=document.getElementById("persoRefus"); if(!e){ e=document.createElement("p"); e.id="persoRefus"; e.className="nosync"; e.setAttribute("role","status"); const h=document.querySelector("header > div"); if(!h) return; h.appendChild(e); }
+    e.textContent="⚠︎ "+(quoi||"Compléments personnels non chargés : leur texte ne correspond pas à celui publié avec cette version de l'app."); };
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",ecrit); else ecrit(); };
 const persoVersion=t=>{ const m=/^\/\* carte-module v(\d+) \*\//.exec(t||""); return m?+m[1]:0; };
 const persoTexte=b=>{ try{ return new TextDecoder().decode(Uint8Array.from(atob(String(b||"").replace(/\s/g,"")),x=>x.charCodeAt(0))); }catch{ return ""; } };
-async function persoEnLigne(delai){ const c=AUD.cfg(); if(!c||navigator.onLine===false) return null; const ac=typeof AbortController==="function"?new AbortController():null, tm=delai?setTimeout(()=>{ if(ac) ac.abort(); },delai):0;
-  try{ const r=await fetch("https://api.github.com/repos/"+c.repo+"/contents/perso/module.js",{headers:AUD.hd(c),cache:"no-store",signal:ac?ac.signal:undefined});
+async function persoEnLigne(delai,chemin){ const c=persoDepot(); if(!c||navigator.onLine===false) return null; const ac=typeof AbortController==="function"?new AbortController():null, tm=delai?setTimeout(()=>{ if(ac) ac.abort(); },delai):0;
+  try{ const r=await fetch("https://api.github.com/repos/"+c.repo+"/contents/"+(chemin||"perso/module.js"),{headers:AUD.hd(c),cache:"no-store",signal:ac?ac.signal:undefined});
     if(r.status===401||r.status===404) return {refus:r.status}; if(!r.ok) return null; const j=await r.json(); return {sha:String(j.sha||""),texte:j.content?persoTexte(j.content):""}; }
   catch{ return null; } finally{ clearTimeout(tm); } }
-/* une version faite pour une app plus récente que celle qui tourne est gardée à part (elle n'écrase pas celle de cette app) :
-   au premier lancement de la nouvelle app, elle est exécutée tout de suite, sans attendre le réseau */
+/* un fichier du dépôt des compléments, en texte brut */
+async function persoFichier(chemin){ const c=persoDepot(); if(!c) return "";
+  try{ const r=await fetch("https://api.github.com/repos/"+c.repo+"/contents/"+chemin,{headers:Object.assign(AUD.hd(c),{Accept:"application/vnd.github.raw"}),cache:"no-store"}); return r.ok?await r.text():""; }catch{ return ""; } }
+/* carte régionale chargée par le module : exécutée seulement si son empreinte est celle écrite ici au build */
+async function persoRegion(t){ if(!t||!/^[0-9a-f]{64}$/.test(REGION_EMP)||await sha256(t)!==REGION_EMP){ console.warn("carte régionale : empreinte inattendue, non exécutée"); return false; } (0,eval)(t); return true; }
 const persoLit=k=>{ try{ return localStorage.getItem(k); }catch{ return null; } };
-const persoGarde=(t,sha)=>{ const s=persoVersion(t)>PERSO_V; try{ localStorage.setItem(s?PERSO_K2:PERSO_K,t); localStorage.setItem(s?PERSO_SHA2:PERSO_SHA,sha); }catch{} };
-/* texte du module en ligne (lu en brut s'il est trop gros pour être renvoyé avec ses métadonnées), vérifié, gardé sur l'appareil */
-async function persoRecu(L){ if(!L||!L.sha) return ""; let tx=L.texte; if(!tx){ const b=await AUD.recupere("perso/module.js","text/plain"); tx=b?await b.text():""; }
-  if(!tx) return ""; if(!await persoSur(tx,L.sha)){ persoAlerte(); return ""; } persoGarde(tx,L.sha); return tx; }
-/* démarrage : la copie gardée sur l'appareil, si elle est faite pour cette version de l'app et intacte (empreinte), est exécutée
-   tout de suite, sans attendre le réseau ; la version en ligne est relue ensuite, en arrière-plan, et gardée pour le prochain
-   lancement (jamais exécutée deux fois). Sinon (première fois, ou aucune copie pour cette version), on attend la version en ligne
-   2,5 s au plus. */
-(async()=>{ let t=null, s0=null, tard=false;
-  if(persoOk()){ t=persoLit(PERSO_K); s0=persoLit(PERSO_SHA);
-    { const t2=persoLit(PERSO_K2), v2=persoVersion(t2);
-      if(t2&&v2===PERSO_V&&persoVersion(t)!==PERSO_V&&await persoSur(t2,persoLit(PERSO_SHA2))){ t=t2; s0=persoLit(PERSO_SHA2); persoGarde(t,s0); }
-      if(t2&&v2<=PERSO_V) try{ localStorage.removeItem(PERSO_K2); localStorage.removeItem(PERSO_SHA2); }catch{} }
-    if(t&&!await persoSur(t,s0)){ persoAlerte(); t=null; }
-    if(t&&persoVersion(t)===PERSO_V) persoEval(t);
-    else { const L=await persoEnLigne(2500);
-      if(!L){ if(t) persoEval(t); }
-      else if(L.sha&&L.sha===s0&&t) persoEval(t);
-      else if(L.sha&&L.texte){ const tx=await persoRecu(L); if(tx) persoEval(tx); }
-      else if(L.sha) tard=L; } }
+/* une version faite pour une app plus récente que celle qui tourne est gardée à part (elle n'écrase pas celle de cette app) :
+   au premier lancement de la nouvelle app, elle est exécutée tout de suite si elle a l'empreinte écrite dans cette nouvelle app */
+const persoGarde=t=>{ const s=persoVersion(t)>PERSO_V; try{ localStorage.setItem(s?PERSO_K2:PERSO_K,t); }catch{ /* stockage plein */ } };
+/* texte du module en ligne (lu en brut s'il est trop gros pour être renvoyé avec ses métadonnées) */
+async function persoRecu(L){ if(!L||!L.sha) return ""; let tx=L.texte; if(!tx) tx=await persoFichier("perso/module.js"); return tx||""; }
+/* seconde règle de sécurité (CSP), posée une fois les compléments chargés : connexions limitées aux adresses exactes utilisées
+   (celles fournies par le module et la passerelle enregistrée) ; elle s'ajoute à la première, seul ce que les deux permettent passe */
+let cspHotes=null;
+function cspPermet(u){ if(!cspHotes) return true; try{ const x=new URL(u); return [...cspHotes].some(h=>h==="'self'"?x.origin===location.origin:h.endsWith("/")?(x.origin+x.pathname).startsWith(h):x.origin===h); }catch{ return false; } }
+function cspSerre(){ if(cspHotes||window.claude) return; const H=new Set(["'self'","https://api.github.com","https://raw.githubusercontent.com","https://api.anthropic.com","https://generativelanguage.googleapis.com","https://widgets.pinterest.com"]);
+  const ajoute=u=>{ try{ const x=new URL(u); if(x.protocol!=="https:") return; const dossier=x.origin+x.pathname.replace(/[^/]*$/,"");
+      if(x.hostname==="script.google.com"){ H.add(dossier); H.add("https://script.googleusercontent.com"); } else H.add(dossier.length>x.origin.length+1?dossier:x.origin); }catch{ /* adresse invalide */ } };
+  try{ [typeof LIEN_URL==="string"?LIEN_URL:"",(PASS.lit()||{}).url].forEach(u=>{ if(u) ajoute(u); }); }catch{ /* rien */ }
+  cspHotes=H; const m=document.createElement("meta"); m.httpEquiv="Content-Security-Policy"; m.content="connect-src "+[...H].join(" ")+" data: blob:"; document.head.appendChild(m); }
+/* Réglages → Synchronisation (propriétaire seulement) : dépôt à part pour les compléments, lu avec une clé en lecture seule.
+   Prêt mais pas activé : tant que rien n'est enregistré ici, les compléments sont lus dans le dépôt de la synchro. */
+function persoDepotUI(){ const pg=document.getElementById("syncLinked"); if(!pg||document.getElementById("persoDepot")) return; let d={}; try{ d=JSON.parse(localStorage.getItem(PERSO_DEPOT)||"{}")||{}; }catch{ d={}; }
+  const r=el("input",{id:"persoDepotR",placeholder:"compte/depot-des-complements",value:d.repo||"",autocomplete:"off"}), k=el("input",{id:"persoDepotK",type:"password",placeholder:d.token?"Clé enregistrée (laisser vide pour la garder)":"Clé en lecture seule",autocomplete:"off"}), m=el("p",{className:"hint",role:"status"});
+  r.setAttribute("aria-label","Dépôt des compléments personnels"); k.setAttribute("aria-label","Clé en lecture seule du dépôt des compléments");
+  const ok=el("button",{type:"button",className:"btn",textContent:"Enregistrer"}), non=el("button",{type:"button",className:"btn ghost",textContent:"Revenir au dépôt de la synchro"});
+  ok.onclick=()=>{ const repo=r.value.trim(), token=k.value.trim()||d.token||""; if(!repoOk(repo)||!estProprio(repo)||!token){ m.textContent="Indique un dépôt de ton compte (compte/nom) et sa clé en lecture seule."; return; }
+    try{ localStorage.setItem(PERSO_DEPOT,JSON.stringify({repo,token})); }catch{ /* stockage plein */ } m.textContent="Enregistré : les compléments seront lus dans ce dépôt au prochain lancement."; k.value=""; };
+  non.onclick=()=>{ try{ localStorage.removeItem(PERSO_DEPOT); }catch{ /* rien */ } r.value=""; m.textContent="Les compléments seront lus dans le dépôt de la synchro au prochain lancement."; };
+  const det=el("details",{id:"persoDepot",className:"persodepot"},el("summary",{textContent:"Compléments personnels : dépôt à part (lecture seule)"}),
+    el("p",{className:"hint",textContent:"Facultatif. Un dépôt privé distinct, que seule la construction de l'app modifie, lu ici avec une clé en lecture seule : un jeton de synchro volé ne permettrait plus de changer le code exécuté."}),r,k,el("div",{className:"fbbar"},ok,non),m);
+  pg.appendChild(det); }
+/* démarrage : la copie gardée sur l'appareil, si elle a l'empreinte attendue, est exécutée tout de suite, sans attendre le réseau.
+   Sinon (première fois, nouvelle version, copie altérée) : le module en ligne, s'il est celui attendu (empreinte git annoncée par
+   GitHub, puis SHA-256 du texte), est exécuté, en l'attendant 2,5 s au plus. Une version faite pour une app plus récente est
+   gardée à part. */
+(async()=>{ let tard=false;
+  if(persoOk()){ let t=persoLit(PERSO_K); const t2=persoLit(PERSO_K2);
+    if(t2){ if(await persoSur(t2)){ t=t2; persoGarde(t2); } if(persoVersion(t2)<=PERSO_V) try{ localStorage.removeItem(PERSO_K2); }catch{ /* rien */ } }
+    if(t&&await persoSur(t)) persoEval(t);
+    else { if(t&&persoVersion(t)===PERSO_V) persoAlerte();
+      const L=await persoEnLigne(2500);
+      if(L&&L.sha===PERSO_GIT){ if(L.texte){ if(await persoSur(L.texte)){ persoGarde(L.texte); persoEval(L.texte); } else persoAlerte(); } else tard=L; }
+      else if(L&&L.sha){ if(L.texte&&persoVersion(L.texte)>PERSO_V) persoGarde(L.texte); else persoAlerte("Compléments personnels non chargés : ceux du dépôt ne sont pas ceux publiés avec cette version de l'app (publie l'app et le module ensemble)."); } } }
   start();
-  if(!persoOk()) return;
-  /* trop gros pour être renvoyé avec ses métadonnées : lu en brut après le démarrage, puis affiché */
-  if(tard){ const tx=await persoRecu(tard); if(tx&&persoEval(tx)&&loaded){ renderBoard(); if(openId&&!drawer.hidden) renderPane(cats.get(openId)); } return; }
-  /* mise à jour en arrière-plan : jamais exécutée maintenant (le module ne tourne qu'une fois), seulement gardée */
-  if(persoFait&&persoVersion(t)===PERSO_V){ const L=await persoEnLigne(0); if(L&&L.sha&&L.sha!==s0&&L.sha!==persoLit(PERSO_SHA2)) await persoRecu(L); }
+  if(!persoOk()){ cspSerre(); return; }
+  try{ persoDepotUI(); }catch{ /* réglages absents */ }
+  /* trop gros pour être renvoyé avec ses métadonnées : lu en brut après le démarrage, vérifié, puis affiché */
+  if(tard){ const tx=await persoRecu(tard); if(tx&&await persoSur(tx)){ persoGarde(tx); if(persoEval(tx)&&loaded){ renderBoard(); if(openId&&!drawer.hidden) renderPane(cats.get(openId)); } } else persoAlerte(); cspSerre(); return; }
+  cspSerre();
+  /* en arrière-plan : une version faite pour l'app suivante est gardée à part (jamais exécutée par cette app) */
+  if(persoFait){ const L=await persoEnLigne(0); if(L&&L.sha&&L.sha!==PERSO_GIT&&L.sha!==await shaGit(persoLit(PERSO_K2)||"")){ const tx=await persoRecu(L); if(tx&&persoVersion(tx)>PERSO_V) persoGarde(tx); } }
 })();
 })();
 
@@ -7504,7 +7626,7 @@ async function persoRecu(L){ if(!L||!L.sha) return ""; let tx=L.texte; if(!tx){ 
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=199; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=200; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0="carte-de-vie-v"+APP_V, rec=false;
