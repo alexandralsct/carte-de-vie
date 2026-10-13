@@ -38,5 +38,7 @@ jobs:
         run: node tests/pwa.mjs
       - name: Accessibilité, axe-core hors réseau (téléphone puis ordinateur)
         run: node tests/accessibilite.mjs
+      - name: Ma semaine et passerelle simulée (téléphone puis ordinateur)
+        run: node tests/semaine.mjs
       - name: Mesures de performance (indicatives)
         run: BUDGETS=0 COURT=1 node tests/mesures.mjs

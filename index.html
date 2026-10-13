@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-4kGxArIX7jsZkpjuL6b3x3FQFQnbAF16dc96WiqI72I=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-QId7VqTzG4wNNVKOWp4EG5zA8/d6IA9TTHQTNNuq93U=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-0emXp6fTPkDAr/Ru/DOJXg+S36b0y4XbP7URRMYtLOQ=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-UtOEim0QBAUVyDcs/8LIW8h2gbJCCSFR6AAEtskbx3U=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f4eee4">
@@ -5306,7 +5306,9 @@ const V2={
 { const o1=ESSAI.rend.bind(ESSAI); ESSAI.rend=function(){ o1(); V2.bande(); };
   const o2=ESSAI.ouvreTraj.bind(ESSAI); ESSAI.ouvreTraj=function(a){ o2(a); const z=$("trajIn"), h=z.querySelector(".hero"); if(h){ h.querySelector("h2").textContent="Ma semaine"; h.querySelector(".lead").textContent="Tes priorités, tes grands sujets, tes horizons et tes décisions. La revue du dimanche les met à jour."; h.after(V2.tabs("semaine")); }
     [...z.querySelectorAll(".card")].forEach(c=>{ const t=c.querySelector("h3"); if(t&&t.textContent==="Ma direction") c.remove(); });
-    const tb=z.querySelector(".seg"); if(tb&&!z.querySelector(".v2prios")){ const p=V2.prios(z); p.classList.add("v2prios"); tb.after(p); } };
+    const tb=z.querySelector(".seg"); if(tb&&!z.querySelector(".v2prios")){ const p=V2.prios(z); p.classList.add("v2prios"); tb.after(p); }
+    /* le tableau horaire de la semaine, juste après les priorités */
+    if(tb&&!z.querySelector(".hsemaine")) (z.querySelector(".v2prios")||tb).after(renderSemaine(null)); };
   const o3=ESSAI.ouvreMem.bind(ESSAI); ESSAI.ouvreMem=function(a){ o3(a); const z=$("memIn"), h=z.querySelector(".hero"); if(h&&!z.querySelector(".seg")){ h.querySelector("h2").textContent="Mon fil"; h.after(V2.tabs("fil")); } };
   const o4=ESSAI.ouvreVal.bind(ESSAI); ESSAI.ouvreVal=function(a){ o4(a); const z=$("valIn"), reg=[...z.querySelectorAll(".card")].pop(); const tmp=el("div"); V2.veillesVal(tmp); [...tmp.children].forEach(c=>z.insertBefore(c,reg));
     const n=V2.nValider(), h3=z.querySelector(".card h3"); if(h3&&/proposition|Rien à valider/.test(h3.textContent)) h3.textContent=ESSAI.aValider().L.length?h3.textContent:"Propositions de l'IA : aucune";
@@ -6621,7 +6623,7 @@ function renderHabits(c){ const H=c.habits||[], td=today(), M30=hDays(30);
   renderAnnee(c);
   /* les pages lourdes (« Ma semaine », « Nouvelle habitude ») se construisent juste après l'affichage : la coche apparaît tout de suite */
   const tard=(cls,fn)=>{ const ph=el("section",{className:cls}); ph.style.minHeight=(tardH[cls]||200)+"px"; pane.appendChild(ph); const go=()=>{ if(!ph.isConnected) return; const n=fn(); ph.replaceWith(n); tardH[cls]=n.offsetHeight||tardH[cls]; }; (window.requestIdleCallback||setTimeout)(go,{timeout:120}); };
-  tard("card hab hsemaine",()=>renderSemaine(cats.get(c.id)||c)); tard("card hab hajout",()=>hAjout(cats.get(c.id)||c,(cats.get(c.id)||c).habits||[],save)); }
+  tard("card hab hajout",()=>hAjout(cats.get(c.id)||c,(cats.get(c.id)||c).habits||[],save)); }
 const tardH={};
 /* ---- vue de l'année : les tâches mensuelles, trimestrielles, semestrielles ou annuelles ---- */
 const AFREQ=[["hebdo","Chaque semaine"],["2sem","Toutes les 2 semaines"],["mois","Tous les mois"],["trim","Tous les 3 mois"],["sem","Tous les 6 mois"],["an","Une fois par an"]], AMOIS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
@@ -6722,8 +6724,15 @@ const PASS={ K:"carte-de-vie-passerelle", lit(){ try{ return JSON.parse(localSto
   async recopie1(){ if(!this.ok()) return 0; const L=((JOURNEES&&JOURNEES.saisies)||[]); const att=L.filter(x=>x.etat!=="recopie"); if(!att.length) return 0;
     const res=await this.ecrire(att), okIds=new Set(res.filter(x=>x.ok).map(x=>x.id)); if(!okIds.size) return 0;
     const N=L.map(x=>okIds.has(x.id)?Object.assign({},x,{etat:"recopie"}):x); JOURNEES={saisies:N}; if(db) db.doc("meta/journees").set({saisies:N}).catch(()=>{}); return okIds.size; } };
+/* la page « Ma semaine » redessine seulement son tableau horaire */
+function semRedessine(){ const x=document.querySelector("#trajIn .hsemaine"); if(x) x.replaceWith(renderSemaine(null)); }
+/* relit le tableau (au plus toutes les 10 min, ou tout de suite si force) et recopie ce qui attend */
+function semLecture(force){ if(!PASS.ok()||renderSemaine.encours) return; renderSemaine.encours=true;
+  Promise.resolve().then(async()=>{ let ch=false; try{ ch=(await PASS.recopie())>0; ch=(await PASS.relire(ch||force))||ch; }catch(_){} renderSemaine.encours=false; if(ch) quandLibre("semaine",semRedessine); }); }
 function renderSemaine(c){ const s=el("section",{className:"card hab hsemaine"},el("h3",{textContent:"Ma semaine"}));
-  const S=SEMAINE; if(!S||!Array.isArray(S.jours)){ s.append(help("Ta semaine arrive ici depuis ton tableau « Tracking Planning » : le temps passé par catégorie et ta semaine en couleurs.")); return s; }
+  const S=SEMAINE; if(!S||!Array.isArray(S.jours)){ s.append(help("Ta semaine arrive ici depuis ton tableau « Tracking Planning » : le temps passé par catégorie et ta semaine en couleurs."),semPasserelle(c));
+    /* première lecture forcée une seule fois par ouverture de l'app (sinon, tableau toujours vide : relecture sans fin) */
+    semLecture(!semLecture.forcee); semLecture.forcee=true; return s; }
   const C=(S.categories||[]).map(x=>({nom:x.nom,hex:x.hex})), lib=n=>{ const t=String(n||"").toLowerCase().replace("quoitidien","quotidien").replace("carriere","carrière").replace("sante","santé").replace("numerique","numérique").replace("developpement","développement").replace(/\//g," · "); return t.charAt(0).toUpperCase()+t.slice(1); };
   const dates=S.jours.map(j=>j.date), A=((JOURNEES&&JOURNEES.saisies)||[]).filter(x=>dates.includes(x.j));
   /* cases : tableau [jour][demi-heure] = {t,c,app} ; les moments ajoutés dans l'app passent par-dessus */
@@ -6774,13 +6783,13 @@ function renderSemaine(c){ const s=el("section",{className:"card hab hsemaine"},
   const f=el("form",{className:"semform"},jour,el("span",{className:"semft"},de,el("span",{textContent:"→"}),a_),cat,txt,el("button",{type:"submit",className:"vbtn",textContent:"Ajouter ce moment"}));
   f.onsubmit=e=>{ e.preventDefault(); if(semI(a_.value==="24:00"?"23:30":a_.value)+(a_.value==="24:00"?1:0)<=semI(de.value)) { det.textContent="La fin doit être après le début."; return; }
     const L=[...((JOURNEES&&JOURNEES.saisies)||[]),{id:uid(),j:jour.value,d:de.value,f:a_.value==="24:00"?"24:00":a_.value,c:cat.value,t:txt.value.trim().slice(0,120),ts:new Date().toISOString(),etat:"a_recopier"}];
-    JOURNEES={saisies:L}; if(db) db.doc("meta/journees").set({saisies:L}).catch(()=>{}); renderPane(cats.get(c.id));
-    if(PASS.ok()) PASS.recopie().then(n=>{ if(n) PASS.relire(true).then(()=>renderPane(cats.get(c.id))); else renderPane(cats.get(c.id)); }).catch(()=>{}); };
+    JOURNEES={saisies:L}; if(db) db.doc("meta/journees").set({saisies:L}).catch(()=>{}); semRedessine();
+    if(PASS.ok()) PASS.recopie().then(n=>{ if(n) PASS.relire(true).then(()=>semRedessine()); else semRedessine(); }).catch(()=>{}); };
   s.append(el("h4",{textContent:"Ajouter un moment"}),f);
   const nAtt=A.filter(x=>x.etat!=="recopie").length; if(nAtt) s.appendChild(el("p",{className:"mut",textContent:nAtt+" moment"+(nAtt>1?"s":"")+" ajouté"+(nAtt>1?"s":"")+" dans l'app pas encore recopié"+(nAtt>1?"s":"")+" dans ton tableau"+(PASS.ok()?" (touche « Relire et recopier »).":" : branche la passerelle ci-dessous.")}));
   s.appendChild(semPasserelle(c));
   /* à l'ouverture : relit le tableau (au plus toutes les 10 min) et recopie ce qui attend */
-  if(PASS.ok()&&!renderSemaine.encours){ renderSemaine.encours=true; Promise.resolve().then(async()=>{ let ch=false; try{ ch=(await PASS.recopie())>0; ch=(await PASS.relire(ch))||ch; }catch(_){} renderSemaine.encours=false; if(ch) quandLibre("semaine",()=>renderPane(cats.get(c.id))); }); }
+  semLecture(false);
   return s; }
 /* la passerelle : adresse de l'Apps Script du tableau + clé, gardées sur cet appareil */
 function semPasserelle(c){ const o=PASS.lit(), d=el("details",{className:"sempass"}); if(!PASS.ok()) d.open=false;
@@ -6789,8 +6798,8 @@ function semPasserelle(c){ const o=PASS.lit(), d=el("details",{className:"sempas
   u.setAttribute("aria-label","Adresse de la passerelle"); k.setAttribute("aria-label","Clé de la passerelle");
   const go=el("button",{type:"submit",className:"vbtn",textContent:"Enregistrer et relire"}), f=el("form",{className:"semform"},u,k,go);
   f.onsubmit=async e=>{ e.preventDefault(); PASS.ecrit({url:u.value.trim(),cle:k.value.trim(),t:0}); if(PASS.ok()&&typeof cspPermet==="function"&&!cspPermet(PASS.lit().url)){ msg.textContent="Adresse enregistrée : l'app se relance pour l'autoriser."; setTimeout(()=>location.reload(),1200); return; } if(!PASS.ok()){ msg.textContent="L'adresse doit commencer par https://script.google.com/ et la clé ne peut pas être vide."; return; }
-    msg.textContent="Je relis ton tableau…"; try{ await PASS.recopie(); await PASS.relire(true); msg.textContent="C'est branché."; renderPane(cats.get(c.id)); }catch(x){ msg.textContent="La passerelle ne répond pas ("+String(x.message||x).slice(0,60)+") : vérifie l'adresse, la clé, et que le déploiement est accessible à « Tout le monde »."; } };
-  const re=el("button",{type:"button",className:"vbtn ghostb",textContent:"Relire et recopier maintenant"}); re.onclick=async()=>{ msg.textContent="…"; try{ const n=await PASS.recopie(); await PASS.relire(true); msg.textContent=(n?n+" moment(s) recopié(s) · ":"")+"tableau relu."; renderPane(cats.get(c.id)); }catch(x){ msg.textContent="Échec : "+String(x.message||x).slice(0,80); } };
+    msg.textContent="Je relis ton tableau…"; try{ await PASS.recopie(); await PASS.relire(true); msg.textContent="C'est branché."; semRedessine(); }catch(x){ msg.textContent="La passerelle ne répond pas ("+String(x.message||x).slice(0,60)+") : vérifie l'adresse, la clé, et que le déploiement est accessible à « Tout le monde »."; } };
+  const re=el("button",{type:"button",className:"vbtn ghostb",textContent:"Relire et recopier maintenant"}); re.onclick=async()=>{ msg.textContent="…"; try{ const n=await PASS.recopie(); await PASS.relire(true); msg.textContent=(n?n+" moment(s) recopié(s) · ":"")+"tableau relu."; semRedessine(); }catch(x){ msg.textContent="Échec : "+String(x.message||x).slice(0,80); } };
   const ol=el("ol",{className:"sempas"}); ["Ouvre ton tableau « Tracking Planning » → Extensions → Apps Script.","Colle le code de la passerelle (bouton ci-dessous), puis enregistre.","Paramètres du projet (roue dentée) → Propriétés du script → ajoute CLE avec un mot de passe à toi.","Déployer → Nouveau déploiement → type « Application web » ; exécuter en tant que : moi ; accès : tout le monde. Autorise, puis copie l'adresse qui finit par /exec.","Colle l'adresse et ta clé ici. Fais-le sur chaque appareil (elles ne quittent pas l'appareil)."].forEach(t=>ol.appendChild(el("li",{textContent:t})));
   const code=el("a",{className:"vbtn ghostb",href:"passerelle/tracking-planning.gs",target:"_blank",rel:"noopener",textContent:"Voir le code de la passerelle ↗"});
   d.append(el("p",{className:"mut",textContent:"La passerelle relit ton tableau à chaque ouverture de « Ma semaine » (au plus toutes les 10 min) et y écrit les moments ajoutés ici, avec la couleur de la catégorie."}),ol,code,f,PASS.ok()?re:"",msg); return d; }
@@ -7519,7 +7528,7 @@ function start(){
     db.doc("meta/compagnon").onSnapshot(x=>{ if(x.exists&&window._compagnon) window._compagnon(x.data()); },()=>{});
     window._baseSync=B=>db.doc("meta/base").set({p:B.p,j:B.j}).catch(()=>{});
     db.doc("meta/base").onSnapshot(x=>{ if(!x.exists){ const b=window._base.get(); if(b.ok) window._baseSync(b); return; } const d=x.data(), b=window._base.get(); if(d&&(d.p!==b.p||d.j!==b.j)&&window._base.PAL[d.p]){ window._base.garde({p:d.p,j:d.j||"plein"},false); quandLibre("base",()=>location.reload()); } },()=>{});
-    const semRe=()=>{ const c=openId&&cats.get(openId); if(c&&c.type==="habitudes") quandLibre("semaine",()=>renderPane(cats.get(openId))); };
+    const semRe=()=>{ if(document.querySelector("#trajIn .hsemaine")) quandLibre("semaine",semRedessine); };
     db.doc("meta/semaine").onSnapshot(x=>{ SEMAINE=x.exists?x.data():null; semRe(); },()=>{}); db.doc("meta/journees").onSnapshot(x=>{ JOURNEES=x.exists?x.data():null; semRe(); },()=>{});
     db.doc("meta/icones").onSnapshot(x=>ICOLIB.recoit(x.exists?x.data():null),()=>{});
     db.doc("meta/energie").onSnapshot(x=>PILOTE.energie(x.exists?x.data():null),()=>{}); db.doc("meta/revues").onSnapshot(x=>PILOTE.revues(x.exists?x.data():null),()=>{}); db.doc("meta/trajectoire").onSnapshot(x=>ESSAI.trajectoire(x.exists?x.data():null),()=>{}); db.doc("meta/memoire").onSnapshot(x=>ESSAI.memoire(x.exists?x.data():null),()=>{}); db.doc("meta/propositions").onSnapshot(x=>ESSAI.propositions(x.exists?x.data():null),()=>{}); db.doc("meta/suivi").onSnapshot(x=>{ if(window.SUIVI) SUIVI.charge(x.exists?x.data():null); },()=>{}); db.doc("meta/suivis").onSnapshot(x=>{ if(window.SUIVIS) SUIVIS.charge(x.exists?x.data():null); },()=>{}); db.doc("meta/atelier").onSnapshot(x=>{ if(window.ATELIER) ATELIER.charge(x.exists?x.data():null); },()=>{});
@@ -7548,8 +7557,8 @@ function start(){
    C'est elle qui fait foi : une copie gardée sur l'appareil, ou un fichier en ligne, n'est exécuté que si son texte a exactement
    cette empreinte. Une empreinte rangée dans le stockage de l'appareil n'est plus jamais utilisée (qui peut écrire l'un peut écrire
    l'autre). */
-const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=200;
-const PERSO_EMP="9629281944562a5341d440c3d67c3db88d0d4c70fe00704818607db07de87145", PERSO_GIT="3b66b2c9c4d901abd4ab2c2b29579a0ca6fd007e", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
+const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=201;
+const PERSO_EMP="5d58c9a954231df26b4b7d25db0ffc7928a71a9a460c2aaf629656f6b582e426", PERSO_GIT="d5d9f6bc2c6d426ffa3312f5b6629ef2bba96ad2", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
 try{ ["carte-de-vie-perso-sha","carte-de-vie-perso-suivant-sha"].forEach(k=>localStorage.removeItem(k)); }catch{ /* stockage bloqué */ }
 /* le module n'est jamais exécuté deux fois (il pose des minuteries et des écouteurs) */
 let persoFait=false;
@@ -7650,7 +7659,7 @@ function persoDepotUI(){ const pg=document.getElementById("syncLinked"); if(!pg|
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=200; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=201; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0="carte-de-vie-v"+APP_V, rec=false;

@@ -94,12 +94,15 @@ function ecrire(s) {
       var v = m.getCell(1, 1).getDisplayValue(), bg = m.getCell(1, 1).getBackground(), r0 = m.getRow(), r1 = r0 + m.getNumRows(), c = m.getColumn(), w = m.getNumColumns();
       m.breakApart();
       [[r0, L0 + a], [L0 + b, r1]].forEach(function (z) { if (z[1] <= z[0]) return; var P = f.feuille.getRange(z[0], c, z[1] - z[0], w);
-        P.setBackground(bg); P.getCell(1, 1).setValue(v); if (z[1] - z[0] > 1 || w > 1) P.merge(); });
+        P.setBackground(bg); P.getCell(1, 1).setValue(texte(v)); if (z[1] - z[0] > 1 || w > 1) P.merge(); });
     });
     R.clearContent();
     if (b - a > 1) R.merge();
-    R.setValue(String(s.t || '').slice(0, 200)).setWrap(true).setVerticalAlignment('top');
+    R.setValue(texte(String(s.t || '').slice(0, 200))).setWrap(true).setVerticalAlignment('top');
     if (l) R.setBackground(l.hex);
     return { id: s.id, ok: true, feuille: f.feuille.getName() };
   } catch (x) { return { id: s.id, ok: false, erreur: String(x).slice(0, 120) }; }
 }
+
+// un texte qui commence par = + - ou @ serait pris pour une formule par Google Sheets : l'apostrophe le garde en texte
+function texte(v) { v = String(v == null ? '' : v); return /^[=+\-@]/.test(v) ? "'" + v : v; }
