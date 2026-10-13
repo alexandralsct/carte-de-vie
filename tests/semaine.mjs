@@ -5,7 +5,9 @@ const { chromium } = await import(process.env.PLAYWRIGHT || 'playwright');
 const URL = process.env.URL || 'http://localhost:8767/index.html';
 const b = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
 const SEM = { feuille: 'S1', categories: [{ nom: 'A', hex: '#7fc97f' }, { nom: 'B', hex: '#386cb0' }],
-  jours: ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'].map((n, k) => ({ nom: n, date: '2026-01-0' + (5 + k), creneaux: k < 3 ? [['09:00', 'Un', 1], ['09:30', 'Un', 1], ['18:00', 'Deux', 0]] : [] })) };
+  jours: ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'].map((n, k) => ({ nom: n, date: '2026-01-' + String(5 + k).padStart(2, '0'), creneaux: k < 3 ? [['09:00', 'Un', 1], ['09:30', 'Un', 1], ['18:00', 'Deux', 0]] : [] })) };
+/* la passerelle simulée renvoie la copie abîmée vue le 13/10 : lundi et mardi en double (copies vides en tête) */
+SEM.jours = [{ ...SEM.jours[0], creneaux: [] }, { ...SEM.jours[1], creneaux: [] }, ...SEM.jours];
 let ko = 0; const verif = (ok, m, x) => { console.log((ok ? 'OK  ' : 'KO  ') + m + (ok || x === undefined ? '' : ' ' + JSON.stringify(x))); if (!ok) ko++; };
 for (const [nom, ctx] of [['App téléphone', { viewport: { width: 412, height: 915 }, hasTouch: true, isMobile: true }], ['App ordinateur', { viewport: { width: 1280, height: 800 } }]]) {
   console.log('== ' + nom);
@@ -23,6 +25,8 @@ for (const [nom, ctx] of [['App téléphone', { viewport: { width: 412, height: 
   verif(lectures >= 1, nom + ' : semaine vide → le tableau est relu tout de suite, même lu il y a moins de 10 min', { lectures });
   verif(r.blocs === 6 && r.encart, nom + ' : la semaine lue s\'affiche (6 moments) avec l\'encart de la passerelle', r);
   verif(!r.deborde, nom + ' : rien ne dépasse en largeur');
+  const jt = await p.evaluate(() => [...document.querySelectorAll('#trajIn .semhd')].map(x => x.textContent).filter(Boolean));
+  verif(jt.join() === 'lun,mar,mer,jeu,ven,sam,dim', nom + ' : 7 jours, chacun une seule fois, même si la semaine reçue a des doublons', jt);
   const tri = await p.evaluate(() => [...document.querySelectorAll('#trajIn .card h3')].map(h => h.textContent));
   verif(!tri.some(t => /grands sujets|horizons|décisions/i.test(t)), nom + ' : onglet « Ma semaine » : seulement les priorités et le tableau', tri);
   const lu0 = lectures; await p.locator("#trajIn .semnav button[data-n=av]").first().click(); await p.waitForTimeout(800);

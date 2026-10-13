@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-uwEPg/LR3aCjPpW4EPZjyG+bqYW1TTNuqGafi3pmnzo=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-kliq8/Nox5GgvUj19VVGbyaV8sjPvAbiYsEeC7/29bI=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-oDgUrcKbtnSyZA+2cD5I20EgzgSWVFP2dDF/Z7SwH4U=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-XVWuescdyrZxEdy9ierkgoScXzcuycWgj+K8BFOPgnc=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f4eee4">
@@ -6717,6 +6717,9 @@ function semVa(n,qui){ SEM_DEC=Math.min(0,n); const k=semJour();
   if(SEM_DEC<0&&!SEM_CACHE[k]){ if(!PASS.ok()) SEM_CACHE["!"+k]="Branche la passerelle (plus bas) pour revoir tes anciennes semaines.";
     else{ delete SEM_CACHE["!"+k]; PASS.lire(k).then(S=>{ SEM_CACHE[k]=S; },x=>{ SEM_CACHE["!"+k]=/introuvable/.test(String(x&&x.message||x))?"Cette semaine n'est pas dans ton tableau.":"Lecture impossible ("+String(x&&x.message||x).slice(0,50)+")."; }).then(()=>{ if(semJour()===k){ semRedessine(); semFocus(qui); } }); } }
   semRedessine(); semFocus(qui); }
+function semPropre(S){ if(!S||!Array.isArray(S.jours)) return S; const m=new Map();
+  S.jours.forEach(j=>{ const k=j&&j.date, o=m.get(k); if(!o||((j.creneaux||[]).length>(o.creneaux||[]).length)) m.set(k,j); });
+  if(m.size===S.jours.length) return S; return Object.assign({},S,{jours:[...m.values()].sort((a,b)=>String(a.date).localeCompare(String(b.date)))}); }
 function semFocus(qui){ const b=qui&&document.querySelector('#trajIn .semnav [data-n="'+qui+'"]'); if(b&&!b.disabled) b.focus(); }
 function semNav(){ const n=el("div",{className:"semnav"}), av=el("button",{type:"button",className:"vbtn ghostb",textContent:"‹ Avant"}), ap=el("button",{type:"button",className:"vbtn ghostb",textContent:"Après ›"});
   av.dataset.n="av"; ap.dataset.n="ap"; av.setAttribute("aria-label","Semaine d'avant"); ap.setAttribute("aria-label","Semaine d'après"); av.onclick=()=>semVa(SEM_DEC-1,"av"); ap.onclick=()=>semVa(SEM_DEC+1,"ap"); ap.disabled=SEM_DEC>=0;
@@ -6747,7 +6750,7 @@ function semRedessine(){ const x=document.querySelector("#trajIn .hsemaine"); if
 function semLecture(force){ if(!PASS.ok()||renderSemaine.encours) return; renderSemaine.encours=true;
   Promise.resolve().then(async()=>{ let ch=false; try{ ch=(await PASS.recopie())>0; ch=(await PASS.relire(ch||force))||ch; }catch(_){} renderSemaine.encours=false; if(ch) quandLibre("semaine",semRedessine); }); }
 function renderSemaine(c){ const s=el("section",{className:"card hab hsemaine"},el("h3",{textContent:"Ma semaine"}));
-  const passee=SEM_DEC<0, S=passee?SEM_CACHE[semJour()]:SEMAINE; s.appendChild(semNav());
+  const passee=SEM_DEC<0, S=semPropre(passee?SEM_CACHE[semJour()]:SEMAINE); s.appendChild(semNav());
   if(passee&&!S){ s.append(help(SEM_CACHE["!"+semJour()]||"Je lis cette semaine dans ton tableau…")); return s; }
   if(!S||!Array.isArray(S.jours)){ s.append(help("Ta semaine arrive ici depuis ton tableau « Tracking Planning » : le temps passé par catégorie et ta semaine en couleurs."),semPasserelle(c));
     /* première lecture forcée une seule fois par ouverture de l'app (sinon, tableau toujours vide : relecture sans fin) */
@@ -7578,8 +7581,8 @@ function start(){
    C'est elle qui fait foi : une copie gardée sur l'appareil, ou un fichier en ligne, n'est exécuté que si son texte a exactement
    cette empreinte. Une empreinte rangée dans le stockage de l'appareil n'est plus jamais utilisée (qui peut écrire l'un peut écrire
    l'autre). */
-const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=202;
-const PERSO_EMP="550b790384cfb7f29500baadd1e26e1ec63712257d3c4e9ffb7df0037037a66f", PERSO_GIT="4988b2e086d261bbfec7d29c3fcaa02dfe26ea00", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
+const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=203;
+const PERSO_EMP="94525c0406e6872abdcc09df24b323f5fd658f17054c59697f3b8039576b491f", PERSO_GIT="96e0f7109d6b3b08504cd5c192dc0a4dd38e231d", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
 try{ ["carte-de-vie-perso-sha","carte-de-vie-perso-suivant-sha"].forEach(k=>localStorage.removeItem(k)); }catch{ /* stockage bloqué */ }
 /* le module n'est jamais exécuté deux fois (il pose des minuteries et des écouteurs) */
 let persoFait=false;
@@ -7680,7 +7683,7 @@ function persoDepotUI(){ const pg=document.getElementById("syncLinked"); if(!pg|
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=202; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=203; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0="carte-de-vie-v"+APP_V, rec=false;
