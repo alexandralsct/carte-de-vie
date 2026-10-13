@@ -48,6 +48,6 @@ jobs:
         env:
           MOTS: ${{ secrets.MOTS_INTERDITS }}
           # commits connus et acceptés par la propriétaire (pas de réécriture de l'historique, décision du 13/10) :
-          # cd47f08 premier commit (version 155) ; 036ddc6 version 180 (nom du service d'automatisation dans 3 textes d'aide, retirés en 182) ; e71e73a V.1.9.6 (même nom dans la règle de sécurité, retiré en V.1.9.7).
-          HISTO_CONNUS: "cd47f08 036ddc6 e71e73a"
+          # 62e7e79 premier commit (version 155) ; 04d20ed version 180 (nom du service d'automatisation dans 3 textes d'aide, retirés en 182) ; e049a37 V.1.9.6 (même nom dans la règle de sécurité, retiré en V.1.9.7).
+          HISTO_CONNUS: "62e7e79 04d20ed e049a37"
         run: bash tests/garde-fou.sh --historique
