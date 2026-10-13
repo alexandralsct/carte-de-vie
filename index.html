@@ -2174,6 +2174,8 @@ html body header .top3a .noterb{display:none!important}
   /* Aujourd'hui, À valider, Ma semaine : plus hautes */
   html body .bande>.puce2:not(.pcarre):not(.atpuce){min-height:100px!important;align-content:space-between}
 }
+/* compagnon : rien ne dépasse sur les côtés (sinon le téléphone dézoome la page) */
+.cpnZone{position:absolute;left:0;top:0;width:100%;height:0;overflow-x:clip;overflow-y:visible}
 
 html.klein .node .ico svg,html.klein .node .ico{color:#002fa7!important;--c:#002fa7}
 </style>
@@ -6854,7 +6856,7 @@ function fete(x,y){ burst(x,y); setTimeout(()=>burst(x-70,y-30),140); setTimeout
       cat.innerHTML='<div class="own2" style="aspect-ratio:'+(+P.w||1)+'/'+(+P.h||1)+'">'+pc(P.tail,"tl4")+P.legs.map((q,i)=>pc(q,"lg l"+(i+1))).join("")+pc({src:P.body,x:0,y:0,w:P.w,h:P.h},"bd4")+'</div>'+SVG.replace('<svg ','<svg class="boxsvg" '); }
     else if(animal==="photo"){ cat.innerHTML='<div class="own" style="aspect-ratio:'+(+own.w||1)+'/'+(+own.h||1)+';-webkit-mask-image:url(&quot;'+imgSure(own.src)+'&quot;);mask-image:url(&quot;'+imgSure(own.src)+'&quot;)"></div>'+SVG.replace('<svg ','<svg class="boxsvg" '); }
     else cat.innerHTML=animal==="chien"?DOG:SVG+DOSCHAT+FACECHAT; ball.innerHTML=animal==="chien"?BALL:YARN; cat.setAttribute("aria-label",animal==="chien"?"Le chien":"Le chat"); }; habille(); cat.hidden=ball.hidden=bulle.hidden=true; ball.setAttribute("aria-label","La balle");
-  document.body.append(ball,cat,bulle);
+  const cpnZone=el("div",{className:"cpnZone"}); cpnZone.append(ball,cat); document.body.append(cpnZone,bulle);
   /* le chat vit dans la page ouverte (item, Moi…) : il défile avec son contenu, jamais collé à l'écran */
   const hote=()=>[...document.querySelectorAll("aside.page")].find(q=>!q.hidden)||null, sY=()=>window.scrollY, sX=()=>window.scrollX;
   const sw=$("petSw"); let on=true, t=0, run=0, C={x:-200,y:0}, bulleFor=null; try{ on=localStorage.getItem("compagnon")!=="0"; }catch(_){}
@@ -6888,7 +6890,7 @@ function fete(x,y){ burst(x,y); setTimeout(()=>burst(x-70,y-30),140); setTimeout
       await wait(250); await moveTo(clampX(bx-dir*W()*.62),C.y,140); if(id!==run) return; cat.style.setProperty("--dir",dir); pose("joue"); await wait(1100); if(id!==run) return; }
     pose("sit"); await wait(900); }
   /* le chat est toujours là : il se promène, s'assoit, fait la sieste, joue, et vient montrer les urgences */
-  const clampX=x=>Math.max(W()/2+4,Math.min(innerWidth-W()/2-4,x)), docH=()=>Math.max(document.documentElement.scrollHeight,innerHeight), solY=()=>Math.round(H()+30+Math.random()*Math.max(1,docH()-H()-60));
+  const clampX=x=>Math.max(W()/2+4,Math.min(document.documentElement.clientWidth-W()/2-4,x)), docH=()=>Math.max(document.documentElement.scrollHeight,innerHeight), solY=()=>Math.round(H()+30+Math.random()*Math.max(1,docH()-H()-60));
   let vuUrg=0;
   /* il feule et gonfle ses poils (le chien grogne) */
   async function feuler(id,html){ if(animal!=="chien") pose("feule"); else pose("sit"); dire(html.replace("Ffff !",animal!=="chien"?"Ffff !":"Grrr !"),true,null); await wait(2800); if(id!==run) return; tais(); pose("sit"); await wait(600); }
@@ -6936,10 +6938,10 @@ function fete(x,y){ burst(x,y); setTimeout(()=>burst(x-70,y-30),140); setTimeout
   /* il se fait les griffes : debout, les pattes avant grattent, des petites rayures apparaissent */
   async function griffes(id){ pose("griffe"); const g=el("div",{className:"griffes"}); g.textContent="///"; const d=cat.style.getPropertyValue("--dir")==="-1"?-1:1; g.style.left=(C.x+d*W()*.42-8)+"px"; g.style.top=(C.y-H()*.55)+"px"; document.body.appendChild(g); await wait(2400); g.remove(); if(id!==run) return; pose("sit"); await wait(600); }
   /* une souris passe : il lui court après jusqu'au bord, puis s'assoit, l'air de rien */
-  async function souris(id){ const dir=C.x<innerWidth/2?1:-1, y=C.y, x0=C.x+dir*W()*.9, x1=dir>0?innerWidth+30:-30; sou.style.setProperty("--sd",dir); sou.hidden=false;
+  async function souris(id){ const dir=C.x<document.documentElement.clientWidth/2?1:-1, y=C.y, x0=C.x+dir*W()*.9, x1=dir>0?document.documentElement.clientWidth+30:-30; sou.style.setProperty("--sd",dir); sou.hidden=false;
     const a=sou.animate([{transform:`translate(${x0}px,${y-14}px)`},{transform:`translate(${x1}px,${y-14}px)`}],{duration:Math.abs(x1-x0)/260*1000,easing:"cubic-bezier(.3,.1,.6,1)",fill:"forwards"});
     cat.style.setProperty("--dir",dir); pose("sit"); await wait(350); if(id!==run){ a.cancel(); sou.hidden=true; return; } motChat("!","vif");
-    await moveTo(clampX(dir>0?innerWidth-W()*.6:W()*.6),y,230); a.finished.catch(()=>{}).then(()=>{ sou.hidden=true; }); if(id!==run) return;
+    await moveTo(clampX(dir>0?document.documentElement.clientWidth-W()*.6:W()*.6),y,230); a.finished.catch(()=>{}).then(()=>{ sou.hidden=true; }); if(id!==run) return;
     pose("sit"); await wait(1200); if(id!==run) return; cat.style.setProperty("--dir",-dir); await miaule(id); }
   /* il remue la queue, franchement, assis */
   async function queue(id){ pose("sit queue"); await wait(2600); if(id!==run) return; pose("sit"); }
@@ -7338,7 +7340,7 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=194; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=195; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
