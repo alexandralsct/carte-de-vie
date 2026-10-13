@@ -1,0 +1,42 @@
+# Tests de l'app à chaque envoi : fusion des données (sans navigateur), puis non-régression, synchronisation (faux GitHub),
+# PWA (service worker réel) et accessibilité (axe-core), chacun en deux parties « App téléphone » puis « App ordinateur ».
+# Aucun secret : seulement la carte de démonstration fictive des tests ; aucun appel à un vrai service (tout est imité).
+# Les mesures de performance (tests/mesures.mjs) dépendent de la machine : elles sont affichées sans faire échouer le contrôle.
+name: Tests de l'app
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      URL: http://localhost:8767/index.html
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fusion des données (sans navigateur)
+        run: node tests/fusion.mjs
+      - name: Playwright, Chromium et axe-core (versions fixées)
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1 axe-core@4.10.2
+          npx playwright install --with-deps chromium
+      - name: Serveur local
+        run: |
+          python3 -m http.server 8767 >/dev/null 2>&1 &
+          sleep 1
+      - name: Non-régression (téléphone puis ordinateur)
+        run: node tests/regression.mjs
+      - name: Synchronisation avec un faux GitHub (téléphone puis ordinateur)
+        run: node tests/synchro.mjs
+      - name: PWA et service worker (téléphone puis ordinateur)
+        run: node tests/pwa.mjs
+      - name: Accessibilité, axe-core hors réseau (téléphone puis ordinateur)
+        run: node tests/accessibilite.mjs
+      - name: Mesures de performance (indicatives)
+        run: BUDGETS=0 COURT=1 node tests/mesures.mjs
