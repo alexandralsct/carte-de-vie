@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-oDgUrcKbtnSyZA+2cD5I20EgzgSWVFP2dDF/Z7SwH4U=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-XVWuescdyrZxEdy9ierkgoScXzcuycWgj+K8BFOPgnc=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-WGQillY3qH8/StUusVFJhgEM1C7N3drsagwrBbFFblo=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-0WRUPB5Wp78C1sdchJbaL89Dnn4yGE3RkbS8gjIDvrE=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f4eee4">
@@ -2180,6 +2180,29 @@ html body header .top3a .noterb{display:none!important}
 .cpnZone{position:absolute;left:0;top:0;width:100%;height:0;overflow-x:clip;overflow-y:visible}
 
 .semnav{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:2px 0 10px}.semnav .semnavl{flex:1;min-width:8em;text-align:center;font-weight:600}.semnav button:disabled{opacity:.4}
+/* Version 204 : « Ce que LIFE a appris de moi » dans la page du cerveau (téléphone et ordinateur) */
+.omni .omnipause{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin:4px 0 10px}
+.omni .omnicontra{border:2px dashed var(--k1);border-radius:14px;padding:8px 12px;margin:0 0 10px}
+.omni .omnicontra p{margin:4px 0 0}
+.omni .omnicw{margin:4px 0 10px}
+.omni .omnicarte{width:100%;max-width:520px;height:auto;display:block;margin:0 auto}
+.omni .omnil{stroke:currentColor;opacity:.35}
+.omni .omnin circle{fill:var(--surface);stroke:currentColor;stroke-width:1.6}
+.omni .omnin.d circle{fill:var(--pale,#dbe3f7)}
+.omni .omnin.on circle{fill:currentColor}
+.omni .omnin{cursor:pointer;outline:none}
+.omni .omnin:focus-visible circle{stroke-width:3}
+.omni .omnin text{font-size:11px;fill:currentColor}
+.omni .omniq{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
+.omni .omnifil{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.omni .omnifil li{border:1.5px solid var(--k1);border-radius:14px;padding:8px 12px;display:grid;gap:4px}
+.omni .omnifil li p{margin:0}
+.omni .omnitete{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.omni .omnist{font-size:11px;font-weight:700;border-radius:999px;padding:1px 8px;border:1.5px solid currentColor}
+.omni .omnist.s-àconfirmer{border-style:dashed}
+.omni .omnist.s-contradiction{background:currentColor;color:var(--surface)}
+.omni .omnioub{justify-self:start}
+
 html.klein .node .ico svg,html.klein .node .ico{color:#002fa7!important;--c:#002fa7}
 html.demarre .wrap>:not(header){visibility:hidden!important}
 /* accessibilité (13/10) : titre de l'accueil lisible par les lecteurs d'écran seulement */
@@ -5590,7 +5613,7 @@ const MEMP={ L:[], notes:[], sub:false,
       it.slice(1).forEach(t=>{ if(ok(t)||(ok((c.name||"")+" "+t)&&!ok(c.name))) R.push({src:c.name,c,texte:t}); }); });
     return R.slice(0,40); },
   ouvre(){ this.ecoute(); const inn=PAGEX("memPersoPage","Ma mémoire");
-    inn.appendChild(el("p",{className:"help",textContent:"Ce que tu veux retenir, et une recherche dans toute ta carte. L'assistant Telegram pourra lire et compléter cette mémoire."}));
+    inn.appendChild(el("p",{className:"help",textContent:"Ce que LIFE a appris de toi, ce que tu veux retenir, et une recherche dans toute ta carte."}));
     const sq=el("section",{className:"card soirc"},el("h3",{textContent:"Qu'est-ce que je sais sur… ?"})), q=el("input",{type:"search",placeholder:"Un mot, une personne, un projet…"}), res=el("div",{className:"memres"});
     q.setAttribute("aria-label","Chercher dans ma mémoire"); q.oninput=()=>{ res.textContent=""; const v=q.value.trim(); if(v.length<2) return; const R=this.cherche(v);
       if(!R.length){ res.appendChild(help("Rien de trouvé pour « "+v+" ». Je ne l'invente pas : retiens-le ci-dessous si tu veux le garder.")); return; }
@@ -5619,7 +5642,6 @@ const MEMP={ L:[], notes:[], sub:false,
   item("✦","Clé du lien (copier, coller, créer)",()=>CLEF.ouvre());
   item("✉︎","LIFE, ma messagerie",()=>LIFEP.ouvre());
   if("Notification" in window&&Notification.permission!=="granted") item("◷",Notification.permission==="denied"?"Rappels bloqués (réglages du téléphone)":"Activer les rappels (énergie 20 h, journée 21 h)",()=>{ if(Notification.permission==="denied") alert("Les notifications sont bloquées pour l'app : autorise-les dans les réglages du téléphone (Applications → Ma carte de vie → Notifications), puis rouvre l'app."); else RAPPELS.active(); });
-  item("◎","Ma mémoire perso",()=>MEMP.ouvre());
   if($("sugBtn")) item("✎","Mes idées pour l'app",()=>$("sugBtn").click(),"r-proprio");
   [...box.children].forEach(b=>{ const t=(b.querySelector("span")||{}).textContent||""; if(!/^(Noter|Notes|Urgences)$/.test(t)) b.remove(); });
   rail.append(tir,box); document.body.appendChild(rail);
@@ -6461,6 +6483,66 @@ const svgIco=k=>'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="curren
   const oI=renderIa; renderIa=function(){ const r=oI.apply(this,arguments); try{ poseIcones(); }catch(_){} return r; }; setTimeout(()=>{ try{ poseIcones(); }catch(_){} },900); }
 /* LIFE ouverte dans la carte : son propre bouton ← ramène à la carte ; la barre « ← Ma carte » de la carte n'est plus utile */
 window.addEventListener("message",e=>{ if(e.origin===location.origin&&e.data&&e.data.life==="fermer"){ try{ LIFEP.ferme(); }catch(_){} } });
+
+/* ===== Version 204 : le cerveau « Ma mémoire » réunit la mémoire de l'app et ce que LIFE a appris (meta/omniscient) =====
+   meta/omniscient (lecture seule, posé par le système) : { pause, total, intime, fil:[{id,date,assistant,domaine,type,zone,
+   statut,couche,confiance,contenu,source}], noeuds:[{id,genre:"domaine"|"assistant",n}], liens:[{de,vers,n}],
+   contradictions:[{id,date,contenu}], _m }. La zone intime n'y entre jamais (seul son nombre).
+   L'app n'écrit rien ici : « Oublie ça », la pause et les questions PRÉPARENT un message dans LIFE (fil Général) ; la
+   personne le relit et touche Envoyer. Tout texte reçu est affiché avec textContent. */
+const OMNI={ d:null, filtre:null, z:null,
+  charge(d){ this.d=d&&typeof d==="object"?d:null; this.rend(); },
+  /* ouvre LIFE et y prépare le message (jamais envoyé sans la personne) */
+  prepare(texte){ LIFEP.ouvre(); const f=document.querySelector("#lifeP iframe"); if(!f) return;
+    const go=()=>{ try{ f.contentWindow.postMessage({life:"preparer",fil:"general",texte},location.origin); }catch(_){} };
+    if(LIFEP.pret) go(); else { LIFEP.attente=go; } },
+  date(s){ const x=new Date(String(s||"").length<=10?s+"T12:00":s); return isNaN(x)?String(s||""):x.toLocaleDateString("fr-FR",{day:"numeric",month:"short"}); },
+  STAT:{"règle":"règle","regle":"règle","confirmé":"confirmé","confirme":"confirmé","proposé":"à confirmer","propose":"à confirmer","contradiction":"contradiction"},
+  section(){ const s=el("section",{className:"card soirc omni"}); this.z=s; this.rend(); return s; },
+  rend(){ const s=this.z; if(!s) return; s.textContent=""; const D=this.d;
+    s.appendChild(el("h3",{textContent:"Ce que LIFE a appris de moi"}));
+    if(!D){ s.appendChild(help("Rien encore : LIFE dépose ici ce qu'il apprend de toi (deux fois par jour, à 7 h 30 et 19 h 30). En attendant, ta mémoire à toi est plus bas.")); return; }
+    const L=Array.isArray(D.fil)?D.fil:[], N=Array.isArray(D.noeuds)?D.noeuds:[], K=Array.isArray(D.liens)?D.liens:[], C=Array.isArray(D.contradictions)?D.contradictions:[];
+    s.appendChild(el("p",{className:"mut",textContent:(D.total||L.length)+" choses retenues"+(D.intime?" · "+D.intime+" intimes, jamais montrées ici":"")+(D._m?" · mis à jour le "+this.date(new Date(D._m).toISOString()):"")}));
+    /* pause */
+    const pz=el("div",{className:"omnipause"}), pb=el("button",{type:"button",className:"vbtn ghostb",textContent:D.pause?"Reprendre":"Mettre en pause"});
+    pz.append(el("span",{textContent:D.pause?"⏸ En pause : LIFE ne lit ni n'écrit rien.":"LIFE retient ce que tu lui dis."}),pb);
+    pb.onclick=()=>this.prepare(D.pause?"Reprends Omniscient":"Mets Omniscient en pause"); s.appendChild(pz);
+    /* contradictions */
+    if(C.length){ const c=el("div",{className:"omnicontra"},el("b",{textContent:"À éclaircir"})); C.slice(0,5).forEach(x=>c.appendChild(el("p",{textContent:this.date(x.date)+" · "+String(x.contenu||"")}))); s.appendChild(c); }
+    /* carte mentale : les domaines en cercle, les assistants au centre ; épaisseur du trait = nombre de choses retenues */
+    if(N.length) s.appendChild(this.carte(N,K));
+    /* questions */
+    const q=el("div",{className:"omniq"}); [["Qu'as-tu appris de moi ?","Qu'as-tu appris de moi ?"],["Dis-moi qui je suis","Dis-moi qui je suis"]].forEach(([t,m])=>{ const b=el("button",{type:"button",className:"vbtn ghostb",textContent:t}); b.onclick=()=>this.prepare(m); q.appendChild(b); });
+    s.appendChild(q);
+    /* le fil des nouveautés */
+    const F=L.filter(x=>!this.filtre||x.domaine===this.filtre||x.assistant===this.filtre);
+    if(this.filtre){ const b=el("button",{type:"button",className:"vbtn ghostb",textContent:"✕ "+this.filtre+" · tout revoir"}); b.onclick=()=>{ this.filtre=null; this.rend(); }; s.appendChild(b); }
+    if(!F.length){ s.appendChild(help("Rien dans le fil pour l'instant.")); return; }
+    const ul=el("ul",{className:"omnifil"}); F.slice(0,80).forEach(x=>{ const st=this.STAT[String(x.statut||"").toLowerCase()]||String(x.statut||"");
+      const li=el("li",{},el("div",{className:"omnitete"},el("span",{className:"omnist s-"+st.replace(/[^a-zà-ü]/gi,""),textContent:st||"—"}),el("small",{className:"mono",textContent:[this.date(x.date),x.assistant,x.domaine].filter(Boolean).join(" · ")})),
+        el("p",{textContent:String(x.contenu||"")}));
+      if(x.source) li.appendChild(el("small",{className:"mut",textContent:"parce que : "+String(x.source)}));
+      if(x.id){ const o=el("button",{type:"button",className:"vbtn ghostb omnioub",textContent:"Oublie ça"}); o.setAttribute("aria-label","Oublie ça : "+String(x.contenu||"").slice(0,60)); o.onclick=()=>this.prepare("oublie "+x.id); li.appendChild(o); }
+      ul.appendChild(li); }); s.appendChild(ul); },
+  carte(N,K){ const W=320, H=240, cx=W/2, cy=H/2, dom=N.filter(x=>x.genre==="domaine"), as=N.filter(x=>x.genre!=="domaine"), P={};
+    dom.forEach((x,i)=>{ const a=2*Math.PI*i/Math.max(1,dom.length)-Math.PI/2; P[x.id]=[cx+Math.cos(a)*(W/2-46),cy+Math.sin(a)*(H/2-26)]; });
+    as.forEach((x,i)=>{ const a=2*Math.PI*i/Math.max(1,as.length)+Math.PI/4; P[x.id]=[cx+Math.cos(a)*(as.length>1?38:0),cy+Math.sin(a)*(as.length>1?26:0)]; });
+    const mx=Math.max(1,...N.map(x=>+x.n||1)), mk=Math.max(1,...K.map(x=>+x.n||1)), NS="http://www.w3.org/2000/svg", svg=document.createElementNS(NS,"svg");
+    svg.setAttribute("viewBox","0 0 "+W+" "+H); svg.setAttribute("class","omnicarte"); svg.setAttribute("role","group"); svg.setAttribute("aria-label","Carte de ce que LIFE a appris : touche un domaine pour filtrer le fil");
+    const mk2=(t,at)=>{ const e=document.createElementNS(NS,t); Object.entries(at).forEach(([k,v])=>e.setAttribute(k,v)); return e; };
+    K.forEach(l=>{ const a=P[l.de], b=P[l.vers]; if(a&&b) svg.appendChild(mk2("line",{x1:a[0],y1:a[1],x2:b[0],y2:b[1],"stroke-width":(1+4*(+l.n||1)/mk).toFixed(1),class:"omnil"})); });
+    N.forEach(x=>{ const p=P[x.id]; if(!p) return; const r=(6+10*Math.sqrt((+x.n||1)/mx)).toFixed(1), g=mk2("g",{class:"omnin "+(x.genre==="domaine"?"d":"a")+(this.filtre===x.id?" on":"")});
+      g.appendChild(mk2("circle",{cx:p[0],cy:p[1],r})); const t=mk2("text",{x:p[0],y:+p[1]+(+r)+11,"text-anchor":"middle"}); t.textContent=String(x.id).slice(0,18); g.appendChild(t);
+      g.setAttribute("tabindex","0"); g.setAttribute("role","button"); g.setAttribute("aria-label",x.id+", "+(x.n||0)+" choses retenues"+(this.filtre===x.id?", filtre actif":""));
+      const f=()=>{ this.filtre=this.filtre===x.id?null:x.id; this.rend(); }; g.addEventListener("click",f); g.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); f(); } });
+      svg.appendChild(g); });
+    return el("div",{className:"omnicw"},svg); } };
+/* LIFE dit qu'il est prêt à recevoir un message préparé */
+window.addEventListener("message",e=>{ if(e.origin===location.origin&&e.data&&e.data.life==="pret"){ LIFEP.pret=true; const a=LIFEP.attente; LIFEP.attente=null; if(a) setTimeout(a,50); } });
+/* la page du cerveau : « Ce que LIFE a appris de moi » en tête, puis la mémoire de l'app (recherche, retenir, souvenirs) */
+{ const e=MEMP.ecoute.bind(MEMP); MEMP.ecoute=function(){ e(); if(!OMNI.sub&&db){ OMNI.sub=true; db.doc("meta/omniscient").onSnapshot(x=>OMNI.charge(x.exists?x.data():null),()=>{}); } };
+  const o=MEMP.ouvre.bind(MEMP); MEMP.ouvre=function(){ o(); const z=$("memPersoPage"), c=z&&z.querySelector(".card"); if(c&&!z.querySelector(".omni")) c.before(OMNI.section()); }; }
 
 /* A8 : une icône qui ne charge pas laisse la place au logo de l'app, plus de carré blanc */
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&!i.dataset.repli&&(i.classList.contains("lgimg")||i.closest(".node,.ico"))){ i.dataset.repli="1"; i.src="icon-192.png"; i.classList.add("repli"); } },true);
@@ -7581,8 +7663,8 @@ function start(){
    C'est elle qui fait foi : une copie gardée sur l'appareil, ou un fichier en ligne, n'est exécuté que si son texte a exactement
    cette empreinte. Une empreinte rangée dans le stockage de l'appareil n'est plus jamais utilisée (qui peut écrire l'un peut écrire
    l'autre). */
-const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=203;
-const PERSO_EMP="94525c0406e6872abdcc09df24b323f5fd658f17054c59697f3b8039576b491f", PERSO_GIT="96e0f7109d6b3b08504cd5c192dc0a4dd38e231d", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
+const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=204;
+const PERSO_EMP="41da611b53d41dc1628acc81236032086077cdbff2ab6dbd3e857f47eba14098", PERSO_GIT="d7865836e2954cb3515be0ad35f091dc5af12a36", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
 try{ ["carte-de-vie-perso-sha","carte-de-vie-perso-suivant-sha"].forEach(k=>localStorage.removeItem(k)); }catch{ /* stockage bloqué */ }
 /* le module n'est jamais exécuté deux fois (il pose des minuteries et des écouteurs) */
 let persoFait=false;
@@ -7683,7 +7765,7 @@ function persoDepotUI(){ const pg=document.getElementById("syncLinked"); if(!pg|
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=203; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=204; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0="carte-de-vie-v"+APP_V, rec=false;
