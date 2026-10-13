@@ -2089,7 +2089,6 @@ html.nu #iaBtn.memb b svg{width:60%!important;height:60%!important}
 /* --- TÉLÉPHONE (écran tactile) : cibles de 44 px, tout sur une colonne --- */
 @media (pointer:coarse),(max-width:899px){
   .top3a .btn{min-width:44px!important;min-height:44px!important}
-  .days{gap:4px}.days .day{min-width:42px;min-height:46px}
   .board .v3add,.board .rgBtn{min-height:40px}
   .items input[type=checkbox],li input[type=checkbox]{width:22px;height:22px}
   .pcarres .pcarre{width:76px!important;height:76px!important}
@@ -2105,7 +2104,6 @@ html.nu #iaBtn.memb b svg{width:60%!important;height:60%!important}
   .bande .raccs.pcarres{gap:8px}
   .pcarres .pcarre{width:96px!important;height:96px!important}.pcarres .pcarre small{font-size:12px!important}
   .pcarres .pcarre.pchemin{width:200px!important}
-  .days .day{min-width:48px;min-height:52px}.days .day small{font-size:12.5px!important}
   .node b{font-size:13px!important}
   aside.page .page-in{max-width:960px;margin-left:auto;margin-right:auto}
   aside.page .lead,aside.page .help,aside.page p{max-width:680px}
@@ -2124,13 +2122,12 @@ html[data-theme="sombre"]:not(.zz1):not(.zz2) body #agenda .day[aria-current=dat
 html[data-theme="sombre"] body #agenda .day.passe{color:#9aabd4!important}
 :root[data-theme="sombre"] .rcard small,:root[data-theme="sombre"] .rcard .mono{color:#9aabd4!important}
 html body .bande .puce2 span{font-size:12px!important}
-@media (min-width:900px) and (pointer:fine){ html body #agenda .day{min-width:48px;min-height:52px} html body #agenda .day small{font-size:12.5px!important} html body #agenda .day b{font-size:16px!important} }
+@media (min-width:900px) and (pointer:fine){ }
 html body .board .zgrid .node b,html body .board .node b{font-size:12px!important}
 html body .bande .pcarres .pcarre small{font-size:12px!important}
 @media (min-width:900px) and (pointer:fine){ html body .board .zgrid .node b,html body .board .node b{font-size:13px!important} }
 @media (pointer:coarse),(max-width:899px){
   html body .top3a .btn{min-width:44px!important;min-height:44px!important;width:44px;height:44px}
-  html body #agenda .day{min-height:46px!important}
   html body .pcarres .pcarre{width:72px!important;height:72px!important;flex:none}
   html body .pcarres .pcarre.pchemin{width:150px!important}
 }
@@ -7325,7 +7322,7 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=190; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=191; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
