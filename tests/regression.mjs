@@ -2,7 +2,9 @@
    Usage : python3 -m http.server 8767 (à la racine du dépôt), puis node tests/regression.mjs
    Par défaut, une carte de démonstration neutre (ci-dessous) est chargée : le test ne dépend d'aucune donnée réelle.
    CARTE=/chemin/vers/sauvegarde.json : rejoue en plus le parcours sur une sauvegarde (export depuis Réglages).
-   CHROMIUM : chemin du navigateur si Playwright ne le trouve pas ; PLAYWRIGHT : chemin du module si besoin. */
+   CHROMIUM : chemin du navigateur si Playwright ne le trouve pas ; PLAYWRIGHT : chemin du module si besoin.
+   Deux parties, comme deux produits : « App téléphone » (Galaxy S9+ émulé, tactile, 412 et 390 px) puis « App ordinateur »
+   (souris, 1280 px, pointer:fine : les règles de l'app ordinateur s'appliquent vraiment), avec quelques budgets de performance. */
 const { chromium, devices } = await import(process.env.PLAYWRIGHT || 'playwright');
 const URL = process.env.URL || 'http://localhost:8767/index.html', CARTE = process.env.CARTE;
 const b = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
@@ -29,8 +31,9 @@ const DEMO = {
     { id: 'p1', name: 'Séances', items: [it('Course', true), it('Natation')] },
     { id: 'p2', name: 'Objectif kilomètres', type: 'objectif', cible: 100, actuel: 20, unite: 'km', pas: 5, items: [] }]),
 };
-const ouvre = async (vp, theme = 'clair') => {
-  const ctx = await b.newContext(Object.assign({}, devices['Galaxy S9+'], { viewport: vp || { width: 412, height: 915 }, serviceWorkers: 'block', locale: 'fr-FR', timezoneId: 'Europe/Paris' }));
+const TEL = devices['Galaxy S9+'], ORDI = { viewport: { width: 1280, height: 900 }, deviceScaleFactor: 1, isMobile: false, hasTouch: false };
+const ouvre = async (vp, theme = 'clair', profil = TEL) => {
+  const ctx = await b.newContext(Object.assign({}, profil, { viewport: vp || profil.viewport || { width: 412, height: 915 }, serviceWorkers: 'block', locale: 'fr-FR', timezoneId: 'Europe/Paris' }));
   await ctx.addInitScript(([carte, theme]) => { if (!sessionStorage.getItem('init')) { sessionStorage.setItem('init', '1'); localStorage.clear(); localStorage.setItem('carte-de-vie-v1', carte);
     ['hRap', 'compagnon', 'mouvements'].forEach(k => localStorage.setItem(k, '0')); localStorage.setItem('carte-de-vie-vu', '1'); localStorage.setItem('theme', theme); } }, [JSON.stringify(DEMO), theme]);
   const p = await ctx.newPage(); const err = []; p.on('pageerror', e => err.push(e.message));
@@ -46,6 +49,7 @@ const rub = (p, nom) => p.evaluate(nom => { const t = [...document.querySelector
 /* ouvre une rubrique seule, en touchant sa tuile (comme on le fait au doigt) */
 const tuile = (p, rid) => p.evaluate(rid => { const t = document.querySelector('#pane .rcard[data-rid="' + rid + '"], #pane .mtile[data-rid="' + rid + '"]'); if (t) t.click(); return !!t; }, rid);
 
+console.log('== App téléphone');
 { const { ctx, p, err, cdp } = await ouvre();
   const noms = await p.evaluate(() => [...document.querySelectorAll('.node b')].map(x => x.textContent.replace(/\s+/g, ' ').trim()).filter(Boolean));
   ok(noms.length >= 4, 'la carte affiche ' + noms.length + ' items');
@@ -109,15 +113,57 @@ const tuile = (p, rid) => p.evaluate(rid => { const t = document.querySelector('
     await ferme(p); await p.waitForTimeout(300); }
   ok(!err.length, 'aucune erreur JavaScript' + (err.length ? ' : ' + err.slice(0, 3).join(' / ') : ''));
   await ctx.close(); }
-/* 6. thème sombre et ordinateur (1280 px) : la carte et chaque item s'affichent sans erreur */
-for (const [vp, theme] of [[{ width: 390, height: 844 }, 'sombre'], [{ width: 1280, height: 900 }, 'clair']]) {
+/* 6. thème sombre (app téléphone, 390 px) : la carte et chaque item s'affichent sans erreur */
+for (const [vp, theme] of [[{ width: 390, height: 844 }, 'sombre']]) {
   const { ctx, p, err } = await ouvre(vp, theme); const tag = vp.width + ' ' + theme;
   const n = await p.evaluate(() => document.querySelectorAll('.node').length); ok(n >= 4, tag + ' : la carte s\'affiche (' + n + ')');
   const noms = await p.evaluate(() => [...document.querySelectorAll('.node b')].map(x => x.textContent.replace(/\s+/g, ' ').trim()).filter(Boolean));
   for (const nom of noms) { await item(p, nom); await p.waitForTimeout(500); if (await debord(p)) ok(false, tag + ' : défilement horizontal dans « ' + nom + ' »'); await ferme(p); await p.waitForTimeout(250); }
   ok(!err.length, tag + ' : aucune erreur JavaScript' + (err.length ? ' : ' + err.slice(0, 3).join(' / ') : '')); await ctx.close(); }
-/* 7. le carnet de recettes (module personnel seulement) */
+/* 7. budgets simples, app téléphone (CPU normal) : ouvrir un espace, activité à l'arrêt, mémoire */
+const budgets = async (nom, p, cdp, B) => {
+  const t = await p.evaluate(async () => { const n = document.querySelector('.node'); const t0 = performance.now(); n.click(); await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); return Math.round(performance.now() - t0); });
+  await p.waitForTimeout(400); await ferme(p); await p.waitForTimeout(800);
+  await cdp.send('Performance.enable'); const m = async () => Object.fromEntries((await cdp.send('Performance.getMetrics')).metrics.map(x => [x.name, x.value]));
+  const a = await m(); await p.waitForTimeout(3000); const z = await m(); const ms = Math.round((z.TaskDuration - a.TaskDuration) * 1000 / 3), tas = Math.round(z.JSHeapUsedSize / 1048576);
+  ok(t < B.ouvrir, nom + ' : budget « ouvrir un espace » (' + t + ' ms < ' + B.ouvrir + ')');
+  ok(ms < B.repos, nom + ' : budget à l\'arrêt (' + ms + ' ms de tâches/s < ' + B.repos + ')');
+  ok(tas < B.tas, nom + ' : budget mémoire JS (' + tas + ' Mo < ' + B.tas + ')'); };
+{ const { ctx, p, cdp } = await ouvre(); await budgets('App téléphone', p, cdp, { ouvrir: 1500, repos: 40, tas: 80 }); await ctx.close(); }
+/* 8. le carnet de recettes (module personnel seulement) */
 { const { ctx, p } = await ouvre(); const r = await p.evaluate(() => { const R = window._rec; if (!R) return null; return Object.keys(R.base).filter(n => { const a = R.analyse(n); return a.type !== 'base' || a.autres.length; }); });
   if (r) ok(!r.length, 'carnet de recettes : toutes reconnues' + (r.length ? ' (sauf ' + r.join(', ') + ')' : '')); else console.log('--  carnet de recettes : module personnel absent, contrôle sauté');
   await ctx.close(); }
+/* ===== App ordinateur : souris, 1280 px ; la requête de l'app ordinateur est vraie, ses règles s'appliquent ===== */
+console.log('\n== App ordinateur');
+{ const { ctx, p, err, cdp } = await ouvre(null, 'clair', ORDI); const tag = 'App ordinateur';
+  ok(await p.evaluate(() => matchMedia('(min-width:900px) and (pointer:fine)').matches && document.documentElement.classList.contains('ordi')), tag + ' : contexte souris réel (pointer:fine, classe « ordi »)');
+  const n = await p.evaluate(() => document.querySelectorAll('.node').length); ok(n >= 4, tag + ' : la carte s\'affiche (' + n + ' items)');
+  ok(!(await debord(p)), tag + ' : accueil sans défilement horizontal');
+  /* chaque item s'ouvre au clic de la souris (vrai pointeur), sans défilement horizontal, et se ferme */
+  const noms = await p.evaluate(() => [...document.querySelectorAll('.node b')].map(x => x.textContent.replace(/\s+/g, ' ').trim()).filter(Boolean));
+  let ouverts = 0; for (const nom of noms) { const c = await p.evaluate(nom => { const x = [...document.querySelectorAll('.node')].find(x => (x.querySelector('b') || {}).textContent?.replace(/\s+/g, ' ').trim() === nom); x.scrollIntoView({ block: 'center' }); const r = x.getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; }, nom);
+    await p.mouse.click(c[0], c[1]); await p.waitForTimeout(500); if (await p.evaluate(() => !document.getElementById('drawer').hidden)) ouverts++;
+    if (await debord(p)) ok(false, tag + ' : défilement horizontal dans « ' + nom + ' »'); await ferme(p); await p.waitForTimeout(300); }
+  ok(ouverts === noms.length, tag + ' : chaque item s\'ouvre au clic (' + ouverts + '/' + noms.length + ')');
+  /* panneau d'espace : onglets de pages cliquables à la souris */
+  await item(p, 'Lecture'); await p.waitForTimeout(500);
+  const ong = await p.evaluate(() => [...document.querySelectorAll('#pane .rpt')].filter(x => x.offsetParent).length);
+  if (ong >= 2) { const c = await p.evaluate(() => { const r = [...document.querySelectorAll('#pane .rpt')].filter(x => x.offsetParent)[1].getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; }); await p.mouse.click(c[0], c[1]); await p.waitForTimeout(500); }
+  ok(ong >= 2 && await sel(p) === 1, tag + ' : panneau d\'espace, onglet de page choisi à la souris (' + ong + ' onglets)');
+  await ferme(p); await p.waitForTimeout(400);
+  /* clavier : Tab atteint un item, avec un contour visible ; Entrée l'ouvre ; Échap le ferme */
+  let foc = null; for (let i = 0; i < 40 && !foc; i++) { await p.keyboard.press('Tab'); foc = await p.evaluate(() => { const a = document.activeElement; return a && a.classList.contains('node') ? getComputedStyle(a).outlineStyle !== 'none' || getComputedStyle(a).boxShadow !== 'none' : null; }); }
+  ok(foc === true, tag + ' : au clavier, Tab atteint un item, contour visible');
+  await p.keyboard.press('Enter'); await p.waitForTimeout(600); const ouv = await p.evaluate(() => !document.getElementById('drawer').hidden);
+  await p.keyboard.press('Escape'); await p.waitForTimeout(600); const ferm = await p.evaluate(() => document.getElementById('drawer').hidden);
+  ok(ouv && ferm, tag + ' : au clavier, Entrée ouvre l\'item et Échap le ferme');
+  ok(!err.length, tag + ' : aucune erreur JavaScript' + (err.length ? ' : ' + err.slice(0, 3).join(' / ') : ''));
+  await budgets(tag, p, cdp, { ouvrir: 800, repos: 25, tas: 80 });
+  await ctx.close(); }
+/* thème sombre, app ordinateur */
+{ const { ctx, p, err } = await ouvre(null, 'sombre', ORDI);
+  const noms = await p.evaluate(() => [...document.querySelectorAll('.node b')].map(x => x.textContent.replace(/\s+/g, ' ').trim()).filter(Boolean));
+  for (const nom of noms) { await item(p, nom); await p.waitForTimeout(400); if (await debord(p)) ok(false, 'App ordinateur sombre : défilement horizontal dans « ' + nom + ' »'); await ferme(p); await p.waitForTimeout(200); }
+  ok(noms.length >= 4 && !err.length, 'App ordinateur, thème sombre : carte et items sans erreur' + (err.length ? ' : ' + err.slice(0, 3).join(' / ') : '')); await ctx.close(); }
 console.log(ko ? ko + ' échec(s)' : 'Tout est bon.'); await b.close(); process.exit(ko ? 1 : 0);
