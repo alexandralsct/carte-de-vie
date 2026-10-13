@@ -2049,7 +2049,7 @@ html body .outilsb button.otout.otout small{color:#002FA7!important}:root[data-t
 .board .outilsb.zone{position:relative;margin:0;border-style:dashed}.board .outilsb.zone>span{position:static;display:inline-block;margin:-26px 0 8px}
 .outilsb .rgz{position:absolute;top:-14px;right:12px}.outilsb .rgz+.rgz{right:52px}
 #iaBtn.memb b{font-size:2.7rem!important;line-height:1}#iaBtn.memb small{display:none!important}
-.board .outilsb.olarge{grid-column:1/-1!important;grid-row:99!important;order:99!important;margin-top:18px}
+.board .outilsb.olarge{grid-column:1/-1!important;grid-row:auto!important;order:99!important;margin-top:18px}
 .atgem{display:grid;gap:8px;margin-top:14px;padding-top:12px;border-top:1.5px dashed var(--k2,#c9d6f0)}.atgem .srow{display:flex;gap:8px}.atgem input{flex:1;min-width:0}
 #iaBtn.memb b svg{width:36px;height:36px;display:block}.board:not(.stack) #iaBtn.memb b svg,.board.libre #iaBtn.memb b svg{width:66%;height:66%;margin:auto}
 
@@ -7192,7 +7192,7 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=188; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=189; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
