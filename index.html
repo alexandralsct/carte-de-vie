@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-r/aWr2pWlRPmTXzYUHN3PKGJTW+ZIraHqE9BtGIy7Pk=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-QId7VqTzG4wNNVKOWp4EG5zA8/d6IA9TTHQTNNuq93U=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-4kGxArIX7jsZkpjuL6b3x3FQFQnbAF16dc96WiqI72I=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-QId7VqTzG4wNNVKOWp4EG5zA8/d6IA9TTHQTNNuq93U=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f4eee4">
@@ -2181,6 +2181,25 @@ html body header .top3a .noterb{display:none!important}
 
 html.klein .node .ico svg,html.klein .node .ico{color:#002fa7!important;--c:#002fa7}
 html.demarre .wrap>:not(header){visibility:hidden!important}
+/* accessibilité (13/10) : titre de l'accueil lisible par les lecteurs d'écran seulement */
+html body .wrap>header h1{display:block!important;position:absolute!important;width:1px!important;height:1px!important;margin:-1px!important;padding:0!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important}
+/* cibles d'au moins 24 px partout (WCAG 2.5.8) : coches des fiches espacées de 24 px, interrupteurs des listes, entrées du menu « Plus » */
+.rl li{min-height:24px}
+html body .items input[type=checkbox]{min-height:24px}.items input[type=checkbox]::before{top:3.5px}
+html body .v3menuIn button{min-height:24px;box-sizing:border-box;display:flex;align-items:center}
+/* textes d'au moins 11 px */
+html body .wb small,html body .o-carnet2 .wb small{font-size:11px!important}
+html body .qcarte small{font-size:max(.68rem,11px)!important}
+html body .card h3{font-size:max(.76rem,11px)!important}html body .v3moiPg section[data-k=moi] h3{font-size:max(.68rem,11px)!important}
+/* app téléphone : commandes principales d'au moins 44 px (toucher au doigt) */
+@media not all and (min-width:900px) and (pointer:fine){
+  html body .v3add,html body .board .rgBtn{min-height:44px!important}
+  html body .v3menuIn button{min-height:44px!important}
+  html body .items input[type=checkbox],html body li input[type=checkbox]{width:24px;height:24px}
+}
+#heroArt:focus-visible,#drawer input[type=date]:focus-visible,#drawer input[type=time]:focus-visible{outline:3px solid #002FA7!important;outline-offset:2px}
+:root[data-theme="sombre"] #heroArt:focus-visible,:root[data-theme="sombre"] #drawer input[type=date]:focus-visible{outline-color:#a9bfff!important}
+@media (prefers-reduced-motion:reduce){.moi,.moi *,.day,.board.intro .node,.board.intro .moi,.board.intro .ia{animation:none!important}}
 </style>
 <script>
 document.documentElement.classList.add("demarre"); setTimeout(()=>document.documentElement.classList.remove("demarre"),5000);
@@ -2217,7 +2236,7 @@ document.documentElement.classList.add("demarre"); setTimeout(()=>document.docum
 </script>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="cut" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".09" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
-<div class="wrap">
+<main class="wrap">
   <header>
     <div>
       <span class="hautg"><button class="btn ghost" id="setBtn">⚙︎ Réglages</button><button class="btn ghost" id="notesBtn3" title="Ouvrir mes notes">✍︎ Mes notes</button></span>
@@ -2245,14 +2264,14 @@ document.documentElement.classList.add("demarre"); setTimeout(()=>document.docum
     <div class="days" id="days" role="group" aria-label="Choisir un jour"></div>
     <ul id="agendaList"></ul>
   </section>
-</div>
+</main>
 
 <aside class="page" id="drawer" hidden aria-label="Page de l'espace">
   <div class="page-in">
     <div><button class="btn ghost" id="closeBtn">← Ma carte</button></div>
     <div class="hero">
       <div class="heroL"><div id="heroArt" role="button" tabindex="0" aria-label="Changer d'icône" aria-haspopup="true"></div><div class="icons pick" id="icons" aria-label="Choisir une icône"></div></div>
-      <div id="gauge" class="gauge" aria-label="Avancement"></div>
+      <div id="gauge" class="gauge" role="img" aria-label="Avancement"></div>
       <div class="hero-t">
         <input id="fName" aria-label="Nom de l'espace" maxlength="60">
         <div class="sw" id="sw"></div>
@@ -2624,7 +2643,7 @@ function renderBoard(){ NUS=isNu()?anneaux(cats.size).s:1; requestAnimationFrame
     if(urg){ const u=el("span",{className:"urg",textContent:"!"}); u.title="Échéance dans les "+rappel(c)+" jours ou en retard"; b.appendChild(u); }
     attachDrag(b,c.id);
     if(stack&&c.forme==="bulle"&&c.xs!=null&&!reorg){ b.classList.add("libreb"); b.style.left=c.xs+"%"; b.style.top=c.ys+"px"; board.appendChild(b); }
-    else if(stack){ const g=c.groupe||"__hors"; if(!G.has(g)){ const z=el("div",{className:"zone"+(g==="__hors"?" hors":"")},el("span",{textContent:g==="__hors"?"":g}),el("div",{className:"zgrid"})); if(reorg){ const fl=(t,d,lab)=>{ const x=el("button",{type:"button",className:"rgz",textContent:t}); x.setAttribute("aria-label",lab+" "+g); x.onclick=e=>{ e.stopPropagation(); bougeGroupe(g,d); }; return x; }; z.appendChild(el("div",{className:"rgzb"},fl("↑",-1,"Monter"),fl("↓",1,"Descendre"))); } G.set(g,z); board.appendChild(z); } G.get(g).querySelector(".zgrid").appendChild(b);
+    else if(stack){ const g=c.groupe||"__hors"; if(!G.has(g)){ const z=el("div",{className:"zone"+(g==="__hors"?" hors":"")},(()=>{ const s=el("span",{textContent:g==="__hors"?"":g}); if(g!=="__hors"){ s.setAttribute("role","heading"); s.setAttribute("aria-level","2"); } return s; })(),el("div",{className:"zgrid"})); if(reorg){ const fl=(t,d,lab)=>{ const x=el("button",{type:"button",className:"rgz",textContent:t}); x.setAttribute("aria-label",lab+" "+g); x.onclick=e=>{ e.stopPropagation(); bougeGroupe(g,d); }; return x; }; z.appendChild(el("div",{className:"rgzb"},fl("↑",-1,"Monter"),fl("↓",1,"Descendre"))); } G.set(g,z); board.appendChild(z); } G.get(g).querySelector(".zgrid").appendChild(b);
       if(reorg){ b.classList.add("rg"); const fl=(t,d,lab)=>{ const x=el("span",{role:"button",tabIndex:0,className:"rgn "+(d<0?"g":"d"),textContent:t}); x.setAttribute("aria-label",lab+" "+(c.name||"")); x.onclick=e=>{ e.stopPropagation(); bougeItem(c.id,d); }; return x; }; b.append(fl("‹",-1,"Avancer"),fl("›",1,"Reculer")); } }
     else board.appendChild(b);
   }
@@ -2641,7 +2660,7 @@ function renderBoard(){ NUS=isNu()?anneaux(cats.size).s:1; requestAnimationFrame
     lb.addEventListener("pointerup",fin); lb.addEventListener("pointercancel",fin);
     lb.onclick=()=>{ if(lb._moved){ lb._moved=false; return; } openRel(c.id,r.id); }; board.appendChild(lb); });
   const ZR=[...Z].map(([name,z])=>({name,l:Math.max(.6,z.x0-1.6),t:Math.max(3.2,z.y0-7.2),r:Math.min(99.4,z.x1+2.2),b:Math.min(99.2,z.y1+3.6)}));
-  ZR.forEach(z=>{ const d=el("div",{className:"zone"},el("span",{textContent:z.name})); d.style.left=z.l+"%"; d.style.top=z.t+"%"; d.style.width=(z.r-z.l)+"%"; d.style.height=(z.b-z.t)+"%"; board.insertBefore(d,board.querySelector(".node")); });
+  ZR.forEach(z=>{ const d=el("div",{className:"zone"},(()=>{ const s=el("span",{textContent:z.name}); s.setAttribute("role","heading"); s.setAttribute("aria-level","2"); return s; })()); d.style.left=z.l+"%"; d.style.top=z.t+"%"; d.style.width=(z.r-z.l)+"%"; d.style.height=(z.b-z.t)+"%"; board.insertBefore(d,board.querySelector(".node")); });
   renderAgenda(); renderIa(); renderToday(); askVeille(); requestAnimationFrame(fitLabels);
 }
 /* noms entiers : jamais coupés au milieu d'un mot ; le texte rétrécit si besoin, deux lignes au plus */
@@ -3970,7 +3989,7 @@ const RID=(()=>{
     /* la taille choisie par la propriétaire passe avant : petite, large ou grande */
     L.forEach(x=>{ const t=T[x.d.r.id]; if(t==="n") x.f="carre"; else if(t==="l") x.f="large"; else if(t==="g") x.f="vedette"; });
     /* le bocal de gratitude seul sur sa page : il la remplit */ if(L.length===1&&estGratitude(L[0].d.r)) L[0].f="plein";
-    L.forEach(x=>{ const b=el("div",{className:"rcard o-"+(x.f==="plein"&&estGratitude(x.d.r)?"bocalg":x.k)+" "+(x.f==="large"&&x.w===2?"ample":x.f)+(x.f==="large"||x.f==="vedette"?" w2":"")+(rubVide(x.d.r)?" vide":"")}); b.dataset.rid=x.d.r.id; b.tabIndex=0; b.setAttribute("role","button"); b.setAttribute("aria-label",x.d.name);
+    L.forEach(x=>{ const b=el("div",{className:"rcard o-"+(x.f==="plein"&&estGratitude(x.d.r)?"bocalg":x.k)+" "+(x.f==="large"&&x.w===2?"ample":x.f)+(x.f==="large"||x.f==="vedette"?" w2":"")+(rubVide(x.d.r)?" vide":"")}); b.dataset.rid=x.d.r.id; b.tabIndex=0; b.setAttribute("role","button"); queueMicrotask(()=>{ if(b.querySelector("button,a[href],input,select,textarea")) b.setAttribute("role","group"); }); b.setAttribute("aria-label",x.d.name);
       const dessine=()=>{ if(x.f==="plein"&&estGratitude(x.d.r)){ bocalGrand(b,x.d,c); return; } b.innerHTML=x.html(x.d,c)+(x.d.type==="objectif"&&!["etoiles","calendrier","cadran"].includes(x.k)?`<button type="button" class="rplus" data-act="plus" aria-label="Ajouter ${esc(fmtN(x.d.pas,x.d.u))}">+ ${esc(fmtN(x.d.pas,x.d.u))}</button>`:""); if(x.monte) x.monte(b,x.d,c,carte);
         if(x.f!=="plein"){ const t=T[x.d.r.id], suite={undefined:"l",l:"g",g:"n",n:undefined}[t], ag=el("button",{type:"button",className:"rtl",textContent:t==="g"?"⤡":"⤢",title:t==="g"?"Rétrécir":"Agrandir"}); ag.setAttribute("aria-label",(t==="g"?"Rétrécir ":"Agrandir ")+x.d.name);
           ag.onclick=e=>{ e.stopPropagation(); const cur=cats.get(c.id), d=Object.assign({},cur.disp||{}), TT=Object.assign({},d.taille||{}); if(suite) TT[x.d.r.id]=suite; else delete TT[x.d.r.id]; d.taille=TT; write(c.id,{disp:d}); renderPane(cats.get(c.id)); }; b.appendChild(ag); } };
@@ -5567,7 +5586,7 @@ const MEMP={ L:[], notes:[], sub:false,
     const sq=el("section",{className:"card soirc"},el("h3",{textContent:"Qu'est-ce que je sais sur… ?"})), q=el("input",{type:"search",placeholder:"Un mot, une personne, un projet…"}), res=el("div",{className:"memres"});
     q.setAttribute("aria-label","Chercher dans ma mémoire"); q.oninput=()=>{ res.textContent=""; const v=q.value.trim(); if(v.length<2) return; const R=this.cherche(v);
       if(!R.length){ res.appendChild(help("Rien de trouvé pour « "+v+" ». Je ne l'invente pas : retiens-le ci-dessous si tu veux le garder.")); return; }
-      R.forEach(r=>{ const b=el("div",{className:"memr"},el("small",{className:"mono",textContent:r.src}),el("p",{textContent:r.texte.slice(0,300)})); if(r.c){ b.tabIndex=0; b.setAttribute("role","button"); b.onclick=()=>open(r.c.id); } res.appendChild(b); }); };
+      R.forEach(r=>{ const b=el("div",{className:"memr"},el("small",{className:"mono",textContent:r.src}),el("p",{textContent:r.texte.slice(0,300)})); if(r.c){ b.tabIndex=0; b.setAttribute("role","button"); queueMicrotask(()=>{ if(b.querySelector("button,a[href],input,select,textarea")) b.setAttribute("role","group"); }); b.onclick=()=>open(r.c.id); } res.appendChild(b); }); };
     sq.append(q,res); inn.appendChild(sq);
     const sa=el("section",{className:"card soirc"},el("h3",{textContent:"Retenir quelque chose"})), ta=el("textarea",{rows:3,maxLength:2000,placeholder:"Ex. : le code de la porte du local vélo est dans la note « immeuble » ; mon restaurant préféré dans le quartier…"}), ok=el("button",{type:"button",className:"btn",textContent:"Retenir"});
     ta.setAttribute("aria-label","Ce que je veux retenir"); ok.onclick=()=>{ const t=ta.value.trim(); if(!t) return; const m={texte:t.slice(0,2000),t:new Date().toISOString(),source:"app"}; if(db) db.collection("memoire").doc().set(m).catch(()=>{}); this.L=[Object.assign({id:"tmp"+Date.now()},m),...this.L]; ta.value=""; fetel(ok); this.rend(); };
@@ -6854,7 +6873,7 @@ function fete(x,y){ burst(x,y); setTimeout(()=>burst(x-70,y-30),140); setTimeout
   const YARN='<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="12" fill="currentColor"/><path d="M7 12c6 2 12 8 14 15M10 7c5 4 10 11 11 18M20 5c-2 6-2 13 3 20M5 19c7-1 15 1 22 6" fill="none" stroke="#fdfaf4" stroke-width="1.4" stroke-linecap="round"/><path d="M27 21c3 2 4 5 3 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
   const DOSCHAT='<svg class="dossvg" viewBox="5 1.5 34 44.5" aria-hidden="true" fill="currentColor"><path class="tld" d="M22.5 40.5c2.2-3.6 6.4-5.2 6.2-11.4-.1-2.6 1.6-4 3-3" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><g class="dbd"><path d="M13.2 33.6c0-6 3.9-10.4 8.8-10.4s8.8 4.4 8.8 10.4c0 5.4-3.6 8.6-8.8 8.6s-8.8-3.2-8.8-8.6z"/><path class="dhd" d="M15.6 18.6c0-1.9.5-3.6 1.4-4.9l-.5-5.4 4.2 3.4c.4-.1.9-.1 1.3-.1s.9 0 1.3.1l4.2-3.4-.5 5.4c.9 1.3 1.4 3 1.4 4.9 0 4-2.9 6.6-6.4 6.6s-6.4-2.6-6.4-6.6z"/><path d="M17.2 11.2l.3 3M26.8 11.2l-.3 3" stroke="var(--surface)" stroke-width=".6" stroke-linecap="round" opacity=".55"/></g><rect class="dl1" x="15.4" y="39.6" width="4.2" height="5.6" rx="2.1"/><rect class="dl2" x="24.4" y="39.6" width="4.2" height="5.6" rx="2.1"/></svg>';
   const FACECHAT='<svg class="facesvg" viewBox="5 1.5 34 44.5" aria-hidden="true" fill="currentColor"><path class="tlf" d="M29.5 41c4.2-.4 6.6-3.6 5.8-8.6-.4-2.4.6-3.8 2-3.8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><g class="fbd"><path d="M14.2 35.2c0-5.4 3.6-9 7.8-9s7.8 3.6 7.8 9c0 4.6-3.4 7.4-7.8 7.4s-7.8-2.8-7.8-7.4z"/><path d="M12.6 18.8c0-2.4.8-4.6 2.1-6.2l-.6-6.2 4.9 3.6c1-.3 1.9-.4 3-.4s2 .1 3 .4l4.9-3.6-.6 6.2c1.3 1.6 2.1 3.8 2.1 6.2 0 5.2-4.2 8.6-9.4 8.6s-9.4-3.4-9.4-8.6z"/><g class="feyes"><circle cx="18.2" cy="18" r="2.3" fill="var(--surface)"/><circle cx="25.8" cy="18" r="2.3" fill="var(--surface)"/><circle cx="18.4" cy="18.3" r="1.35"/><circle cx="25.6" cy="18.3" r="1.35"/></g><path d="M21 21.6h2l-1 1.1z" fill="var(--surface)"/><path d="M13.4 21.4l-4-.6M13.4 22.8l-3.8.8M30.6 21.4l4-.6M30.6 22.8l3.8.8" stroke="currentColor" stroke-width=".4" stroke-linecap="round"/></g><rect class="fl1" x="16.6" y="39.4" width="4.2" height="5.8" rx="2.1"/><rect class="fl2" x="23.2" y="39.4" width="4.2" height="5.8" rx="2.1"/></svg>';
-  const cat=el("div",{className:"cpn"}), ball=el("div",{className:"pelote"}), bulle=el("button",{className:"cpnBulle"});
+  const cat=el("div",{className:"cpn",role:"img"}), ball=el("div",{className:"pelote",role:"img"}), bulle=el("button",{className:"cpnBulle"});
   let animal="chat"; try{ const v=localStorage.getItem("animal"); animal=v==="chien"||v==="photo"?v:"chat"; }catch(_){}
   const imgSure=u=>{ u=String(u||""); return /^data:image\/(png|jpe?g|webp|gif|svg\+xml);base64,[A-Za-z0-9+/=]+$/.test(u)||(/^[\w.\/-]+$/.test(u)&&!u.startsWith("//")&&!u.includes(".."))?u:""; };
   const ownOk=o=>!!(o&&typeof o==="object"&&(o.parts&&typeof o.parts==="object"?imgSure(o.parts.body)&&o.parts.tail&&imgSure(o.parts.tail.src)&&Array.isArray(o.parts.legs)&&o.parts.legs.every(q=>q&&imgSure(q.src)):imgSure(o.src)));
@@ -6864,7 +6883,7 @@ function fete(x,y){ burst(x,y); setTimeout(()=>burst(x-70,y-30),140); setTimeout
       cat.innerHTML='<div class="own2" style="aspect-ratio:'+(+P.w||1)+'/'+(+P.h||1)+'">'+pc(P.tail,"tl4")+P.legs.map((q,i)=>pc(q,"lg l"+(i+1))).join("")+pc({src:P.body,x:0,y:0,w:P.w,h:P.h},"bd4")+'</div>'+SVG.replace('<svg ','<svg class="boxsvg" '); }
     else if(animal==="photo"){ cat.innerHTML='<div class="own" style="aspect-ratio:'+(+own.w||1)+'/'+(+own.h||1)+';-webkit-mask-image:url(&quot;'+imgSure(own.src)+'&quot;);mask-image:url(&quot;'+imgSure(own.src)+'&quot;)"></div>'+SVG.replace('<svg ','<svg class="boxsvg" '); }
     else cat.innerHTML=animal==="chien"?DOG:SVG+DOSCHAT+FACECHAT; ball.innerHTML=animal==="chien"?BALL:YARN; cat.setAttribute("aria-label",animal==="chien"?"Le chien":"Le chat"); }; habille(); cat.hidden=ball.hidden=bulle.hidden=true; ball.setAttribute("aria-label","La balle");
-  const cpnZone=el("div",{className:"cpnZone"}); cpnZone.append(ball,cat); document.body.append(cpnZone,bulle);
+  const cpnZone=el("div",{className:"cpnZone",role:"complementary"}); cpnZone.setAttribute("aria-label","Compagnon"); cpnZone.append(ball,cat); document.body.append(cpnZone,bulle);
   /* le chat vit dans la page ouverte (item, Moi…) : il défile avec son contenu, jamais collé à l'écran */
   const hote=()=>[...document.querySelectorAll("aside.page")].find(q=>!q.hidden)||null, sY=()=>window.scrollY, sX=()=>window.scrollX;
   const sw=$("petSw"); let on=true, t=0, run=0, C={x:-200,y:0}, bulleFor=null;
