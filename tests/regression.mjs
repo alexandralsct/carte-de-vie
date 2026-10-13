@@ -34,10 +34,13 @@ const DEMO = {
 const TEL = devices['Galaxy S9+'], ORDI = { viewport: { width: 1280, height: 900 }, deviceScaleFactor: 1, isMobile: false, hasTouch: false };
 const ouvre = async (vp, theme = 'clair', profil = TEL) => {
   const ctx = await b.newContext(Object.assign({}, profil, { viewport: vp || profil.viewport || { width: 412, height: 915 }, serviceWorkers: 'block', locale: 'fr-FR', timezoneId: 'Europe/Paris' }));
+  /* règle de sécurité (CSP) : toute violation est notée (un script ou une ressource bloqués casseraient l'app en silence) */
+  await ctx.addInitScript(() => { window.__csp = []; document.addEventListener('securitypolicyviolation', e => window.__csp.push(e.violatedDirective + ' ' + (e.blockedURI || ''))); });
   await ctx.addInitScript(([carte, theme]) => { if (!sessionStorage.getItem('init')) { sessionStorage.setItem('init', '1'); localStorage.clear(); localStorage.setItem('carte-de-vie-v1', carte);
     ['hRap', 'compagnon', 'mouvements'].forEach(k => localStorage.setItem(k, '0')); localStorage.setItem('carte-de-vie-vu', '1'); localStorage.setItem('theme', theme); } }, [JSON.stringify(DEMO), theme]);
   const p = await ctx.newPage(); const err = []; p.on('pageerror', e => err.push(e.message));
   await p.goto(URL); if (CARTE) await p.setInputFiles('#impFile', CARTE); await p.waitForTimeout(1800); return { ctx, p, err, cdp: await ctx.newCDPSession(p) }; };
+const csp = async (p, tag) => { const v = await p.evaluate(() => window.__csp || []); ok(!v.length, tag + ' : aucune violation de la règle de sécurité (CSP)' + (v.length ? ' : ' + v.slice(0, 3).join(' / ') : '')); };
 const item = (p, n) => p.evaluate(n => { const x = [...document.querySelectorAll('.node')].find(x => { const t = x.querySelector('b'); return t && t.textContent.replace(/\s+/g, ' ').trim() === n; }); if (x) x.click(); return !!x; }, n);
 const ferme = p => p.evaluate(() => document.getElementById('closeBtn').click());
 const sel = p => p.evaluate(() => [...document.querySelectorAll('#pane .rpt')].findIndex(b => b.getAttribute('aria-selected') === 'true'));
@@ -49,6 +52,9 @@ const rub = (p, nom) => p.evaluate(nom => { const t = [...document.querySelector
 /* ouvre une rubrique seule, en touchant sa tuile (comme on le fait au doigt) */
 const tuile = (p, rid) => p.evaluate(rid => { const t = document.querySelector('#pane .rcard[data-rid="' + rid + '"], #pane .mtile[data-rid="' + rid + '"]'); if (t) t.click(); return !!t; }, rid);
 
+/* la règle de sécurité n'autorise que les scripts de la page, par empreinte (ni 'unsafe-inline', ni adresse quelconque) */
+{ const h = await (await fetch(URL)).text(), m = /script-src ([^;]*);/.exec(h), src = m ? m[1] : '';
+  ok(m && /'sha256-/.test(src) && !/unsafe-inline/.test(src) && !/(^| )(https?:|\*)( |$)/.test(src), 'règle de sécurité : scripts autorisés par empreinte seulement, sans \'unsafe-inline\''); }
 console.log('== App téléphone');
 { const { ctx, p, err, cdp } = await ouvre();
   const noms = await p.evaluate(() => [...document.querySelectorAll('.node b')].map(x => x.textContent.replace(/\s+/g, ' ').trim()).filter(Boolean));
@@ -112,6 +118,7 @@ console.log('== App téléphone');
         const L = await p.evaluate(() => [...document.querySelectorAll('#pane .crs li, #pane li')].map(x => x.textContent).join('|')); ok(L.includes(attendu), 'recette « ' + q + ' » → ' + attendu); } }
     await ferme(p); await p.waitForTimeout(300); }
   ok(!err.length, 'aucune erreur JavaScript' + (err.length ? ' : ' + err.slice(0, 3).join(' / ') : ''));
+  await csp(p, 'App téléphone');
   await ctx.close(); }
 /* 6. thème sombre (app téléphone, 390 px) : la carte et chaque item s'affichent sans erreur */
 for (const [vp, theme] of [[{ width: 390, height: 844 }, 'sombre']]) {
@@ -159,6 +166,7 @@ console.log('\n== App ordinateur');
   await p.keyboard.press('Escape'); await p.waitForTimeout(600); const ferm = await p.evaluate(() => document.getElementById('drawer').hidden);
   ok(ouv && ferm, tag + ' : au clavier, Entrée ouvre l\'item et Échap le ferme');
   ok(!err.length, tag + ' : aucune erreur JavaScript' + (err.length ? ' : ' + err.slice(0, 3).join(' / ') : ''));
+  await csp(p, tag);
   await budgets(tag, p, cdp, { ouvrir: 800, repos: 25, tas: 80 });
   await ctx.close(); }
 /* thème sombre, app ordinateur */
