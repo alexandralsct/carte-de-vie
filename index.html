@@ -2053,6 +2053,117 @@ html body .outilsb button.otout.otout small{color:#002FA7!important}:root[data-t
 .atgem{display:grid;gap:8px;margin-top:14px;padding-top:12px;border-top:1.5px dashed var(--k2,#c9d6f0)}.atgem .srow{display:flex;gap:8px}.atgem input{flex:1;min-width:0}
 #iaBtn.memb b svg{width:36px;height:36px;display:block}.board:not(.stack) #iaBtn.memb b svg,.board.libre #iaBtn.memb b svg{width:66%;height:66%;margin:auto}
 
+/* ===== Version 190 : recommandations des audits UX/UI et graphique, appliquées séparément au TÉLÉPHONE et à l'ORDINATEUR ===== */
+/* --- commun aux deux appareils --- */
+:root{--r-s:8px;--r-m:14px;--r-l:24px;--sh-1:2px 2px 0 var(--k2,#c9d6f0);--sh-2:4px 4px 0 var(--k2,#c9d6f0)}
+input::placeholder,textarea::placeholder{color:color-mix(in srgb,currentColor 62%,transparent)!important;opacity:1}
+h2,h3,.hero h2,.v3fr small{text-wrap:balance}
+.gauge text.lab{display:none}
+.cdp-sem small{font-size:12px!important}
+.day.passe{opacity:1!important;color:rgba(0,47,167,.72);border-style:dashed!important}
+.rpnav{scroll-padding-inline:16px}
+.rpnav .rpt{font-size:13px!important}
+.days .day small,.node b,#moiSub,.bande .puce2 small,.bande small{font-size:12px!important}
+.setlist small,.setgrp>summary small{font-family:var(--body,"Instrument Sans",sans-serif)!important}
+[data-typo] .o-mesures b,.o-mesures .big,.o-mesures strong{font-family:var(--display)!important;font-weight:700!important}
+/* petits carrés : même trait que la rangée du haut, plus discrets mais pas éteints */
+.pcarres .pcarre{border:1.5px solid var(--k1,#002FA7)!important;box-shadow:var(--sh-1)!important}
+.pcarres .pcarre small{font-size:11.5px!important;line-height:1.15!important}
+.pcarres .pcarre b svg{width:22px;height:22px;display:block;margin:0 auto}
+.top3a .btn svg.ico{width:20px;height:20px;display:block}
+/* l'onglet ✎ et le bouton + Noter ne recouvrent rien : masqués sur les pages plein écran */
+body:has(aside.page:not([hidden])) .v3rail{display:none!important}
+body:has(#noterPage:not([hidden])) #noterFab{display:none!important}
+html.nu #iaBtn.memb b svg{width:60%!important;height:60%!important}
+/* --- thème sombre : plus de surfaces blanches ou crème, textes lisibles --- */
+:root[data-theme="sombre"] .rcard{background:#172a52!important;color:#e3eaff}
+:root[data-theme="sombre"] .rcard.rnew .rn,:root[data-theme="sombre"] .rcard.rnew .rt{color:#93b3f0!important}
+:root[data-theme="sombre"] input:not([type=checkbox]):not([type=radio]):not([type=range]),:root[data-theme="sombre"] textarea,:root[data-theme="sombre"] select{background:#10204a!important;color:#e3eaff!important;border-color:#45598a!important}
+:root[data-theme="sombre"] .v3pt small,:root[data-theme="sombre"] .v3fil li small{color:#9aabd4!important}
+:root[data-theme="sombre"] .days .day{color:#c9d6f0}
+:root[data-theme="sombre"] .days .day.passe{color:#9aabd4}
+:root[data-theme="sombre"] .days .day[aria-current="date"],:root[data-theme="sombre"] .days .day[aria-pressed="true"]{background:#93b3f0!important;color:#0e1830!important}
+:root[data-theme="sombre"] .days .day[aria-current="date"] *,:root[data-theme="sombre"] .days .day[aria-pressed="true"] *{color:#0e1830!important}
+:root[data-theme="sombre"] #iaBtn.memb{background:#29447f!important}:root[data-theme="sombre"] #iaBtn.memb *{color:#e3eaff!important}
+
+/* --- TÉLÉPHONE (écran tactile) : cibles de 44 px, tout sur une colonne --- */
+@media (pointer:coarse),(max-width:899px){
+  .top3a .btn{min-width:44px!important;min-height:44px!important}
+  .days{gap:4px}.days .day{min-width:42px;min-height:46px}
+  .board .v3add,.board .rgBtn{min-height:40px}
+  .items input[type=checkbox],li input[type=checkbox]{width:22px;height:22px}
+  .pcarres .pcarre{width:76px!important;height:76px!important}
+  .pcarres .pcarre.pchemin{width:155px!important}
+}
+
+/* --- ORDINATEUR (souris, ≥ 900 px) : contenu centré, grilles pleine largeur, échelle de texte plus grande --- */
+@media (min-width:900px) and (pointer:fine){
+  .wrap{max-width:1120px!important;margin:0 auto!important;padding:0 24px!important}
+  .bande{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:16px!important}
+  .bande .puce2{min-height:96px!important;padding:14px 16px!important}
+  .bande .puce2 small{font-size:12.5px!important}.bande .puce2 span{font-size:13px!important}.bande .puce2 b{font-size:1.5rem!important}
+  .bande .raccs.pcarres{gap:8px}
+  .pcarres .pcarre{width:96px!important;height:96px!important}.pcarres .pcarre small{font-size:12px!important}
+  .pcarres .pcarre.pchemin{width:200px!important}
+  .days .day{min-width:48px;min-height:52px}.days .day small{font-size:12.5px!important}
+  .node b{font-size:13px!important}
+  aside.page .page-in{max-width:960px;margin-left:auto;margin-right:auto}
+  aside.page .lead,aside.page .help,aside.page p{max-width:680px}
+  aside.page h2{font-size:32px!important;line-height:1.12!important}
+  body{font-size:16px}
+  .ppas{width:100%;box-sizing:border-box}
+  #drawer .hero-t *{text-overflow:clip!important;white-space:normal!important}
+  .v3rail{display:none!important}
+  .top3a .noterb{min-height:40px;border-radius:999px;padding:0 16px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+  #noterFab{display:none!important}
+}
+/* priorité plus forte que les anciennes règles des jours (#agenda) */
+html body #agenda .day small{font-size:12px!important}
+html[data-theme="sombre"]:not(.zz1):not(.zz2) body #agenda .day[aria-current=date]{background:#93b3f0!important;border-color:#93b3f0!important}
+html[data-theme="sombre"]:not(.zz1):not(.zz2) body #agenda .day[aria-current=date] *{color:#0e1830!important}
+html[data-theme="sombre"] body #agenda .day.passe{color:#9aabd4!important}
+:root[data-theme="sombre"] .rcard small,:root[data-theme="sombre"] .rcard .mono{color:#9aabd4!important}
+html body .bande .puce2 span{font-size:12px!important}
+@media (min-width:900px) and (pointer:fine){ html body #agenda .day{min-width:48px;min-height:52px} html body #agenda .day small{font-size:12.5px!important} html body #agenda .day b{font-size:16px!important} }
+html body .board .zgrid .node b,html body .board .node b{font-size:12px!important}
+html body .bande .pcarres .pcarre small{font-size:12px!important}
+@media (min-width:900px) and (pointer:fine){ html body .board .zgrid .node b,html body .board .node b{font-size:13px!important} }
+@media (pointer:coarse),(max-width:899px){
+  html body .top3a .btn{min-width:44px!important;min-height:44px!important;width:44px;height:44px}
+  html body #agenda .day{min-height:46px!important}
+  html body .pcarres .pcarre{width:72px!important;height:72px!important;flex:none}
+  html body .pcarres .pcarre.pchemin{width:150px!important}
+}
+@media (min-width:900px) and (pointer:fine){
+  html body .bande{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  html body .bande>.puce2{max-width:none!important;width:auto!important}
+}
+/* priorités : ces règles passent devant les anciennes, plus spécifiques */
+html:not(.zz1):not(.zz2):not(.zz3) body .board.stack .node:not(.nbulle):not(.zz4) b,html:not(.zz1):not(.zz2):not(.zz3) body .board .node:not(.zz4) b{font-size:12px!important}
+@media (min-width:900px) and (pointer:fine){
+  html:not(.zz1):not(.zz2):not(.zz3) body .board.stack .node:not(.nbulle):not(.zz4) b,html:not(.zz1):not(.zz2):not(.zz3) body .board .node:not(.zz4) b{font-size:13px!important}
+  html body #bande.bande{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+@media (pointer:coarse),(max-width:899px){
+  html body header .top3a .btn{min-width:44px!important;min-height:44px!important;width:44px!important;height:44px!important}
+}
+html body .outilsb .otout small,html body .outilsb button.otout.otout small{font-size:12px!important}
+@media (pointer:coarse),(max-width:899px){
+  html.proprio body header .top3a .btn:not(.zz){min-width:44px!important;min-height:44px!important;width:44px!important;height:44px!important}
+}
+@media (min-width:900px) and (pointer:fine){
+  html.proprio body header .top3a .btn:not(.zz):not(.noterb){min-width:40px!important;min-height:40px!important;width:40px!important;height:40px!important}
+  html body header .top3a .btn.noterb{width:auto!important;min-width:0!important;padding:0 16px!important}
+}
+html body .board .moi #moiSub,html body #moiSub{letter-spacing:0!important;white-space:nowrap}
+html body .bande .pcarres .pcarre.pchemin{border:1.5px solid var(--k1,#002FA7)!important;box-shadow:var(--sh-1)!important}
+/* Noter : bouton flottant (téléphone, testeurs) ou onglet ✎ (téléphone, propriétaire) ; sur ordinateur, bouton dans l'en-tête */
+html body header .top3a .noterb{display:none!important}
+@media (min-width:900px) and (pointer:fine){
+  html body header .top3a .noterb{display:inline-flex!important}
+  html:not(.zz1) body #noterFab,html.proprio body #noterFab{display:none!important}
+}
+
 html.klein .node .ico svg,html.klein .node .ico{color:#002fa7!important;--c:#002fa7}
 </style>
 <script>
@@ -2440,7 +2551,7 @@ function renderBoard(){ NUS=isNu()?anneaux(cats.size).s:1; requestAnimationFrame
   wires.textContent="";
   const list=[...cats.values()].sort((a,b)=>(a.order||0)-(b.order||0));
   state.hidden=list.length>0;
-  if(!list.length&&loaded) state.firstElementChild.textContent="La planche est vide. Ajoute ton premier espace avec le bouton « Nouvel espace ».";
+  if(!list.length&&loaded) state.firstElementChild.textContent="La planche est vide. Ajoute ton premier espace avec « + Espace ».";
   let open_=0; for(const c of list){ open_+=(c.tasks||[]).filter(k=>!k.done).length;
     const sp=document.createElementNS("http://www.w3.org/2000/svg","line"); sp.setAttribute("class","spoke"); sp.style.stroke=c.color||"";
     sp.setAttribute("x1",MP.x);sp.setAttribute("y1",MP.y);sp.setAttribute("x2",PX(c));sp.setAttribute("y2",PY(c)); wires.appendChild(sp); }
@@ -2566,7 +2677,7 @@ function renderAgenda(){
   const dz=$("days"); dz.textContent="";
   for(let i=0;i<7;i++){ const k=D(i), d=new Date(k+"T12:00"), auj=k===td, cnt=rows.filter(r=>(r.late&&auj)||r.key.slice(0,10)===k).length;
     const b=el("button",{className:"day"+(k<td?" passe":"")},el("small",{textContent:auj?"auj.":d.toLocaleDateString("fr-FR",{weekday:"short"}).replace(".","")}),el("b",{textContent:String(d.getDate())}),el("i",{textContent:cnt?"•".repeat(Math.min(cnt,3)):""}));
-    b.setAttribute("aria-pressed",String(agDay===k)); if(auj) b.setAttribute("aria-current","date"); b.onclick=()=>{ agDay=agDay===k?null:k; renderAgenda(); }; dz.appendChild(b); }
+    b.setAttribute("aria-pressed",String(agDay===k)); b.setAttribute("aria-label",d.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})+(auj?", aujourd'hui":"")); if(auj) b.setAttribute("aria-current","date"); if(auj) b.setAttribute("aria-current","date"); b.onclick=()=>{ agDay=agDay===k?null:k; renderAgenda(); }; dz.appendChild(b); }
   const shown=agDay?rows.filter(r=>r.key.slice(0,10)===agDay||(r.late&&agDay===td)):rows;
   const ul=$("agendaList"); ul.textContent=""; if(!shown.length) ul.appendChild(el("li",{},none("Rien ce jour-là.")));
   shown.slice(0,12).forEach(r=>{
@@ -5057,7 +5168,7 @@ const ESSAI={ tr:{}, me:{}, pr:[], memF:"tout",
     L.forEach(c=>{ const b=el("button",{type:"button",className:"vchip",textContent:c===at?"Plus tard (à trier)":c.name}); b.setAttribute("aria-pressed",String(this.noterOu===c.id)); b.onclick=()=>{ this.noterOu=c.id; this.renderOu(); }; z.appendChild(b); });
     const q=$("noterQuoi"); q.textContent=""; const cj=cats.get(this.noterOu), jr=cj&&(cj.rub||[]).find(r=>r.journal); if(!jr&&this.noterQuoi==="souvenir") this.noterQuoi="tache";
     [["tache","À faire"],["idee","Idée"],...(jr?[["souvenir","Souvenir (journal)"]]:[])].forEach(([k,n])=>{ const b=el("button",{type:"button",className:"vchip",textContent:n}); b.setAttribute("aria-pressed",String(this.noterQuoi===k)); b.onclick=()=>{ this.noterQuoi=k; this.renderOu(); }; q.appendChild(b); }); },
-  noter(){ const t=$("noterTxt").value.trim(), c=cats.get(this.noterOu); if(!t||!c) return;
+  noter(){ const t=$("noterTxt").value.trim(), c=cats.get(this.noterOu); if(!t){ $("noterTxt").focus(); return; } if(!c){ $("noterMsg").textContent="Choisis d'abord où le ranger : touche un espace ci-dessus."; return; }
     const lignes=t.split(/\n+/).map(s=>s.replace(/^[-•*]\s*/,"").trim()).filter(Boolean);
     const jr=(c.rub||[]).find(r=>r.journal);
     if(this.noterQuoi==="souvenir"&&jr) write(c.id,{rub:c.rub.map(r=>r.id===jr.id?Object.assign({},r,{items:[...(r.items||[]),{id:uid(),text:t,done:false,t:new Date().toISOString()}]}):r)});
@@ -5429,7 +5540,7 @@ const MEMP={ L:[], notes:[], sub:false,
       if(ok(c.name)) R.push({src:"Espace",c,texte:c.name+(c.notes?" — "+c.notes:"")});
       it.slice(1).forEach(t=>{ if(ok(t)||(ok((c.name||"")+" "+t)&&!ok(c.name))) R.push({src:c.name,c,texte:t}); }); });
     return R.slice(0,40); },
-  ouvre(){ this.ecoute(); const inn=PAGEX("memPersoPage","Ma mémoire perso");
+  ouvre(){ this.ecoute(); const inn=PAGEX("memPersoPage","Ma mémoire");
     inn.appendChild(el("p",{className:"help",textContent:"Ce que tu veux retenir, et une recherche dans toute ta carte. L'assistant Telegram pourra lire et compléter cette mémoire."}));
     const sq=el("section",{className:"card soirc"},el("h3",{textContent:"Qu'est-ce que je sais sur… ?"})), q=el("input",{type:"search",placeholder:"Un mot, une personne, un projet…"}), res=el("div",{className:"memres"});
     q.setAttribute("aria-label","Chercher dans ma mémoire"); q.oninput=()=>{ res.textContent=""; const v=q.value.trim(); if(v.length<2) return; const R=this.cherche(v);
@@ -6277,6 +6388,28 @@ const CATOUT={ K:"outilsPos",
       i.setAttribute("aria-label","Clé Gemini"); s.onclick=()=>{ const v=i.value.trim(); if(v.length<20) { i.focus(); return; } try{ localStorage.setItem(KG,v); }catch(_){} this.rend(); };
       w.append(el("small",{className:"mono",textContent:"Créer les images directement avec Gemini : colle ta clé une fois (elle reste sur cet appareil)."}),el("div",{className:"srow"},i,s)); }
     z.appendChild(w); }; }
+
+/* ===== Version 190 : icônes SVG au trait (plus de caractères comme icônes), Noter sans espace qui répond, jours nommés, bouton Noter
+   dans l'en-tête sur ordinateur ===== */
+const ICO={
+  chemin:'<path d="M5 20c3-6 6-2 8-8s5-6 6-8"/><circle cx="5" cy="20" r="1.6"/><circle cx="19" cy="4" r="1.6"/>',
+  soir:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+  suivi:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/>',
+  rappels:'<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
+  reglages:'<circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/>',
+  atelier:'<path d="M12 3.5C7 3.5 3.5 7 3.5 11.5c0 4 3 6.5 6 6.5 1.5 0 2-1 2-2s-.5-1.5.5-2.5 2.5-.5 4-.5c3.5 0 5-2 5-5 0-2.8-4-5-9-5z"/><circle cx="8" cy="10" r="1.2"/><circle cx="12" cy="7.5" r="1.2"/><circle cx="16" cy="9" r="1.2"/>',
+  noter:'<path d="M12 5v14M5 12h14"/>'
+};
+const svgIco=k=>'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICO[k]+'</svg>';
+{ const poseIcones=()=>{ const m={"Mon chemin":"chemin","Ferme ta journée":"soir","Mon suivi":"suivi","Rappels":"rappels"};
+    document.querySelectorAll(".pcarres .pcarre").forEach(b=>{ const k=m[(b.querySelector("small")||{}).textContent||""], i=b.querySelector("b"); if(k&&i&&!i.querySelector("svg")) i.innerHTML=svgIco(k); });
+    const at=document.querySelector(".outilsb .otout b"); if(at&&!at.querySelector("svg")) at.innerHTML=svgIco("atelier");
+    document.querySelectorAll(".top3a .btn").forEach(b=>{ if(b.textContent.trim()==="⚙︎"||/^⚙︎/.test(b.textContent.trim())){ b.innerHTML=svgIco("reglages"); } });
+    const a=document.querySelector(".top3a"); if(a&&!a.querySelector(".noterb")){
+      const n=el("button",{type:"button",className:"btn ghost noterb",title:"Noter"}); n.innerHTML=svgIco("noter"); n.appendChild(el("span",{textContent:"Noter"})); n.setAttribute("aria-label","Noter");
+      n.onclick=()=>{ try{ ESSAI.ouvreNote(); }catch(_){ const f=$("noterFab"); if(f) f.click(); } }; a.prepend(n); } };
+  const oB=V2.bande.bind(V2); V2.bande=function(){ const r=oB.apply(this,arguments); try{ poseIcones(); }catch(_){} return r; };
+  const oI=renderIa; renderIa=function(){ const r=oI.apply(this,arguments); try{ poseIcones(); }catch(_){} return r; }; setTimeout(()=>{ try{ poseIcones(); }catch(_){} },900); }
 
 /* A8 : une icône qui ne charge pas laisse la place au logo de l'app, plus de carré blanc */
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&!i.dataset.repli&&(i.classList.contains("lgimg")||i.closest(".node,.ico"))){ i.dataset.repli="1"; i.src="icon-192.png"; i.classList.add("repli"); } },true);
@@ -7192,7 +7325,7 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=189; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=190; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;

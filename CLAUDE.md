@@ -18,3 +18,9 @@ Avant chaque commit ici, vérifier le diff : `git diff --cached --stat` ne doit 
 Les parties sur mesure (espaces personnels, textes, jeux, carte régionale, adresse de son système d'automatisation) ne sont **pas** dans ce code : elles vivent dans le dépôt privé (`perso/module.js`, `perso/region.js`). L'app les lit avec la clé de synchro, seulement pour un dépôt de son compte, et les exécute dans son propre contexte grâce aux points d'accroche `CROCHETS` et à `Object.assign` sur les tables. Les clés d'icônes publiques sont neutres ; le module remet les anciennes en alias.
 
 Ne jamais remettre ici un nom d'espace, un texte ou une règle qui la concerne : l'ajouter au module privé. Le contrôle « Aucun mot de la liste privée » du garde-fou s'appuie sur le secret `MOTS_INTERDITS`.
+
+## Téléphone et ordinateur : toujours séparément
+Chaque modification de l'app est pensée, réglée et testée **séparément sur téléphone (tactile, ~412 px) et sur ordinateur
+(souris, ≥ 900 px)** : cibles de 44 px au doigt, 36-40 px à la souris ; textes de 12 px minimum ; contenu centré et limité
+en largeur sur ordinateur (1 120 px l'accueil, 960 px les pages, 680 px le texte). Règles propres à l'ordinateur sous
+`@media (min-width:900px) and (pointer:fine)`. Les captures de test se font aux deux tailles, en clair et en sombre.
