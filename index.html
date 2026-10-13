@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-AWVSlBezbR1Bf8UyEzFn/zV88igavV/IFB8WPQX9U48=' 'sha256-oE4ywJdRH1RjjoCsKajnU5V8UHzUAl7QFR9grRRQZXU=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-QId7VqTzG4wNNVKOWp4EG5zA8/d6IA9TTHQTNNuq93U=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-r/aWr2pWlRPmTXzYUHN3PKGJTW+ZIraHqE9BtGIy7Pk=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-QId7VqTzG4wNNVKOWp4EG5zA8/d6IA9TTHQTNNuq93U=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f4eee4">
@@ -2180,8 +2180,10 @@ html body header .top3a .noterb{display:none!important}
 .cpnZone{position:absolute;left:0;top:0;width:100%;height:0;overflow-x:clip;overflow-y:visible}
 
 html.klein .node .ico svg,html.klein .node .ico{color:#002fa7!important;--c:#002fa7}
+html.demarre .wrap>:not(header){visibility:hidden!important}
 </style>
 <script>
+document.documentElement.classList.add("demarre"); setTimeout(()=>document.documentElement.classList.remove("demarre"),5000);
 /* version test : ?test=1 → données à part (préfixe « test: » sur tout le stockage local), jamais celles de la carte principale */
 (function(){ if(!/[?&](test|essai)\b/.test(location.search)) return; window._modeTest=true; const P="test:", S=Storage.prototype, g=S.getItem, st=S.setItem, r=S.removeItem;
   S.getItem=function(k){ return this===window.localStorage?g.call(this,P+k):g.call(this,k); };
@@ -2538,8 +2540,9 @@ function write(id,patch){
     ()=>{$("saved").textContent="Enregistré";},
     e=>{$("saved").textContent=e&&e.code==="quota_exceeded"?"Espace de stockage plein : supprime des éléments.":"Non enregistré. Recharge la page et réessaie.";});
   /* page d'un espace ouverte en plein écran : la carte cachée dessous sera redessinée à la fermeture */
-  if(openId&&typeof drawer!=="undefined"&&!drawer.hidden&&drawer.offsetWidth>=innerWidth-2) boardSale=true; else renderBoard();
+  if(openId&&typeof drawer!=="undefined"&&!drawer.hidden&&drawer.offsetWidth>=innerWidth-2) boardSale=true; else renduBientot();
 }
+let renduPrevu=false; function renduBientot(){ if(renduPrevu) return; renduPrevu=true; queueMicrotask(()=>{ renduPrevu=false; renderBoard(); }); }
 
 const PRIO=["","En veille","Normal","Important","Prioritaire"];
 /* ce que chaque niveau change vraiment */
@@ -7312,7 +7315,7 @@ function localDb(){ const KEY="carte-de-vie-v1", CKEY="carte-de-vie-sync"; let s
     catch(_){ plein=true; $("saved").textContent="Stockage de l'appareil plein : modification gardée dans la réserve."; bandeau(true); SECOURS.ecrit(t).catch(()=>{ $("saved").textContent="Stockage de l'appareil plein ou bloqué : exporte une sauvegarde."; }); if(cfg&&api.dirty) setTimeout(()=>api.sync(),0); } };
   const persist=()=>{ clearTimeout(persistT); if(document.hidden) return persistNow(); persistT=setTimeout(persistNow,800); };
   addEventListener("pagehide",()=>{ if(persistT) persistNow(); }); addEventListener("beforeunload",()=>{ if(persistT) persistNow(); }); document.addEventListener("visibilitychange",()=>{ if(document.hidden&&persistT) persistNow(); });
-  const notify=()=>subs.slice().forEach(f=>f());
+  let notifT=false; const notifyNow=()=>{ notifT=false; subs.slice().forEach(f=>f()); }; const notify=()=>{ if(notifT) return; notifT=true; queueMicrotask(notifyNow); };
   let gen=0; const save=()=>{ persist(); notify(); gen++; api.dirty=true; api.queue(); };
   const doc=path=>({ id:path.split("/").pop(), path,
     set:d=>{ store[path]=estampille(ancien(path),clone(d),HORLOGE.now()); note(path); save(); return Promise.resolve(); },
@@ -7429,6 +7432,8 @@ function iaKeySetup(){ const AK="carte-de-vie-ia"; let key=""; try{ key=localSto
     try{ localStorage.setItem(AK,k); }catch(_){} $("iaKeyIn").value=""; setKey(k); };
   $("iaKeyOff").onclick=()=>{ try{ localStorage.removeItem(AK); }catch(_){} setKey(""); };
   setKey(key); }
+function demarreFin(){ const H=document.documentElement; if(!H.classList.contains("demarre")) return; const sc=document.querySelector(".scroller"); let y=-1, n=0; const t0=performance.now();
+  const f=()=>{ const y2=sc?Math.round(sc.getBoundingClientRect().top):0; if(y2===y) n++; else { n=0; y=y2; } if(n>=3||performance.now()-t0>1500) H.classList.remove("demarre"); else requestAnimationFrame(f); }; requestAnimationFrame(f); }
 function start(){
   const CL=!!(window.claude&&window.claude.use); if(CL) document.documentElement.classList.add("claude");
   (CL?window.claude.use("db").then(d=>d?claudeDb(d):localDb(),()=>localDb()):SECOURS.lit().then(x=>{ if(x&&x.texte){ secoursTexte=x.texte; } return localDb(); })).then(d=>{
@@ -7510,7 +7515,7 @@ function start(){
     col.onSnapshot(snap=>{
       loaded=true; const m=new Map();
       snap.docs.forEach(x=>{ const d=x.data(); m.set(x.id,Object.assign({id:x.id},d,{color:soft(d.color)})); });
-      cats=m; setTimeout(()=>{ PILOTE.rend(); ESSAI.rend(); RAPPELS.tic(); if(!window._vaH&&/^#(soir|energie)$/.test(location.hash)){ window._vaH=1; setTimeout(()=>RAPPELS.va(location.hash),400); } },0); if(!window._intro){ window._intro=1; board.classList.add("intro"); setTimeout(()=>board.classList.remove("intro"),2200); } /* nouvelle disposition des tuiles encadrées (nom sous la tuile) : sur ordinateur, la carte se range une fois d'elle-même */ if(cats.size>3&&!isStack()&&!isNu()&&!document.documentElement.classList.contains("dedans")&&(!db.cfg()||db.synced)){ let fait=true; try{ fait=!!localStorage.getItem("range108"); if(!fait) localStorage.setItem("range108","1"); }catch(_){} if(!fait) setTimeout(()=>{ arrange(); },400); }
+      cats=m; setTimeout(()=>{ PILOTE.rend(); ESSAI.rend(); RAPPELS.tic(); if(!window._vaH&&/^#(soir|energie)$/.test(location.hash)){ window._vaH=1; setTimeout(()=>RAPPELS.va(location.hash),400); } },0); if(!window._revele0){ window._revele0=1; setTimeout(demarreFin,0); } if(!window._intro){ window._intro=1; board.classList.add("intro"); setTimeout(()=>board.classList.remove("intro"),2200); } /* nouvelle disposition des tuiles encadrées (nom sous la tuile) : sur ordinateur, la carte se range une fois d'elle-même */ if(cats.size>3&&!isStack()&&!isNu()&&!document.documentElement.classList.contains("dedans")&&(!db.cfg()||db.synced)){ let fait=true; try{ fait=!!localStorage.getItem("range108"); if(!fait) localStorage.setItem("range108","1"); }catch(_){} if(!fait) setTimeout(()=>{ arrange(); },400); }
       quandLibre("carte",()=>{ /* page d'un item ouverte en plein écran : la carte, cachée dessous, sera redessinée à la fermeture */ if(openId&&!drawer.hidden&&drawer.offsetWidth>=innerWidth-2) boardSale=true; else renderBoard(); if(window._autoArr) window._autoArr();
         /* la page de l'item : une seule fois par image ; si elle vient d'être redessinée par le geste lui-même, on ne met à jour que l'en-tête */ if(openId){ const t=performance.now(); cancelAnimationFrame(window._rdF); window._rdF=requestAnimationFrame(()=>{ if(openId) renderDrawer(false,paneT>t||sigCat(cats.get(openId))===paneSig); }); } if(!relPage.hidden) renderRel(); });
       if(!window._onbChecked){ window._onbChecked=true; let seen=false; try{ seen=!!localStorage.getItem("carte-de-vie-vu"); }catch(_){} if(!cats.size&&!seen){ setTimeout(()=>{ let vu=false; try{ vu=!!localStorage.getItem("carte-de-vie-vu"); }catch(_){} if(!cats.size&&!vu&&onb.hidden){ renderOnb(); onb.hidden=false; } },document.documentElement.classList.contains("claude")?8000:2500); } }
