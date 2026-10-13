@@ -19,8 +19,8 @@ Les parties sur mesure (espaces personnels, textes, jeux, carte régionale, adre
 
 Ne jamais remettre ici un nom d'espace, un texte ou une règle qui la concerne : l'ajouter au module privé. Le contrôle « Aucun mot de la liste privée » du garde-fou s'appuie sur le secret `MOTS_INTERDITS`.
 
-## Téléphone et ordinateur : toujours séparément
-Chaque modification de l'app est pensée, réglée et testée **séparément sur téléphone (tactile, ~412 px) et sur ordinateur
-(souris, ≥ 900 px)** : cibles de 44 px au doigt, 36-40 px à la souris ; textes de 12 px minimum ; contenu centré et limité
-en largeur sur ordinateur (1 120 px l'accueil, 960 px les pages, 680 px le texte). Règles propres à l'ordinateur sous
-`@media (min-width:900px) and (pointer:fine)`. Les captures de test se font aux deux tailles, en clair et en sombre.
+## Deux apps : l'app téléphone et l'app ordinateur
+L'app existe en deux versions pensées séparément, comme deux produits : l'**app téléphone** (tactile, ~412 px) et l'**app
+ordinateur** (souris, ≥ 900 px), chacune avec sa mise en page, sa navigation et ses tailles. Une modification vaut pour
+l'app où elle est demandée ; on ne reporte rien de l'une sur l'autre sans le décider. Les règles de l'app ordinateur sont
+rangées à part (`@media (min-width:900px) and (pointer:fine)`). Tests et captures : toujours pour les deux, séparément.
