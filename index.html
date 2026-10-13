@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-AWVSlBezbR1Bf8UyEzFn/zV88igavV/IFB8WPQX9U48=' 'sha256-wlYuxUKIz9+ySQscjBjr5yYZml1cWRMkcQ5MsQARp+U=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-WHAy/v0YH+iwK6I37UDWKH65g2cRS60c8izgYKAMSKQ=' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-AWVSlBezbR1Bf8UyEzFn/zV88igavV/IFB8WPQX9U48=' 'sha256-Ujvax3ApvsUkMu8macubM5+9GnLtyA5x9+dSrZ4qB7E=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-T2xi708MIq6x/8b9l0GxK/j7vkoc6iUykyhCMfxV7jk=' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f4eee4">
@@ -7430,7 +7430,7 @@ function start(){
 }
 /* compléments personnels : un module gardé dans le dépôt de données de la propriétaire, jamais dans ce code public.
    Il n'est lu que pour un dépôt de son compte, avec sa clé ; ailleurs l'app reste générique. */
-const PERSO_K="carte-de-vie-perso", PERSO_SHA="carte-de-vie-perso-sha", PERSO_V=198;
+const PERSO_K="carte-de-vie-perso", PERSO_SHA="carte-de-vie-perso-sha", PERSO_K2="carte-de-vie-perso-suivant", PERSO_SHA2="carte-de-vie-perso-suivant-sha", PERSO_V=199;
 /* le module n'est jamais exécuté deux fois (il pose des minuteries et des écouteurs) */
 let persoFait=false;
 function persoEval(t){ if(persoFait) return false; persoFait=true; try{ eval(t); return true; }catch(err){ console.warn("module perso",err); return false; } }
@@ -7451,15 +7451,22 @@ async function persoEnLigne(delai){ const c=AUD.cfg(); if(!c||navigator.onLine==
   try{ const r=await fetch("https://api.github.com/repos/"+c.repo+"/contents/perso/module.js",{headers:AUD.hd(c),cache:"no-store",signal:ac?ac.signal:undefined});
     if(r.status===401||r.status===404) return {refus:r.status}; if(!r.ok) return null; const j=await r.json(); return {sha:String(j.sha||""),texte:j.content?persoTexte(j.content):""}; }
   catch{ return null; } finally{ clearTimeout(tm); } }
-const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.setItem(PERSO_SHA,sha); }catch{} };
+/* une version faite pour une app plus récente que celle qui tourne est gardée à part (elle n'écrase pas celle de cette app) :
+   au premier lancement de la nouvelle app, elle est exécutée tout de suite, sans attendre le réseau */
+const persoLit=k=>{ try{ return localStorage.getItem(k); }catch{ return null; } };
+const persoGarde=(t,sha)=>{ const s=persoVersion(t)>PERSO_V; try{ localStorage.setItem(s?PERSO_K2:PERSO_K,t); localStorage.setItem(s?PERSO_SHA2:PERSO_SHA,sha); }catch{} };
 /* texte du module en ligne (lu en brut s'il est trop gros pour être renvoyé avec ses métadonnées), vérifié, gardé sur l'appareil */
 async function persoRecu(L){ if(!L||!L.sha) return ""; let tx=L.texte; if(!tx){ const b=await AUD.recupere("perso/module.js","text/plain"); tx=b?await b.text():""; }
   if(!tx) return ""; if(!await persoSur(tx,L.sha)){ persoAlerte(); return ""; } persoGarde(tx,L.sha); return tx; }
-/* démarrage : la copie gardée sur l'appareil, si elle est faite pour cette version de l'app et intacte, est exécutée tout de suite,
-   sans attendre le réseau ; la version en ligne est relue ensuite et gardée pour le prochain lancement. Sinon (première fois,
-   nouvelle version de l'app), on attend la version en ligne 2,5 s au plus, comme avant. */
+/* démarrage : la copie gardée sur l'appareil, si elle est faite pour cette version de l'app et intacte (empreinte), est exécutée
+   tout de suite, sans attendre le réseau ; la version en ligne est relue ensuite, en arrière-plan, et gardée pour le prochain
+   lancement (jamais exécutée deux fois). Sinon (première fois, ou aucune copie pour cette version), on attend la version en ligne
+   2,5 s au plus. */
 (async()=>{ let t=null, s0=null, tard=false;
-  if(persoOk()){ try{ t=localStorage.getItem(PERSO_K); s0=localStorage.getItem(PERSO_SHA); }catch{}
+  if(persoOk()){ t=persoLit(PERSO_K); s0=persoLit(PERSO_SHA);
+    { const t2=persoLit(PERSO_K2), v2=persoVersion(t2);
+      if(t2&&v2===PERSO_V&&persoVersion(t)!==PERSO_V&&await persoSur(t2,persoLit(PERSO_SHA2))){ t=t2; s0=persoLit(PERSO_SHA2); persoGarde(t,s0); }
+      if(t2&&v2<=PERSO_V) try{ localStorage.removeItem(PERSO_K2); localStorage.removeItem(PERSO_SHA2); }catch{} }
     if(t&&!await persoSur(t,s0)){ persoAlerte(); t=null; }
     if(t&&persoVersion(t)===PERSO_V) persoEval(t);
     else { const L=await persoEnLigne(2500);
@@ -7472,7 +7479,7 @@ async function persoRecu(L){ if(!L||!L.sha) return ""; let tx=L.texte; if(!tx){ 
   /* trop gros pour être renvoyé avec ses métadonnées : lu en brut après le démarrage, puis affiché */
   if(tard){ const tx=await persoRecu(tard); if(tx&&persoEval(tx)&&loaded){ renderBoard(); if(openId&&!drawer.hidden) renderPane(cats.get(openId)); } return; }
   /* mise à jour en arrière-plan : jamais exécutée maintenant (le module ne tourne qu'une fois), seulement gardée */
-  if(persoFait&&persoVersion(t)===PERSO_V){ const L=await persoEnLigne(0); if(L&&L.sha&&L.sha!==s0) await persoRecu(L); }
+  if(persoFait&&persoVersion(t)===PERSO_V){ const L=await persoEnLigne(0); if(L&&L.sha&&L.sha!==s0&&L.sha!==persoLit(PERSO_SHA2)) await persoRecu(L); }
 })();
 })();
 
@@ -7491,7 +7498,7 @@ async function persoRecu(L){ if(!L||!L.sha) return ""; let tx=L.texte; if(!tx){ 
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=198; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=199; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0="carte-de-vie-v"+APP_V, rec=false;
