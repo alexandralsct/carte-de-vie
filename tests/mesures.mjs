@@ -6,7 +6,8 @@
    - démarrage : FCP, DOMContentLoaded, TBT (somme des longues tâches au-delà de 50 ms) et plus longue tâche ;
    - à l'arrêt, compagnon allumé : temps de tâches (ms par seconde) et mises en page par seconde, juste après l'ouverture
      puis après 30 s sans toucher l'écran (le compagnon doit s'être mis en pause) ;
-   - réglages par défaut : idem (sur l'app téléphone, le compagnon est éteint par défaut). */
+   - réglages par défaut : idem (sur l'app téléphone, le compagnon est éteint par défaut) ;
+   - « moins de mouvement » (prefers-reduced-motion) : compagnon éteint par défaut, immobile s'il est rallumé. */
 import fs from 'fs';
 const { chromium, devices } = await import(process.env.PLAYWRIGHT || 'playwright');
 const URL = process.env.URL || 'http://localhost:8767/index.html', BUDG = process.env.BUDGETS !== '0', COURT = !!process.env.COURT;
@@ -52,6 +53,15 @@ for (const [nom, opt, cpu] of PROFILS) {
         if (cn === 'démo') ok(r2.ms < 40, nom + ' : compagnon en pause après 30 s sans toucher (' + r2.ms + ' ms/s < 40)'); res[nom + cn + 'pause'] = r2; }
       res[nom + cn + 'cpn'] = r1; await ctx.close(); }
   }
+}
+/* « moins de mouvement » demandé par le système (prefers-reduced-motion) : compagnon éteint par défaut ; rallumé par la personne,
+   il reste immobile (aucune animation, aucune promenade) */
+for (const [nom, opt] of PROFILS.map(([n, o]) => [n, Object.assign({}, o, { reducedMotion: 'reduce' })])) {
+  { const { ctx, p } = await ouvre(opt, 1, CARTES[0][1], {}); await p.waitForTimeout(2500);
+    ok(await p.evaluate(() => { const c = document.querySelector('.cpn'); return !c || c.hidden; }), nom + ', moins de mouvement : compagnon éteint par défaut'); await ctx.close(); }
+  { const { ctx, p, cdp } = await ouvre(opt, 1, CARTES[0][1], { compagnon: '1', compagnonChoisi: '1', mouvements: '1' }); await p.waitForTimeout(2500);
+    const n = await p.evaluate(() => { const c = document.querySelector('.cpn'); return c && !c.hidden ? c.getAnimations({ subtree: true }).filter(a => a.playState === 'running').length : -1; });
+    const r = await repos(p, cdp, 3); ok(n === 0 && r.lay < 5, nom + ', moins de mouvement, compagnon rallumé : immobile (' + n + ' animation, ' + r.ms + ' ms de tâches/s, ' + r.lay + ' mises en page/s)'); await ctx.close(); }
 }
 /* budget de taille */
 { const r = await fetch(URL); const t = await r.text(); ok(t.length < 1.3e6, 'index.html : ' + Math.round(t.length / 1024) + ' Ko (< 1 300 Ko)'); }
