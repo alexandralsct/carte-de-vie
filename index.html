@@ -2160,6 +2160,14 @@ html body header .top3a .noterb{display:none!important}
   html body header .top3a .noterb{display:inline-flex!important}
   html:not(.zz1) body #noterFab,html.proprio body #noterFab{display:none!important}
 }
+/* app téléphone : Mon chemin (2 carrés) + 3 petits carrés sur une grille fluide de 5 colonnes, rien ne dépasse à droite */
+@media (pointer:coarse),(max-width:899px){
+  html body .bande .raccs.pcarres{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:4px!important;width:100%}
+  html body .bande .pcarres .pcarre{width:auto!important;height:auto!important;aspect-ratio:1/1;min-width:0!important}
+  html body .bande .pcarres .pcarre.pchemin{grid-column:span 2;aspect-ratio:auto;margin-right:0!important;width:auto!important}
+  html,body{overflow-x:hidden}
+}
+.lifep .lifex{display:none!important}
 
 html.klein .node .ico svg,html.klein .node .ico{color:#002fa7!important;--c:#002fa7}
 </style>
@@ -6407,6 +6415,8 @@ const svgIco=k=>'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="curren
       n.onclick=()=>{ try{ ESSAI.ouvreNote(); }catch(_){ const f=$("noterFab"); if(f) f.click(); } }; a.prepend(n); } };
   const oB=V2.bande.bind(V2); V2.bande=function(){ const r=oB.apply(this,arguments); try{ poseIcones(); }catch(_){} return r; };
   const oI=renderIa; renderIa=function(){ const r=oI.apply(this,arguments); try{ poseIcones(); }catch(_){} return r; }; setTimeout(()=>{ try{ poseIcones(); }catch(_){} },900); }
+/* LIFE ouverte dans la carte : son propre bouton ← ramène à la carte ; la barre « ← Ma carte » de la carte n'est plus utile */
+window.addEventListener("message",e=>{ if(e.origin===location.origin&&e.data&&e.data.life==="fermer"){ try{ LIFEP.ferme(); }catch(_){} } });
 
 /* A8 : une icône qui ne charge pas laisse la place au logo de l'app, plus de carré blanc */
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&!i.dataset.repli&&(i.classList.contains("lgimg")||i.closest(".node,.ico"))){ i.dataset.repli="1"; i.src="icon-192.png"; i.classList.add("repli"); } },true);
@@ -7322,7 +7332,7 @@ const persoGarde=(t,sha)=>{ try{ localStorage.setItem(PERSO_K,t); localStorage.s
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=191; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=192; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0=null, rec=false;
