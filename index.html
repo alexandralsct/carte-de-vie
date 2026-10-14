@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-M7ZPTA7Qyk3OiMASWA626rT2LibdlJz3wUgOow075jk=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-xI3Kkuh4DLNPr4Q5s7+9gKiKDkNDHrlzaB5Gr/NapdA=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-/5EdLfhVKnsJw3jnGyR5Mer7kQPq8Z+3gdMkxHqG9b8=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-igtxTERAhH08ZlQ6MbYcfeduaOdZAesGcIcn1Yg522Q=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f4eee4">
@@ -2229,8 +2229,8 @@ html body header .top3a .noterb{display:none!important}
 #assistPage .assout li{border-top:1px solid var(--pale,#dbe3f7);padding-top:6px;display:grid;gap:2px}
 
 /* Version 207 : variante « Tout sur un écran », APP TÉLÉPHONE seulement : la classe html.ui-ecran n'est posée que hors app ordinateur (ECRAN.tel) */
-/* le cadre ne porte que les espaces ; Moi passe en bas ; Omni flotte, sans cadre, au-dessus de « + Noter » */
-html.ui-ecran #board.stack{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr)) var(--ecr-noter,81px);column-gap:0!important;row-gap:0!important;gap:0!important;padding:0!important;margin:12px calc(-1 * var(--ecr-droite,0px)) 0 0!important;border:0!important;background:none!important;box-shadow:none!important;min-height:0!important;height:auto!important}
+/* le cadre ne porte que les espaces ; Moi passe en bas ; Omni flotte, sans cadre, au-dessus de la rangée du bas */
+html.ui-ecran #board.stack{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:0!important;row-gap:0!important;gap:0!important;padding:0!important;margin:12px calc(-1 * var(--ecr-droite,0px)) 0 0!important;border:0!important;background:none!important;box-shadow:none!important;min-height:0!important;height:auto!important}
 html.ui-ecran #board.stack>svg,html.ui-ecran #board.stack>.float,html.ui-ecran #board.stack>.notesb,html.ui-ecran #board.stack>.state,html.ui-ecran #board.stack>.v3add,html.ui-ecran #board.stack>.rgBtn{display:none!important}
 html.ui-ecran #board.stack>.moi{position:static!important;transform:none!important;translate:none!important;inset:auto!important;order:50!important;grid-column:auto;width:auto!important;aspect-ratio:auto!important;max-width:none!important;height:61px!important;min-height:0!important;margin:var(--ecr-ecart,8px) 8px 0 0!important;padding:0 6px!important;border-radius:12px!important;display:flex!important;align-items:center;justify-content:center;background:#002FA7!important;border:2px solid #002FA7!important;box-shadow:2px 2px 0 #c9d6f0!important}
 html.ui-ecran #board.stack>.moi *{color:#fff!important;text-align:center!important}
@@ -2253,14 +2253,14 @@ html.ui-ecran #board.stack .zone .node{grid-template-columns:1fr!important;grid-
 html.ui-ecran #board.stack .zone .node .ico{grid-area:1/1!important;justify-self:center!important;align-self:center!important;margin:auto!important}
 html.ui-ecran #board.stack .zone .node .ico,html.ui-ecran #board.stack .zone .node .ico img,html.ui-ecran #board.stack .zone .node .ico svg{width:var(--ecr-icone,44px)!important;height:var(--ecr-icone,44px)!important;margin:0!important}
 html.ui-ecran #board.stack .zone .node .urg{position:absolute!important;top:-5px!important;right:-5px!important;left:auto!important;width:16px!important;height:16px!important;min-width:0!important;border-radius:50%!important;background:#002FA7!important;color:#fff!important;font:800 11px/16px system-ui!important;text-align:center!important;padding:0!important;border:0!important;box-shadow:0 0 0 2px #FFFDF7!important}
-/* en bas : Moi, Atelier (case longue), Mes assistants, même hauteur ; la 4e colonne laisse la place à « + Noter » */
+/* en bas : Moi, Atelier (case longue), Mes assistants, même hauteur */
 html.ui-ecran #board.stack>.outilsb,html.ui-ecran #board.stack>.outilsb .ogrid{display:contents!important}
 html.ui-ecran #board.stack>.outilsb>span{display:none!important}
 html.ui-ecran #board.stack>.outilsb .otout{order:51!important;width:auto!important;height:61px!important;min-height:0!important;margin:var(--ecr-ecart,8px) 8px 0 0!important;padding:0 4px!important;display:flex!important;align-items:center;justify-content:center;box-shadow:2px 2px 0 #c9d6f0!important;border-radius:12px!important}
 html.ui-ecran #board.stack>.outilsb .otout.asspuce{order:52!important}
 html.ui-ecran #board.stack>.outilsb .otout b,html.ui-ecran #board.stack>.outilsb .otout em,html.ui-ecran #board.stack>.outilsb .otout span{display:none!important}
-html.ui-ecran #board.stack>.outilsb .otout small{font:500 12px/1.15 "DM Mono",ui-monospace,Menlo,monospace!important;letter-spacing:.3px!important;text-transform:uppercase!important;color:var(--k1,#002FA7)!important;white-space:normal;text-align:center}
-html.ui-ecran #noterFab{display:flex!important;align-items:center;justify-content:center;line-height:1!important;height:61px!important;min-height:0!important;padding:0 14px!important;font-size:13px!important;right:16px!important;bottom:calc(env(safe-area-inset-bottom) + 12px)!important}
+html.ui-ecran #board.stack>.outilsb .otout small{font:500 12px/1.15 "DM Mono",ui-monospace,Menlo,monospace!important;letter-spacing:.3px!important;text-transform:uppercase!important;color:rgba(0,47,167,.72)!important;white-space:normal;text-align:center}
+html.ui-ecran #noterFab{display:none!important}
 html.ui-ecran .scroller{padding-bottom:calc(env(safe-area-inset-bottom) + 8px)!important}
 html.ui-ecran body{padding-bottom:0!important}
 html.ui-ecran .scroller{margin-top:var(--ecr-haut,0px)!important}
@@ -2269,6 +2269,8 @@ html.ui-ecran #board.stack .zone .node{min-width:0!important}
 html.ui-ecran #board.stack .zone .node.libreb .ico,html.ui-ecran #board.stack .zone .node .ico{display:grid!important;place-items:center;opacity:1!important}
 html.ui-ecran #board.stack>.outilsb.zone{border:0!important;border-radius:0!important}
 
+/* sans « + Noter » : la rangée du bas prend toute la largeur ; la dernière case touche le bord droit */
+html.ui-ecran #board.stack>.outilsb .otout.asspuce{margin-right:0!important}
 html.klein .node .ico svg,html.klein .node .ico{color:#002fa7!important;--c:#002fa7}
 html.demarre .wrap>:not(header){visibility:hidden!important}
 /* accessibilité (13/10) : titre de l'accueil lisible par les lecteurs d'écran seulement */
@@ -6655,7 +6657,8 @@ const ASSIST={ d:null,
 
 /* ===== Version 207 : variante d'interface « Tout sur un écran » (APP TÉLÉPHONE seulement), interrupteur dans Réglages → Apparence =====
    Le haut ne change pas ; les espaces deviennent des cases sans titre, une rangée par grand sujet ; en bas : Moi (bleu Klein),
-   Atelier en case longue, Mes assistants, puis « + Noter » ; Omni (logo de l'app, couleurs inversées) flotte au-dessus de « + Noter ».
+   Atelier, Mes assistants, sur toute la largeur (pas de « + Noter » dans cette variante) ; Omni (logo de l'app, couleurs
+   inversées) flotte au-dessus, sans cadre.
    L'app ordinateur n'est pas touchée. */
 const ECRAN={ K:"uiEcran",
   on(){ try{ return localStorage.getItem(this.K)==="1"; }catch{ return false; } },
@@ -6680,18 +6683,17 @@ const ECRAN={ K:"uiEcran",
     /* le cadre remonte : l'écart au-dessus = l'écart entre « Aujourd'hui » et « Mon chemin » */
     const pc=document.querySelector(".pcarres"), bd=pc&&pc.parentElement.firstElementChild; document.documentElement.style.setProperty("--ecr-haut","0px");
     if(pc&&bd){ const g=pc.getBoundingClientRect().top-bd.getBoundingClientRect().bottom, now=B.getBoundingClientRect().top-pc.getBoundingClientRect().bottom; if(g>=0){ document.documentElement.style.setProperty("--ecr-haut",Math.round(g-now)+"px"); document.documentElement.style.setProperty("--ecr-ecart",Math.round(g)+"px"); } }
-    /* tout s'aligne à droite sur les cartes du haut ; la colonne de « + Noter » reprend celle de « Rappels » */
+    /* tout s'aligne à droite sur les cartes du haut */
     const RS=document.documentElement.style; RS.setProperty("--ecr-droite","0px");
     if(pc){ const dr=Math.round(pc.getBoundingClientRect().right-B.getBoundingClientRect().right); if(dr>0) RS.setProperty("--ecr-droite",dr+"px"); }
-    const nf0=$("noterFab"); if(nf0) RS.setProperty("--ecr-noter",Math.round(nf0.getBoundingClientRect().width+8)+"px");
     const haut=B.getBoundingClientRect().top+scrollY, moi=0, bas=69+12, cadre=22+4*Z.length, H=window.visualViewport?visualViewport.height:innerHeight;
     const R=document.documentElement.style, pose=r=>{ R.setProperty("--ecr-rangee",r+"px"); R.setProperty("--ecr-icone",Math.max(20,Math.min(44,r-10))+"px"); };
     let r=Math.max(28,Math.min(64,Math.floor((H-haut-moi-bas-cadre-12)/Z.length))); pose(r);
     /* puis on mesure pour de vrai : tant que la page dépasse l'écran, on rétrécit les rangées (jamais sous 28 px) */
     for(let i=0;i<4&&r>28;i++){ const trop=document.scrollingElement.scrollHeight-Math.floor(H); if(trop<=0) break; r=Math.max(28,r-Math.ceil(trop/Z.length)); pose(r); }
-    /* même règle en bas : la rangée Moi · Atelier · Mes assistants se pose sur « + Noter », à un écart du cadre ;
+    /* même règle en bas : la rangée Moi · Atelier · Mes assistants se pose au pied de l'écran, à un écart du cadre ;
        la place qui reste agrandit les rangées de tuiles, puis le cadre lui-même */
-    R.setProperty("--ecr-plus","0px"); const a=B.querySelector(".otout"), nf=$("noterFab"), reste=()=>a&&nf?Math.floor(nf.getBoundingClientRect().bottom-a.getBoundingClientRect().bottom):0;
+    R.setProperty("--ecr-plus","0px"); const a=B.querySelector(".otout"), pied=Math.floor(H)-12, reste=()=>a?Math.floor(pied-a.getBoundingClientRect().bottom):0;
     if(document.scrollingElement.scrollHeight<=Math.floor(H)){ let d=reste(); if(d>=Z.length){ r=Math.min(80,r+Math.floor(d/Z.length)); pose(r); d=reste(); } if(d>0) R.setProperty("--ecr-plus",d+"px"); } },
   range(){ const B=$("board"); if(!B||!this.actif()) return;
     const Z=[...B.querySelectorAll(":scope>.zone:not(.outilsb)")];
@@ -7208,7 +7210,7 @@ function fete(x,y){ burst(x,y); setTimeout(()=>burst(x-70,y-30),140); setTimeout
       await wait(250); await moveTo(clampX(bx-dir*W()*.62),C.y,140); if(id!==run) return; cat.style.setProperty("--dir",dir); pose("joue"); await wait(1100); if(id!==run) return; }
     pose("sit"); await wait(900); }
   /* le chat est toujours là : il se promène, s'assoit, fait la sieste, joue, et vient montrer les urgences */
-  const clampX=x=>Math.max(W()/2+4,Math.min(document.documentElement.clientWidth-W()/2-4,x)), docH=()=>Math.max(document.documentElement.scrollHeight,innerHeight), solY=()=>Math.round(H()+30+Math.random()*Math.max(1,docH()-H()-60));
+  const clampX=x=>Math.max(W()/2+4,Math.min(document.documentElement.clientWidth-W()/2-4,x)), docH=()=>document.documentElement.classList.contains("ui-ecran")?Math.round(scrollY+innerHeight):Math.max(document.documentElement.scrollHeight,innerHeight), solY=()=>Math.round(H()+30+Math.random()*Math.max(1,docH()-H()-60));
   let vuUrg=0;
   /* il feule et gonfle ses poils (le chien grogne) */
   async function feuler(id,html){ if(animal!=="chien") pose("feule"); else pose("sit"); dire(html.replace("Ffff !",animal!=="chien"?"Ffff !":"Grrr !"),true,null); await wait(2800); if(id!==run) return; tais(); pose("sit"); await wait(600); }
@@ -7833,8 +7835,8 @@ function start(){
    C'est elle qui fait foi : une copie gardée sur l'appareil, ou un fichier en ligne, n'est exécuté que si son texte a exactement
    cette empreinte. Une empreinte rangée dans le stockage de l'appareil n'est plus jamais utilisée (qui peut écrire l'un peut écrire
    l'autre). */
-const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=208;
-const PERSO_EMP="e1bb1caaa4eabea7b7de8ecdf78413ae01b61433f649f3e6e227b6ed46ba4375", PERSO_GIT="9372cd66c5da73c05f378481b191224a9475f9ca", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
+const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=209;
+const PERSO_EMP="46cd93d61cdae04734298ebb996d395ed2a9ff50c65b3c6b1253f73fe1e2a700", PERSO_GIT="bbd3b3fa0779f1113db3d1cdf7c5c50a47cdc5ea", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
 try{ ["carte-de-vie-perso-sha","carte-de-vie-perso-suivant-sha"].forEach(k=>localStorage.removeItem(k)); }catch{ /* stockage bloqué */ }
 /* le module n'est jamais exécuté deux fois (il pose des minuteries et des écouteurs) */
 let persoFait=false;
@@ -7935,7 +7937,7 @@ function persoDepotUI(){ const pg=document.getElementById("syncLinked"); if(!pg|
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=208; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=209; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0="carte-de-vie-v"+APP_V, rec=false;
