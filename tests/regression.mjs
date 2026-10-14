@@ -38,7 +38,7 @@ const ouvre = async (vp, theme = 'clair', profil = TEL) => {
   /* règle de sécurité (CSP) : toute violation est notée (un script ou une ressource bloqués casseraient l'app en silence) */
   await ctx.addInitScript(() => { window.__csp = []; document.addEventListener('securitypolicyviolation', e => window.__csp.push(e.violatedDirective + ' ' + (e.blockedURI || ''))); });
   await ctx.addInitScript(([carte, theme]) => { if (!sessionStorage.getItem('init')) { sessionStorage.setItem('init', '1'); localStorage.clear(); localStorage.setItem('carte-de-vie-v1', carte);
-    ['hRap', 'compagnon', 'mouvements'].forEach(k => localStorage.setItem(k, '0')); localStorage.setItem('carte-de-vie-vu', '1'); localStorage.setItem('theme', theme); } }, [JSON.stringify(DEMO), theme]);
+    ['hRap', 'compagnon', 'mouvements'].forEach(k => localStorage.setItem(k, '0')); localStorage.setItem('compagnonChoisi', '1'); localStorage.setItem('carte-de-vie-vu', '1'); localStorage.setItem('theme', theme); } }, [JSON.stringify(DEMO), theme]);
   const p = await ctx.newPage(); const err = []; p.on('pageerror', e => err.push(e.message));
   await p.goto(URL); if (CARTE) await p.setInputFiles('#impFile', CARTE); await p.waitForTimeout(1800); return { ctx, p, err, cdp: await ctx.newCDPSession(p) }; };
 const csp = async (p, tag) => { const v = await p.evaluate(() => window.__csp || []); ok(!v.length, tag + ' : aucune violation de la règle de sécurité (CSP)' + (v.length ? ' : ' + v.slice(0, 3).join(' / ') : ''));
