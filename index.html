@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-NoFJ9lVJSiwxdsWIb4WZJ2YLNdySW7qbNqTSftBgwCk=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-yTE7DsCnXr04V6rehKg+RJzJxtFNAKkV0TOW0lUcugI=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud https://cocon.metamorphose-architecture.fr data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-sGeIw+HfVeO+wLrvD9+Hkt3vNeBQ3E/dSJdyb1BYo4c=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-p/K1vNOCW1AIeAv54cmjNekyzkqmRXP3/8O+kyzmy/Y=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud https://cocon.metamorphose-architecture.fr data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f4eee4">
@@ -2215,6 +2215,20 @@ html body header .top3a .noterb{display:none!important}
 .omni .omnic{font-size:1rem;line-height:1.45}
 .omni .omnimeta{opacity:.75}
 .omni .omnioub{justify-self:start;background:none;border:0;padding:4px 0;color:inherit;text-decoration:underline;font:inherit;font-size:.85rem;cursor:pointer;min-height:24px}
+/* 14/10 : bouton « Moi dans 5 ans » (avatar au trait, couleurs de la charte) */
+.omni .omnifutur{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 14px;border:2px solid var(--ink);border-radius:16px;background:var(--surface);color:var(--ink);cursor:pointer;font:inherit;box-shadow:3px 3px 0 color-mix(in srgb,var(--ink) 22%,transparent)}
+.omni .omnifutur:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.omni .omniavatar{width:56px;height:56px;flex:none}
+.omni .omniavatar .trait{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.omni .omniavatar .plein{fill:var(--ink)}
+.omni .omniavatar .boule{fill:color-mix(in srgb,var(--ink) 12%,var(--surface));stroke:var(--ink);stroke-width:2}
+.omni .omniavatar .reflet{opacity:.6}
+.omni .omnifuturt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.omni .omnifuturt b{font-size:1.05rem}
+.omni .omnifuturt small{opacity:.8}
+.omni .omnied{width:100%;box-sizing:border-box;resize:none;overflow:hidden;border:0;border-radius:8px;padding:4px 6px;margin:0 -6px;background:transparent;color:inherit;font:inherit;font-size:1rem;line-height:1.45}
+.omni .omnied:hover{background:color-mix(in srgb,var(--ink) 6%,transparent)}
+.omni .omnied:focus{outline:2px solid var(--ink);background:var(--surface)}
 
 /* Version 205 : « Mes assistants » (téléphone et ordinateur) */
 #assistPage{--c:var(--ink);background:var(--bg)!important;z-index:60}
@@ -6573,11 +6587,17 @@ window.addEventListener("message",e=>{ if(e.origin===location.origin&&e.data&&e.
    contradictions:[{id,date,contenu}], _m }. La zone intime n'y entre jamais (seul son nombre).
    L'app n'écrit rien ici : « Oublie ça », la pause et les questions PRÉPARENT un message dans LIFE (fil Général) ; la
    personne le relit et touche Envoyer. Tout texte reçu est affiché avec textContent. */
-const OMNI={ d:null, filtre:null, z:null,
+const OMNI={ d:null, filtre:null, z:null, corr:{},
+  /* 14/10 : ce que LIFE sait est un texte modifiable ; chaque correction va dans meta/omniscient_corr {liste:[{id, texte, t}]},
+     que le système reporte dans Omniscient (le texte d'origine n'est jamais écrasé par l'app) */
+  chargeCorr(d){ const L=d&&Array.isArray(d.liste)?d.liste:[]; this.corr={}; L.forEach(x=>{ if(x&&x.id) this.corr[x.id]=x; });
+    const a=document.activeElement; if(this.z&&this.z.isConnected&&!(a&&a.classList&&a.classList.contains("omnied"))) this.rend(); },
+  corrige(id,texte){ this.corr[id]={id,texte,t:new Date().toISOString()};
+    if(db) db.doc("meta/omniscient_corr").set({liste:Object.values(this.corr)}).catch(()=>{}); this.rend(); },
   charge(d){ this.d=d&&typeof d==="object"?d:null; if(this.z&&this.z.isConnected) this.rend(); },
   /* ouvre LIFE et y prépare le message (jamais envoyé sans la personne) */
-  prepare(texte){ LIFEP.ouvre(); const f=document.querySelector("#lifeP iframe"); if(!f) return;
-    const go=()=>{ try{ f.contentWindow.postMessage({life:"preparer",fil:"general",texte},location.origin); }catch(_){} };
+  prepare(texte,fil){ LIFEP.ouvre(); const f=document.querySelector("#lifeP iframe"); if(!f) return;
+    const go=()=>{ try{ f.contentWindow.postMessage({life:"preparer",fil:fil||"general",texte},location.origin); }catch(_){} };
     if(LIFEP.pret) go(); else { LIFEP.attente=go; } },
   date(s){ const x=new Date(String(s||"").length<=10?s+"T12:00":s); return isNaN(x)?String(s||""):x.toLocaleDateString("fr-FR",{day:"numeric",month:"short"}); },
   STAT:{"règle":"règle","regle":"règle","confirmé":"confirmé","confirme":"confirmé","proposé":"à confirmer","propose":"à confirmer","contradiction":"contradiction"},
@@ -6594,6 +6614,7 @@ const OMNI={ d:null, filtre:null, z:null,
       const q1=el("button",{type:"button",className:"vbtn ghostb",textContent:"Qu'as-tu appris de moi ?"}), q2=el("button",{type:"button",className:"vbtn ghostb",textContent:"Dis-moi qui je suis"});
       q1.onclick=()=>this.prepare("Qu'as-tu appris de moi ?"); q2.onclick=()=>this.prepare("Dis-moi qui je suis"); t.appendChild(el("div",{className:"omniq"},pb,q1,q2));
       if(D.pause) t.appendChild(el("p",{className:"omnipz",textContent:"En pause : LIFE ne lit ni n'écrit rien."})); }
+    t.appendChild(this.futur());
     z.appendChild(t);
     const O=[["sait","Ce qu'il sait"],["carte","Carte"],["eclair","À voir"+(C.length?" ("+C.length+")":"")],["mem","Mémoire"]], seg=el("div",{className:"seg omniseg",role:"tablist"});
     O.forEach(([k,n])=>{ const b=el("button",{type:"button",role:"tab",textContent:n}); b.setAttribute("aria-selected",String(this.ong===k)); b.onclick=()=>{ this.ong=k; this.rend(); }; seg.appendChild(b); });
@@ -6610,10 +6631,30 @@ const OMNI={ d:null, filtre:null, z:null,
     Object.keys(G).sort((a,b)=>G[b].length-G[a].length).forEach(k=>{ const d=el("details",{className:"omnigr"}); d.open=Object.keys(G).length<=3||k===this.filtre;
       d.appendChild(el("summary",{},el("b",{textContent:this.dom(k)}),el("span",{className:"omnin2",textContent:String(G[k].length)})));
       const ul=el("ul",{className:"omnifil"}); G[k].forEach(x=>{ const st=this.STAT[String(x.statut||"").toLowerCase()]||String(x.statut||"");
-        const li=el("li",{},el("p",{className:"omnic",textContent:String(x.contenu||"")}),el("small",{className:"omnimeta",textContent:[st,this.date(x.date),x.source?"d'après "+String(x.source):""].filter(Boolean).join(" · ")}));
+        const c=x.id&&this.corr[x.id], txt=c?String(c.texte||""):String(x.contenu||""), ta=el("textarea",{className:"omnic omnied",value:txt,rows:1,spellcheck:true});
+        ta.setAttribute("aria-label","Ce que LIFE sait (modifiable) : "+txt.slice(0,60));
+        const haut=()=>{ ta.style.height="auto"; ta.style.height=ta.scrollHeight+"px"; }; ta.addEventListener("input",haut); requestAnimationFrame(haut);
+        if(x.id) ta.addEventListener("change",()=>{ const v=ta.value.trim(); if(!v){ ta.value=txt; haut(); return; } if(v!==txt) this.corrige(x.id,v); }); else ta.readOnly=true;
+        const li=el("li",{},ta,el("small",{className:"omnimeta",textContent:[c?"modifié par toi":st,this.date(c?c.t:x.date),x.source&&!c?"d'après "+String(x.source):""].filter(Boolean).join(" · ")}));
         if(x.id){ const o=el("button",{type:"button",className:"omnioub",textContent:"Oublie ça"}); o.setAttribute("aria-label","Oublie ça : "+String(x.contenu||"").slice(0,60)); o.onclick=()=>this.prepare("oublie "+x.id); li.appendChild(o); }
         ul.appendChild(li); }); d.appendChild(ul); pan.appendChild(d); });
     if(!F.length) pan.appendChild(help("Rien pour l'instant.")); },
+  /* 14/10 : « Moi dans 5 ans » — une boule de voyance au trait (couleurs de la charte) ; le toucher ouvre dans LIFE le fil « Moi dans 5 ans »,
+     une conversation où LIFE répond comme la personne dans 5 ans, à partir d'Omniscient (premier message préparé, jamais envoyé seul) */
+  futur(){ const an=new Date().getFullYear()+5, b=el("button",{type:"button",className:"omnifutur"});
+    b.setAttribute("aria-label","Moi dans 5 ans : parler avec moi en "+an);
+    const NS="http://www.w3.org/2000/svg", s=document.createElementNS(NS,"svg"), mk=(t,at)=>{ const e=document.createElementNS(NS,t); Object.entries(at).forEach(([k,v])=>e.setAttribute(k,v)); return e; };
+    s.setAttribute("viewBox","0 0 64 64"); s.setAttribute("aria-hidden","true"); s.setAttribute("class","omniavatar");
+    s.append(mk("path",{d:"M18 58h28l-3-7H21z",class:"plein"}),
+      mk("path",{d:"M23 51c-6-4-9-10-9-17 0-10 8-18 18-18s18 8 18 18c0 7-3 13-9 17",class:"boule"}),
+      mk("path",{d:"M21 30c1-6 5-10 11-11",class:"trait reflet"}),
+      mk("path",{d:"M38 28l1.2 3 3 1.2-3 1.2-1.2 3-1.2-3-3-1.2 3-1.2z",class:"plein"}),
+      mk("path",{d:"M29 37l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z",class:"plein"}),
+      mk("path",{d:"M52 8l1.4 3.6L57 13l-3.6 1.4L52 18l-1.4-3.6L47 13l3.6-1.4z",class:"plein"}));
+    b.append(s,el("span",{className:"omnifuturt"},el("b",{textContent:"Moi dans 5 ans"}),el("small",{textContent:"Parle-moi depuis "+an})));
+    /* 14/10 : une vraie conversation par messages, dans le fil « Moi dans 5 ans » de LIFE (LIFE y répond comme la personne dans 5 ans) */
+    b.onclick=()=>this.prepare("Bonjour, moi de "+an+" !","futur");
+    return b; },
   carte(N,K){ const W=320, H=240, cx=W/2, cy=H/2, dom=N.filter(x=>x.genre==="domaine"), as=N.filter(x=>x.genre!=="domaine"), P={};
     dom.forEach((x,i)=>{ const a=2*Math.PI*i/Math.max(1,dom.length)-Math.PI/2; P[x.id]=[cx+Math.cos(a)*(W/2-46),cy+Math.sin(a)*(H/2-26)]; });
     as.forEach((x,i)=>{ const a=2*Math.PI*i/Math.max(1,as.length)+Math.PI/4; P[x.id]=[cx+Math.cos(a)*(as.length>1?38:0),cy+Math.sin(a)*(as.length>1?26:0)]; });
@@ -6630,7 +6671,7 @@ const OMNI={ d:null, filtre:null, z:null,
 /* LIFE dit qu'il est prêt à recevoir un message préparé */
 window.addEventListener("message",e=>{ if(e.origin===location.origin&&e.data&&e.data.life==="pret"){ LIFEP.pret=true; const a=LIFEP.attente; LIFEP.attente=null; if(a) setTimeout(a,50); } });
 /* la page du cerveau s'appelle « Omni » : ce que LIFE sait de toi, en onglets ; la mémoire de l'app devient l'onglet « Ma mémoire » */
-{ const e=MEMP.ecoute.bind(MEMP); MEMP.ecoute=function(){ e(); if(!OMNI.sub&&db){ OMNI.sub=true; db.doc("meta/omniscient").onSnapshot(x=>OMNI.charge(x.exists?x.data():null),()=>{}); } };
+{ const e=MEMP.ecoute.bind(MEMP); MEMP.ecoute=function(){ e(); if(!OMNI.sub&&db){ OMNI.sub=true; db.doc("meta/omniscient").onSnapshot(x=>OMNI.charge(x.exists?x.data():null),()=>{}); db.doc("meta/omniscient_corr").onSnapshot(x=>OMNI.chargeCorr(x.exists?x.data():null),()=>{}); } };
   const o=MEMP.ouvre.bind(MEMP); MEMP.ouvre=function(){ o(); const p=$("memPersoPage"); if(!p) return; const inn=p.querySelector(".page-in"), h=inn&&inn.querySelector("h2"); if(!inn) return;
     if(h) h.textContent="Omni"; p.setAttribute("aria-label","Omni");
     const mem=el("div",{className:"omnimem"}); [...inn.children].filter(x=>x!==h&&x!==inn.firstElementChild).forEach(x=>mem.appendChild(x));
@@ -7873,8 +7914,8 @@ function start(){
    C'est elle qui fait foi : une copie gardée sur l'appareil, ou un fichier en ligne, n'est exécuté que si son texte a exactement
    cette empreinte. Une empreinte rangée dans le stockage de l'appareil n'est plus jamais utilisée (qui peut écrire l'un peut écrire
    l'autre). */
-const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=213;
-const PERSO_EMP="2d12aa1546b3c86ee482a74aedd08c85d4fc96343bdefab57224d788db7126b2", PERSO_GIT="bd96e2639f9d5890c147fca5e71241f2a01a5c6b", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
+const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=214;
+const PERSO_EMP="f51e716a1feb26a58a809b19f517521e70953ba437b9289d0a566229ccbbfe8b", PERSO_GIT="e1c32e4efe12e118e6b72abf7d399148c2f46522", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
 try{ ["carte-de-vie-perso-sha","carte-de-vie-perso-suivant-sha"].forEach(k=>localStorage.removeItem(k)); }catch{ /* stockage bloqué */ }
 /* le module n'est jamais exécuté deux fois (il pose des minuteries et des écouteurs) */
 let persoFait=false;
@@ -7975,7 +8016,7 @@ function persoDepotUI(){ const pg=document.getElementById("syncLinked"); if(!pg|
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=213; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=214; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0="carte-de-vie-v"+APP_V, rec=false;
