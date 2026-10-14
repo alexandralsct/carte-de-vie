@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-dBf7Xa8FaBjphPU7PgxikU5b2jnR1Y8ifwSJ9UsE+kU=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-OngYNnn3mE1UbFuRHQfF8iV3HWbWm5FOMltz56efLIs=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud https://*.fr data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-NoFJ9lVJSiwxdsWIb4WZJ2YLNdySW7qbNqTSftBgwCk=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-yTE7DsCnXr04V6rehKg+RJzJxtFNAKkV0TOW0lUcugI=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud https://cocon.metamorphose-architecture.fr data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f4eee4">
@@ -7873,8 +7873,8 @@ function start(){
    C'est elle qui fait foi : une copie gardée sur l'appareil, ou un fichier en ligne, n'est exécuté que si son texte a exactement
    cette empreinte. Une empreinte rangée dans le stockage de l'appareil n'est plus jamais utilisée (qui peut écrire l'un peut écrire
    l'autre). */
-const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=212;
-const PERSO_EMP="1d48d43ca2b4d98a884945daeb130d6996085c8f1f19e97b1cff237dddba5f97", PERSO_GIT="b1bbf16459a2495028216b4301c7124ecd7b7726", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
+const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=213;
+const PERSO_EMP="2d12aa1546b3c86ee482a74aedd08c85d4fc96343bdefab57224d788db7126b2", PERSO_GIT="bd96e2639f9d5890c147fca5e71241f2a01a5c6b", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
 try{ ["carte-de-vie-perso-sha","carte-de-vie-perso-suivant-sha"].forEach(k=>localStorage.removeItem(k)); }catch{ /* stockage bloqué */ }
 /* le module n'est jamais exécuté deux fois (il pose des minuteries et des écouteurs) */
 let persoFait=false;
@@ -7975,7 +7975,7 @@ function persoDepotUI(){ const pg=document.getElementById("syncLinked"); if(!pg|
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=212; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=213; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0="carte-de-vie-v"+APP_V, rec=false;
