@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-N6ONeiOPTPir37RVT6KFIVahwneePi7iDn3MsRNDhDY=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-RytfCDnsBoSt4N6CBzvjQUy8vVExkAO8xU4ajXUBAgA=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud https://*.fr data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-dBf7Xa8FaBjphPU7PgxikU5b2jnR1Y8ifwSJ9UsE+kU=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-OngYNnn3mE1UbFuRHQfF8iV3HWbWm5FOMltz56efLIs=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud https://*.fr data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f4eee4">
@@ -2271,6 +2271,20 @@ html.ui-ecran #board.stack>.outilsb.zone{border:0!important;border-radius:0!impo
 
 /* sans « + Noter » : la rangée du bas prend toute la largeur ; la dernière case touche le bord droit */
 html.ui-ecran #board.stack>.outilsb .otout.asspuce{margin-right:0!important}
+/* Version 212 : « Le brief éco » en tête de la page News (téléphone et ordinateur) */
+.beco{border:2px solid var(--ink);border-radius:16px;padding:12px 14px;margin:0 0 16px;background:var(--surface)}
+.beco h3{margin:0 0 6px}
+.beconav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 10px}
+.becot{font-weight:700;font-size:1.05rem;margin:0 0 6px}
+.becos{margin:0 0 10px;line-height:1.5}
+.becod{border-top:1px solid color-mix(in srgb,var(--ink) 25%,transparent);padding:8px 0}
+.becod>summary{cursor:pointer;font-weight:600}
+.becod p{margin:6px 0 0;line-height:1.5}
+.beco h4{margin:10px 0 4px}
+.becosv{margin:0;padding-left:18px}
+.becoi{opacity:.75;font-size:.85rem;margin:8px 0 0}
+.becosrc{margin:8px 0 0;font-size:.85rem;overflow-wrap:anywhere}
+
 html.klein .node .ico svg,html.klein .node .ico{color:#002fa7!important;--c:#002fa7}
 html.demarre .wrap>:not(header){visibility:hidden!important}
 /* accessibilité (13/10) : titre de l'accueil lisible par les lecteurs d'écran seulement */
@@ -4701,7 +4715,7 @@ function renderRub(c,only){ if(only==="rubs") only=null, c=Object.assign({},c,{_
     const nd=items.filter(k=>k.done).length, prog=!J&&items.length>1&&nd?[el("div",{className:"rprog"},el("i",{style:"width:"+Math.round(nd*100/items.length)+"%"})),el("div",{className:"rprogt",textContent:nd+" / "+items.length+" fait"+(nd>1?"s":"")})]:[];
     const cad=only==="rub:"+r.id&&estCadran(r); if(cad) pane.appendChild(cadranPage(c,r));
     if(only==="rub:"+r.id&&estAudio(r)) pane.appendChild(audioPage(c,r));
-    if(only==="rub:"+r.id&&r.type==="news") pane.appendChild(newsPage(c,r));
+    if(only==="rub:"+r.id&&r.type==="news"){ const np=newsPage(c,r); np.insertBefore(briefEco(c,r),np.firstChild); pane.appendChild(np); }
     const body=r.type==="news"?[]:r.type==="objectif"?rubObjectif(r,upd,setRub):r.type==="monde"?rubMonde(r,upd,setRub):r.type==="prix"?rubPrix(r,upd,setRub):r.type==="mesures"?rubMesures(r,upd,setRub):[...prog,f,items.length?ul:none("Vide pour l'instant.")];
     const rc=el("section",{className:"card rub t"+(ri%3)+(r.type==="objectif"?" obj":r.type==="monde"?" monde":r.type==="prix"?" prix":r.type==="mesures"?" mes":"")+(cad?" cdreg":"")},sy,tt,...body,rm); rc.dataset.k="rub:"+r.id; if(cad) rc.prepend(el("small",{className:"mono cdreg-t",textContent:"Réglages de l'objectif"})); pane.appendChild(rc); });
   const ni=el("input",{id:"fRubNew",placeholder:"Nom d'une nouvelle rubrique",maxLength:40}); ni.setAttribute("aria-label","Nouvelle rubrique");
@@ -6716,6 +6730,30 @@ const ECRAN={ K:"uiEcran",
     clearTimeout(t); t=setTimeout(()=>{ const r=n.getBoundingClientRect(), b=el("div",{className:"ecranBulle",textContent:n.getAttribute("aria-label")||""}); b.style.left=Math.round(r.left+r.width/2)+"px"; b.style.top=Math.round(r.top-8)+"px"; document.body.appendChild(b); setTimeout(()=>b.remove(),1500); },450); },{passive:true});
   ["touchend","touchmove","touchcancel"].forEach(k=>document.addEventListener(k,()=>clearTimeout(t),{passive:true})); }
 
+/* ===== Version 212 : « Le brief éco », analyse approfondie du jour (toute l'économie, pas seulement le bitcoin) =====
+   Données : rubrique « news » de l'espace Bourse, champ analyses:[{id, d:"AAAA-MM-JJ", titre, synthese, sections:[{t, texte}],
+   surveiller:[texte], incertain, sources:[{t, u}]}], écrit chaque matin par la routine. Information seulement, jamais de conseil.
+   Tout texte reçu est affiché avec textContent ; liens https seulement. Même rendu dans l'app téléphone et l'app ordinateur. */
+let BRIEF_I=0;
+function briefEco(c,r){ const A=(r.analyses||[]).filter(x=>x&&x.d).slice().sort((a,b)=>String(b.d).localeCompare(String(a.d))), box=el("div",{className:"beco"});
+  if(!A.length){ box.appendChild(el("h3",{textContent:"Le brief éco"})); box.appendChild(help("Chaque matin, une analyse approfondie de l'actualité économique : marchés, taux, inflation, matières premières, entreprises, géopolitique.")); return box; }
+  BRIEF_I=Math.max(0,Math.min(BRIEF_I,A.length-1)); const x=A[BRIEF_I], jour=new Date(x.d+"T12:00").toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
+  const nav=el("div",{className:"beconav"}), av=el("button",{type:"button",className:"vbtn ghostb",textContent:"‹ Avant"}), ap=el("button",{type:"button",className:"vbtn ghostb",textContent:"Après ›"});
+  av.disabled=BRIEF_I>=A.length-1; ap.disabled=BRIEF_I===0; av.setAttribute("aria-label","Brief précédent"); ap.setAttribute("aria-label","Brief suivant");
+  av.onclick=()=>{ BRIEF_I++; renderPane(cats.get(c.id)); }; ap.onclick=()=>{ BRIEF_I--; renderPane(cats.get(c.id)); };
+  nav.append(av,el("small",{className:"mono",textContent:jour}),ap);
+  box.append(el("h3",{textContent:"Le brief éco"}),nav);
+  if(x.titre) box.appendChild(el("p",{className:"becot",textContent:String(x.titre)}));
+  if(x.synthese) box.appendChild(el("p",{className:"becos",textContent:String(x.synthese)}));
+  (Array.isArray(x.sections)?x.sections:[]).forEach((s,i)=>{ if(!s||!s.texte) return; const d=el("details",{className:"becod"}); d.open=i<2;
+    d.append(el("summary",{textContent:String(s.t||"")}),el("p",{textContent:String(s.texte)})); box.appendChild(d); });
+  const S=(Array.isArray(x.surveiller)?x.surveiller:[]).filter(Boolean); if(S.length){ const u=el("ul",{className:"becosv"}); S.forEach(t=>u.appendChild(el("li",{textContent:String(t)}))); box.append(el("h4",{textContent:"À surveiller"}),u); }
+  if(x.incertain) box.appendChild(el("p",{className:"becoi",textContent:"À prendre avec prudence : "+String(x.incertain)}));
+  const L=(Array.isArray(x.sources)?x.sources:[]).filter(s=>s&&/^https:\/\//.test(String(s.u||""))); if(L.length){ const p=el("p",{className:"becosrc"}); p.appendChild(el("small",{className:"mono",textContent:"Sources : "}));
+    L.slice(0,10).forEach((s,i)=>{ if(i) p.appendChild(document.createTextNode(" · ")); const a=el("a",{href:String(s.u),textContent:String(s.t||s.u),target:"_blank",rel:"noopener noreferrer"}); p.appendChild(a); }); box.appendChild(p); }
+  box.appendChild(el("p",{className:"becoi",textContent:"Information seulement : ni conseil d'achat, ni de vente, ni de placement."}));
+  return box; }
+
 /* A8 : une icône qui ne charge pas laisse la place au logo de l'app, plus de carré blanc */
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&!i.dataset.repli&&(i.classList.contains("lgimg")||i.closest(".node,.ico"))){ i.dataset.repli="1"; i.src="icon-192.png"; i.classList.add("repli"); } },true);
 
@@ -7835,8 +7873,8 @@ function start(){
    C'est elle qui fait foi : une copie gardée sur l'appareil, ou un fichier en ligne, n'est exécuté que si son texte a exactement
    cette empreinte. Une empreinte rangée dans le stockage de l'appareil n'est plus jamais utilisée (qui peut écrire l'un peut écrire
    l'autre). */
-const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=211;
-const PERSO_EMP="a08571ec7d04048cad49ec418f64bd61c630fe82af539d328d464b78f8640985", PERSO_GIT="2fe2720803d970f9aa3fb8fd58cb6919af17ce1e", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
+const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=212;
+const PERSO_EMP="1d48d43ca2b4d98a884945daeb130d6996085c8f1f19e97b1cff237dddba5f97", PERSO_GIT="b1bbf16459a2495028216b4301c7124ecd7b7726", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
 try{ ["carte-de-vie-perso-sha","carte-de-vie-perso-suivant-sha"].forEach(k=>localStorage.removeItem(k)); }catch{ /* stockage bloqué */ }
 /* le module n'est jamais exécuté deux fois (il pose des minuteries et des écouteurs) */
 let persoFait=false;
@@ -7937,7 +7975,7 @@ function persoDepotUI(){ const pg=document.getElementById("syncLinked"); if(!pg|
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=211; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=212; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0="carte-de-vie-v"+APP_V, rec=false;
