@@ -36,6 +36,14 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   await ctx.route(/\/index\.html/, async r => { const rep = await r.fetch(); await r.fulfill({ response: rep, body: (await rep.text()).replace("connect-src 'self'", "connect-src 'self' https://serveur-demo.cloud") }); });
   const p = await ctx.newPage(); const err = []; p.on('pageerror', e => { err.push(e.message); if (process.env.DBG) console.log('ERR', e.message); });
   await p.goto(URL); await p.waitForTimeout(1800);
+  /* 0. numéro de version en haut à gauche de l'accueil (V.2.2.8 pour la 228), le même que celui du service worker ; sa place est propre à chaque app */
+  const swV = await p.evaluate(async () => { const t = await (await fetch('sw.js', { cache: 'no-store' })).text(); return (/carte-de-vie-v(\d+)/.exec(t) || [])[1]; });
+  const vt = await p.evaluate(() => { const t = document.getElementById('versTag'); if (!t) return null; const r = t.getBoundingClientRect(), s = getComputedStyle(t); return { txt: t.textContent, x: Math.round(r.x), y: Math.round(r.y + scrollY), h: Math.round(r.height), taille: parseFloat(s.fontSize) }; });
+  ok(vt && vt.txt === 'V.' + swV.split('').join('.'), nom + ' : le numéro de version affiché (' + (vt && vt.txt) + ') est celui de la version publiée (' + swV + ')');
+  ok(vt && vt.x === (tel ? 8 : 12) && vt.y === (tel ? 4 : 6) && vt.taille <= 11, nom + ' : il est tout en haut à gauche, petit (' + (vt && vt.x) + ' px, ' + (vt && vt.y) + ' px, ' + (vt && vt.taille) + ' px de haut)');
+  await p.evaluate(() => { document.getElementById('setPage').hidden = false; }); await p.waitForTimeout(200);
+  ok(await p.evaluate(() => getComputedStyle(document.getElementById('versTag')).display === 'none'), nom + ' : il disparaît quand une page est ouverte par-dessus l\'accueil');
+  await p.evaluate(() => { document.getElementById('setPage').hidden = true; });
   /* 1. le cercle « Moi » reste dans la planche, sous les boutons du haut (décalage enregistré trop haut) */
   if (tel) {
     const g = await p.evaluate(() => { const r = e => e.getBoundingClientRect(), B = r(document.getElementById('board')), M = r(document.querySelector('.moi')); let hb = 0; B && document.querySelectorAll('#board .v3add,#board .rgBtn').forEach(e => { if (e.offsetParent) hb = Math.max(hb, r(e).bottom); }); return { top: M.top - B.top, bas: B.bottom - M.bottom, sousBoutons: M.top >= hb - 1 }; });
