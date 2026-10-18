@@ -16,6 +16,8 @@ const DEMO = {
       disp: { page: { a4: 'Outils', a3: 'Outils' }, cachees: ['À faire'] } }),
   'espaces/cuisine-demo': esp('Cuisine de démo', 20, 62, [{ id: 'k1', name: 'Menus', items: [it('Un menu')] }], { disp: { envies: 'Mes envies' }, jeu: { envies: [{ id: 'abcdefghij1', txt: 'Une soupe', t: '2026-10-10T10:00:00.000Z' }] } }),
   'espaces/boutique-demo': esp('Boutique de démo', 78, 62, [{ id: 'm1', name: 'Offre', items: [it('Une offre')] }, { id: 'm2', name: 'Tarifs', items: [it('Un tarif')] }], { disp: { cachees: ['Page retirée'] } }),
+  'espaces/a-traiter': esp('À traiter', 50, 85, [{ id: 't1', name: 'Vrac', items: [] }]),
+  'meta/propositions': { liste: ['tache:Une tâche proposée', 'idee:Une idée proposée', 'rubrique:Une rubrique proposée', 'tache:Une tâche à annuler tard'].map((v, i) => ({ id: 'prop' + i, type: v.split(':')[0], titre: null, pourquoi: 'Pour la démonstration', source: 'Claude', t: new Date().toISOString(), quand: new Date().toISOString(), p: 1, etat: 'nouvelle', data: { text: v.split(':')[1], cat: 'jardin' } })), _m: Date.now() },
   'espaces/jardin': esp('Jardin', 65, 25, [{ id: 'j1', name: 'À planter', items: [it('Tomates')] }]),
   'meta/layout': { mx: 50, my: 50, sx: -1.5, sy: -900, _m: Date.now() },
 };
@@ -68,6 +70,46 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   await p.waitForTimeout(900);
   const oA = await p.evaluate(() => [...document.querySelectorAll('#pane .rpnav .rpt')].map(x => x.textContent.trim()));
   ok(oA.includes("L'essentiel") && !oA.includes('Page retirée'), nom + " : la page « L'essentiel » est là, seule la page retirée a disparu (" + oA.join(' | ') + ')');
+  /* 2 quater. Propositions (étape a) : valider = ajouter tout de suite, trace dans meta/a_appliquer, _src, annulation 10 min, rien d'ajouté deux fois */
+  const lisDonnees = () => p.evaluate(() => { const d = JSON.parse(localStorage.getItem('carte-de-vie-v1')); return { j: d['espaces/jardin'], a: (d['meta/a_appliquer'] || {}).liste || [], e: (d['meta/entrees'] || {}).liste || [], pr: (d['meta/propositions'] || {}).liste || [] }; });
+  await p.evaluate(() => window.__v227.ESSAI.ouvreVal()); await p.waitForTimeout(500);
+  await p.evaluate(() => [...document.querySelectorAll('#valIn .vprop')].find(b => /Une tâche proposée/.test((b.querySelector('input,textarea') || {}).value || '')).querySelector('.btn').click()); await p.waitForTimeout(1500);
+  let st = await lisDonnees(), tk = (st.j.tasks || []).find(t => t.text === 'Une tâche proposée');
+  ok(tk && tk._src === 'prop0' && /^[a-z0-9]{11}$/.test(tk.id), nom + ' : valider une tâche proposée l\'ajoute tout de suite, avec _src = la proposition');
+  const ent = st.a.find(e => e.proposition === 'prop0');
+  ok(ent && ent.statut === 'faite' && ent.action.ids[0] === tk.id && ent.jusqu > Date.now(), nom + ' : la ligne est dans meta/a_appliquer (statut faite, annulable 10 min)');
+  ok(/✓ Fait · Une tâche proposée/.test(await p.evaluate(() => (document.querySelector('#valIn .appl') || {}).textContent || '')), nom + ' : la page À valider montre ✓ « Fait »');
+  await p.evaluate(() => window.__v227.APPL.applique({ id: 'prop0', type: 'tache', data: { text: 'Une tâche proposée', cat: 'jardin' } })); await p.waitForTimeout(800);
+  st = await lisDonnees(); ok((st.j.tasks || []).filter(t => t.text === 'Une tâche proposée').length === 1 && st.a.filter(e => e.proposition === 'prop0').length === 1, nom + ' : rejouer la même proposition ne crée rien deux fois');
+  await p.evaluate(() => [...document.querySelectorAll('#valIn .appl .aprow')].find(r => /Une tâche proposée/.test(r.textContent)).querySelector('.btn').click()); await p.waitForTimeout(1500);
+  st = await lisDonnees(); ok(!(st.j.tasks || []).some(t => t.text === 'Une tâche proposée') && st.a.find(e => e.proposition === 'prop0').statut === 'annulee' && st.pr.find(x => x.id === 'prop0').etat === 'nouvelle', nom + ' : « Annuler » retire l\'ajout, la ligne passe à annulée et la proposition revient à valider');
+  await p.evaluate(() => [...document.querySelectorAll('#valIn .vprop')].find(b => /Une rubrique proposée/.test((b.querySelector('input,textarea') || {}).value || '')).querySelector('.btn').click()); await p.waitForTimeout(1200);
+  st = await lisDonnees(); ok((st.j.rub || []).some(r => r.name === 'Une rubrique proposée' && r._src === 'prop2'), nom + ' : une rubrique proposée est ajoutée (ajout seulement)');
+  const tard = await p.evaluate(() => { const A = window.__v227.APPL; A.applique({ id: 'prop3', type: 'tache', data: { text: 'Une tâche à annuler tard', cat: 'jardin' } }); const e = A.L.find(y => y.proposition === 'prop3'); e.jusqu = Date.now() - 1000; return A.annule(e); });
+  await p.waitForTimeout(1500); st = await lisDonnees();
+  ok(/10 minutes/.test(tard) && (st.j.tasks || []).some(t => t.text === 'Une tâche à annuler tard'), nom + ' : après 10 minutes, « Annuler » ne retire plus rien');
+  const modif = await p.evaluate(() => { const A = window.__v227.APPL, e = A.L.find(y => y.proposition === 'prop3'); e.jusqu = Date.now() + 60000; e.action.texte = 'Autre texte'; return A.annule(e); });
+  ok(/modifié/.test(modif), nom + ' : ce que tu as modifié depuis n\'est jamais retiré');
+  await p.evaluate(() => { document.getElementById('valPage').hidden = true; });
+  /* 2 quinquies. Mes entrées : trace de chaque saisie, pastille sur « + Noter », trois colonnes Lu · Réfléchi · Traité */
+  await p.evaluate(() => document.getElementById('noterFab').click()); await p.waitForTimeout(400);
+  await p.fill('#noterTxt', 'Penser à un rendez-vous santé'); await p.click('#noterOk'); await p.waitForTimeout(1500);
+  st = await lisDonnees(); const eN1 = st.e.find(e => /rendez-vous santé/.test(e.texte));
+  ok(eN1 && eN1.statut === 'recue' && eN1.source === 'noter' && eN1.sensible === true && /^[a-z0-9]{11}$/.test(eN1.id), nom + ' : une note laissée « à trier » est reçue dans meta/entrees, marquée sensible (reste dans la carte)');
+  const pa = await p.evaluate(() => (document.querySelector('.noterfab .entpast') || {}).textContent);
+  ok(/1 en cours/.test(pa || ''), nom + ' : la pastille « 1 en cours » apparaît sur « + Noter » (' + pa + ')');
+  await p.evaluate(() => { document.getElementById('noterClose').click(); window.__v227.ENT.ouvre(); }); await p.waitForTimeout(500);
+  const col = await p.evaluate(() => [...document.querySelectorAll('#entIn .entcol')].map(c => c.querySelector('h3').textContent + '|' + c.querySelectorAll('.entrow').length));
+  ok(col.length === 3 && /^Lu/.test(col[0]) && /^Réfléchi/.test(col[1]) && /^Traité/.test(col[2]) && /\|1$/.test(col[0]), nom + ' : la page « Mes entrées » a trois colonnes (Lu · Réfléchi · Traité), l\'entrée est dans Lu (' + col.join(' ; ') + ')');
+  await p.evaluate(() => [...document.querySelectorAll('#entIn .entrow .btn')][0].click()); await p.waitForTimeout(1200);
+  st = await lisDonnees(); ok(st.e.find(e => /rendez-vous santé/.test(e.texte)).statut === 'traitee' && !(await p.evaluate(() => document.querySelector('.noterfab .entpast'))), nom + ' : « Marquer traité » la passe dans Traité et la pastille disparaît');
+  await p.evaluate(() => { window.__v227.ENT.ecrit([]); document.getElementById('entPage').hidden = true; });
+  await p.evaluate(() => { const e = [...document.querySelectorAll('#board .node')].find(n => /^Cuisine/.test(n.textContent.trim())); if (e) { e.scrollIntoView(); e.click(); } }); await p.waitForTimeout(700);
+  await p.evaluate(() => document.getElementById('noterFab').click()); await p.waitForTimeout(300);
+  await p.evaluate(() => { const c = [...document.querySelectorAll('#noterOu .vchip')].find(b => /Jardin/.test(b.textContent)); c.click(); }); await p.fill('#noterTxt', 'Planter des fraisiers'); await p.click('#noterOk'); await p.waitForTimeout(1200);
+  st = await lisDonnees(); const eN2 = st.e.find(e => /fraisiers/.test(e.texte));
+  ok(eN2 && eN2.statut === 'traitee' && eN2.lieu.cat === 'jardin' && !eN2.sensible, nom + ' : une note rangée directement est « traitée » avec le lieu exact');
+  await p.evaluate(() => { document.getElementById('noterClose').click(); });
   /* 3. frise de la famille depuis l'arbre : seulement la lignée directe */
   const fr = await p.evaluate(g => window.friseArbre({ jeu: { ged: g, gedRacine: 'r' } }), GED);
   ok(fr.length === 6 && !fr.some(e => /Cousin/.test(e.t)) && fr.every(e => e.auto), nom + " : la frise lit les naissances et décès de la lignée directe, pas des cousins (" + fr.length + ' événements)');
