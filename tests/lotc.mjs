@@ -28,9 +28,11 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   const ctx = await b.newContext(Object.assign({}, profil, { serviceWorkers: 'block', locale: 'fr-FR', timezoneId: 'Europe/Paris' }));
   await ctx.addInitScript(([carte]) => { if (!sessionStorage.getItem('init')) { sessionStorage.setItem('init', '1'); localStorage.clear(); localStorage.setItem('test:carte-de-vie-v1', carte);
     ['hRap', 'compagnon', 'mouvements'].forEach(k => localStorage.setItem('test:' + k, '0')); ['compagnonChoisi', 'carte-de-vie-vu'].forEach(k => localStorage.setItem('test:' + k, '1'));
-    localStorage.setItem('test:theme', 'sombre'); localStorage.setItem('test:carte-de-vie-sync', JSON.stringify({ repo: 'compte-demo/depot-demo', token: '' + ['github', 'pat', 'JETON0123456789abcdefghijklmnopqrstuvwxyz'].join('_') + '' })); } }, [JSON.stringify(DEMO)]);
+    localStorage.setItem('test:theme', 'sombre'); ['', 'test:'].forEach(x => localStorage.setItem(x + 'carte-de-vie-passerelle', JSON.stringify({ url: 'https://serveur-demo.cloud/crochets/app-lien' }))); localStorage.setItem('test:carte-de-vie-sync', JSON.stringify({ repo: 'compte-demo/depot-demo', token: '' + ['github', 'pat', 'JETON0123456789abcdefghijklmnopqrstuvwxyz'].join('_') + '' })); } }, [JSON.stringify(DEMO)]);
   await ctx.route('https://api.github.com/**', r => r.abort());
-  const p = await ctx.newPage(); const err = []; p.on('pageerror', e => err.push(e.message));
+  /* la politique de sécurité n'ouvre que l'adresse du système (module personnel) ; ici, seul le faux serveur de démonstration est ouvert */
+  await ctx.route(/\/index\.html/, async r => { const rep = await r.fetch(); await r.fulfill({ response: rep, body: (await rep.text()).replace("connect-src 'self'", "connect-src 'self' https://serveur-demo.cloud") }); });
+  const p = await ctx.newPage(); const err = []; p.on('pageerror', e => { err.push(e.message); if (process.env.DBG) console.log('ERR', e.message); });
   await p.goto(URL); await p.waitForTimeout(1800);
   /* 1. le cercle « Moi » reste dans la planche, sous les boutons du haut (décalage enregistré trop haut) */
   if (tel) {
@@ -79,15 +81,35 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
     return { code, ok: o.r === 'compte-demo/depot-demo' && o.t === '' + ['github', 'pat', 'JETON0123456789'].join('_') + '', mauvais, perime, enClair: lien.includes('JETON0123') || svg.includes('JETON0123'), svg: /^<svg/.test(svg), n: M.length, h }; });
   ok(/^[A-Z0-9]{8}$/.test(q.code) && q.ok, nom + ' : le code à 8 caractères déchiffre le dépôt et la clé (écrits en minuscules avec une espace : acceptés)');
   ok(q.mauvais === 'refusé' && q.perime === 'refusé', nom + ' : un mauvais code et un QR périmé sont refusés');
-  const K = 'cle-du-lien-de-demonstration-0123456789';
-  const qk = await p.evaluate(async K => { const { APPAIR, QRG } = window.__lotc; localStorage.setItem('carte-de-vie-lien', K); let vu = ''; const sv = QRG.svg; QRG.svg = (t, px) => { vu = t; return sv.call(QRG, t, px); };
-    const z = document.createElement('div'); document.body.appendChild(z); await APPAIR.montre(z); QRG.svg = sv;
-    const code = z.querySelector('.qrcode').textContent.replace(/\s/g, ''), o = await APPAIR.recoit(vu, code), clair = vu.includes(K) || vu.includes('JETON0123');
-    localStorage.removeItem('carte-de-vie-lien'); document.getElementById('syncPage').hidden = false; document.getElementById('syncForm').hidden = false;
-    const bl = document.querySelector('.qrrecoit'), ins = bl.querySelectorAll('input'); ins[0].value = vu; ins[1].value = code; bl.querySelector('button').click(); await new Promise(r => setTimeout(r, 1500));
-    return { k: o.k, r: o.r, rec: localStorage.getItem('carte-de-vie-lien'), tok: document.getElementById('syncToken').value.length > 10, clair, msg: bl.querySelector('.help[role=status]').textContent }; }, K);
-  ok(qk.k === K && qk.r === 'compte-demo/depot-demo' && !qk.clair, nom + ' : le QR transmet le jeton GitHub ET la clé du lien, toujours chiffrés (rien en clair)');
-  ok(qk.rec === K && qk.tok && /clé du lien/.test(qk.msg), nom + ' : à la réception, la clé du lien est rangée dans « carte-de-vie-lien » et le jeton remplit la synchro, sans presse-papiers');
+  /* 4 bis. QR à usage unique géré par le système (protocole « transfert » de LIFE) : faux serveur de démonstration */
+  const K = 'cle-du-lien-de-demonstration-0123456789', SRV = 'https://serveur-demo.cloud/crochets/app-lien';
+  let paquets = {}, ancien = false, depots = 0, cleVue = '';
+  await ctx.route('https://serveur-demo.cloud/**', async r => { const q = r.request(), c = JSON.parse(q.postData() || '{}'), u = q.url(), h = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'content-type': 'application/json' };
+    if (q.method() === 'OPTIONS') return r.fulfill({ status: 204, headers: h });
+    if (u.endsWith('/app-lien')) { cleVue = q.headers()['x-cle-app'] || ''; if (cleVue !== K) return r.fulfill({ status: 403, headers: h, body: '{}' });
+      if (ancien || c.type !== 'transfert_deposer') return r.fulfill({ status: 200, headers: h, body: JSON.stringify({ ok: false, erreur: 'type inconnu' }) });
+      depots++; paquets[c.id] = c.donnees; return r.fulfill({ status: 200, headers: h, body: JSON.stringify({ ok: true, transfert: true, expire: 120 }) }); }
+    if (u.endsWith('/app-lien-transfert')) { const d = paquets[c.id]; delete paquets[c.id]; return r.fulfill({ status: d ? 200 : 404, headers: h, body: JSON.stringify(d ? { ok: true, donnees: d } : { ok: false, erreur: 'inconnu' }) }); }
+    return r.abort(); });
+  const dep = async K => p.evaluate(async K => { const { APPAIR, QRG, setLien } = window.__lotc; localStorage.setItem('carte-de-vie-lien', K); setLien('https://serveur-demo.cloud/crochets/app-lien');
+    let vu = ''; const sv = QRG.svg; QRG.svg = (t, px) => { vu = t; return sv.call(QRG, t, px); };
+    const z = document.createElement('div'); document.body.appendChild(z); await APPAIR.montre(z); QRG.svg = sv; window.__vu = vu; return { qr: !!z.querySelector('.qrbox svg'), msg: z.textContent, vu, code: !!z.querySelector('.qrcode') }; }, K);
+  const e1 = await dep(K);
+  ok(e1.qr && /#transfert=/.test(e1.vu) && !/appairage/.test(e1.vu) && !e1.code && depots === 1 && cleVue === K, nom + " : le QR est à usage unique, déposé chez le système (type « transfert »), sans code à 8 caractères");
+  ok(!e1.vu.includes(K) && !e1.vu.includes('JETON0123') && !e1.vu.includes('compte-demo'), nom + ' : ni le lien ni le QR ne contiennent la clé ni le jeton en clair (le système ne garde qu\'un paquet chiffré)');
+  ok(!Object.values(paquets).join('').includes('JETON0123') && !Object.values(paquets).join('').includes(K), nom + ' : le paquet gardé par le système est chiffré');
+  const qk = await p.evaluate(async () => { const { APPAIR } = window.__lotc, vu = window.__vu; localStorage.removeItem('carte-de-vie-lien'); document.getElementById('syncPage').hidden = false; document.getElementById('syncForm').hidden = false;
+    const bl = document.querySelector('.qrrecoit'), ins = bl.querySelectorAll('input'); ins[0].value = vu; bl.querySelector('button').click(); await new Promise(r => setTimeout(r, 1500));
+    const rec = localStorage.getItem('carte-de-vie-lien'), tok = document.getElementById('syncToken').value.length > 10, msg = bl.querySelector('.help[role=status]').textContent;
+    let deux = 'accepté'; try { await APPAIR.retire(vu); } catch (e) { deux = 'refusé'; } return { rec, tok, msg, deux }; });
+  ok(qk.rec === K && qk.tok && /clé du lien/.test(qk.msg) && /jeton GitHub/.test(qk.msg), nom + ' : à la réception, la clé du lien est rangée dans « carte-de-vie-lien » et le jeton remplit la synchro, sans presse-papiers');
+  ok(qk.deux === 'refusé', nom + ' : le même QR lu une seconde fois est refusé (usage unique)');
+  ancien = true; const e2 = await dep(K);
+  ok(!e2.qr && /pas encore à jour/.test(e2.msg) && /jamais dans un lien/.test(e2.msg) && !/#transfert=|#appairage=/.test(e2.vu), nom + ' : système pas à jour : QR refusé avec un message clair, aucun lien portant une clé');
+  ancien = false; const e3 = await p.evaluate(async () => { localStorage.removeItem('carte-de-vie-lien'); const z = document.createElement('div'); document.body.appendChild(z); await window.__lotc.APPAIR.montre(z); return z.textContent; });
+  ok(/clé du lien manque/.test(e3), nom + ' : sans clé du lien sur l\'appareil, le QR est refusé avec un message clair');
+  const ol = await p.evaluate(async () => { const { APPAIR } = window.__lotc, code = APPAIR.code(), t = await APPAIR.chiffre({ r: 'compte-demo/depot-demo', t: 'x'.repeat(12), k: 'cle-du-lien-de-demonstration-0123456789', e: Date.now() + 120000 }, code); const o = await APPAIR.recoit(APPAIR.lien(t), code); return o.k && o.r; });
+  ok(!!ol, nom + " : l'ancien format #appairage= (code à 8 caractères) peut toujours être reçu");
   const dc = await p.evaluate(() => { const t = document.querySelector('#syncPage .deuxcles'); return { sync: t ? t.textContent : '' }; });
   ok(/deux clés différentes/i.test(dc.sync) && /jamais/.test(dc.sync), nom + ' : la page Synchronisation dit que le jeton GitHub et la clé du lien sont deux clés différentes');
   await p.evaluate(() => { window.__lotc.CLEF.ouvre(); }); await p.waitForTimeout(400);
