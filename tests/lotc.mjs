@@ -14,6 +14,8 @@ const DEMO = {
     { id: 'a1', name: 'Un', items: [it('a')] }, { id: 'a2', name: 'Deux', items: [it('b')] }, { id: 'a3', name: 'Trois', items: [it('c')] }, { id: 'a4', name: 'Quatre', items: [it('d')] }],
     { links: [{ id: 'l1', url: 'https://exemple.org/outil', title: 'Un outil visible', page: 'Outils' }, { id: 'l2', url: 'https://exemple.org/autre', title: 'Un lien rangé' }],
       disp: { page: { a4: 'Outils', a3: 'Outils' }, cachees: ['À faire'] } }),
+  'espaces/cuisine-demo': esp('Cuisine de démo', 20, 62, [{ id: 'k1', name: 'Menus', items: [it('Un menu')] }], { disp: { envies: 'Mes envies' }, jeu: { envies: [{ id: 'abcdefghij1', txt: 'Une soupe', t: '2026-10-10T10:00:00.000Z' }] } }),
+  'espaces/boutique-demo': esp('Boutique de démo', 78, 62, [{ id: 'm1', name: 'Offre', items: [it('Une offre')] }, { id: 'm2', name: 'Tarifs', items: [it('Un tarif')] }], { disp: { cachees: ['Page retirée'] } }),
   'espaces/jardin': esp('Jardin', 65, 25, [{ id: 'j1', name: 'À planter', items: [it('Tomates')] }]),
   'meta/layout': { mx: 50, my: 50, sx: -1.5, sy: -900, _m: Date.now() },
 };
@@ -44,6 +46,26 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   if (iO >= 0) { await p.evaluate(i => document.querySelectorAll('#pane .rpnav .rpt')[i].click(), iO); await p.waitForTimeout(500);
     const l = await p.evaluate(() => [...document.querySelectorAll('#pane a.lvl')].map(a => a.textContent + '|' + a.getAttribute('href')));
     ok(l.length === 1 && /Un outil visible/.test(l[0]) && /exemple\.org\/outil$/.test(l[0]), nom + ' : le lien mis en avant est un bouton visible sur sa page (le lien rangé reste à sa place)'); }
+  /* 2 bis. « Mes envies » : jeu.envies est une LISTE {id, txt, t} ; chaque saisie AJOUTE un élément (le format lu par l'assistant de cuisine) */
+  await p.evaluate(() => { const e = [...document.querySelectorAll('#board .node')].find(n => /^Cuisine/.test(n.textContent.trim())); if (e) { e.scrollIntoView(); e.click(); } });
+  await p.waitForTimeout(900);
+  const oC = await p.evaluate(() => [...document.querySelectorAll('#pane .rpnav .rpt')].map(x => x.textContent.trim())), iE = oC.indexOf('Mes envies');
+  ok(iE >= 0, nom + ' : la page « Mes envies » existe dans la cuisine (disp.envies) (' + oC.join(' | ') + ')');
+  if (iE >= 0) { await p.evaluate(i => document.querySelectorAll('#pane .rpnav .rpt')[i].click(), iE); await p.waitForTimeout(500);
+    const av = await p.evaluate(() => [...document.querySelectorAll('#pane .envies .envl li span')].map(x => x.textContent));
+    ok(av.length === 1 && av[0] === 'Une soupe', nom + ' : la zone affiche la dernière envie déjà notée');
+    for (const t of ['Des pâtes au citron', 'Un gratin']) { await p.fill('#pane .envies textarea', t); await p.click('#pane .envies .btn'); await p.waitForTimeout(400); }
+    await p.waitForTimeout(1200);
+    const E = await p.evaluate(() => { const c = JSON.parse(localStorage.getItem('carte-de-vie-v1'))['espaces/cuisine-demo']; return { L: (c.jeu || {}).envies, f: (c._f || {}).jeu, m: c._m, aff: [...document.querySelectorAll('#pane .envies .envl li span')].map(x => x.textContent) }; });
+    ok(Array.isArray(E.L) && E.L.length === 3 && E.L[0].id === 'abcdefghij1' && E.L[0].txt === 'Une soupe', nom + ' : jeu.envies reste une liste et la première envie n\'est pas réécrite (' + (E.L || []).length + ' éléments)');
+    ok(E.L && E.L.slice(1).every(x => /^[a-z0-9]{11}$/.test(x.id) && !isNaN(Date.parse(x.t)) && /^\d{4}-\d\d-\d\dT/.test(x.t)) && E.L[1].txt === 'Des pâtes au citron' && E.L[2].txt === 'Un gratin', nom + ' : chaque saisie ajoute {id de 11 caractères, txt, t en date ISO}');
+    ok(E.f > 0 && E.m >= E.f, nom + ' : _f.jeu et _m sont mis à maintenant');
+    ok(E.aff.length === 3 && E.aff[0] === 'Un gratin', nom + ' : les dernières envies s\'affichent, la plus récente en premier'); }
+  /* 2 ter. Métamorphose : « L'essentiel » (première page) reste visible tant qu'elle n'est pas dans disp.cachees ; seule la page retirée disparaît */
+  await p.evaluate(() => { const e = [...document.querySelectorAll('#board .node')].find(n => /^Boutique/.test(n.textContent.trim())); if (e) { e.scrollIntoView(); e.click(); } });
+  await p.waitForTimeout(900);
+  const oA = await p.evaluate(() => [...document.querySelectorAll('#pane .rpnav .rpt')].map(x => x.textContent.trim()));
+  ok(oA.includes("L'essentiel") && !oA.includes('Page retirée'), nom + " : la page « L'essentiel » est là, seule la page retirée a disparu (" + oA.join(' | ') + ')');
   /* 3. frise de la famille depuis l'arbre : seulement la lignée directe */
   const fr = await p.evaluate(g => window.friseArbre({ jeu: { ged: g, gedRacine: 'r' } }), GED);
   ok(fr.length === 6 && !fr.some(e => /Cousin/.test(e.t)) && fr.every(e => e.auto), nom + " : la frise lit les naissances et décès de la lignée directe, pas des cousins (" + fr.length + ' événements)');
@@ -57,6 +79,21 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
     return { code, ok: o.r === 'compte-demo/depot-demo' && o.t === '' + ['github', 'pat', 'JETON0123456789'].join('_') + '', mauvais, perime, enClair: lien.includes('JETON0123') || svg.includes('JETON0123'), svg: /^<svg/.test(svg), n: M.length, h }; });
   ok(/^[A-Z0-9]{8}$/.test(q.code) && q.ok, nom + ' : le code à 8 caractères déchiffre le dépôt et la clé (écrits en minuscules avec une espace : acceptés)');
   ok(q.mauvais === 'refusé' && q.perime === 'refusé', nom + ' : un mauvais code et un QR périmé sont refusés');
+  const K = 'cle-du-lien-de-demonstration-0123456789';
+  const qk = await p.evaluate(async K => { const { APPAIR, QRG } = window.__lotc; localStorage.setItem('carte-de-vie-lien', K); let vu = ''; const sv = QRG.svg; QRG.svg = (t, px) => { vu = t; return sv.call(QRG, t, px); };
+    const z = document.createElement('div'); document.body.appendChild(z); await APPAIR.montre(z); QRG.svg = sv;
+    const code = z.querySelector('.qrcode').textContent.replace(/\s/g, ''), o = await APPAIR.recoit(vu, code), clair = vu.includes(K) || vu.includes('JETON0123');
+    localStorage.removeItem('carte-de-vie-lien'); document.getElementById('syncPage').hidden = false; document.getElementById('syncForm').hidden = false;
+    const bl = document.querySelector('.qrrecoit'), ins = bl.querySelectorAll('input'); ins[0].value = vu; ins[1].value = code; bl.querySelector('button').click(); await new Promise(r => setTimeout(r, 1500));
+    return { k: o.k, r: o.r, rec: localStorage.getItem('carte-de-vie-lien'), tok: document.getElementById('syncToken').value.length > 10, clair, msg: bl.querySelector('.help[role=status]').textContent }; }, K);
+  ok(qk.k === K && qk.r === 'compte-demo/depot-demo' && !qk.clair, nom + ' : le QR transmet le jeton GitHub ET la clé du lien, toujours chiffrés (rien en clair)');
+  ok(qk.rec === K && qk.tok && /clé du lien/.test(qk.msg), nom + ' : à la réception, la clé du lien est rangée dans « carte-de-vie-lien » et le jeton remplit la synchro, sans presse-papiers');
+  const dc = await p.evaluate(() => { const t = document.querySelector('#syncPage .deuxcles'); return { sync: t ? t.textContent : '' }; });
+  ok(/deux clés différentes/i.test(dc.sync) && /jamais/.test(dc.sync), nom + ' : la page Synchronisation dit que le jeton GitHub et la clé du lien sont deux clés différentes');
+  await p.evaluate(() => { window.__lotc.CLEF.ouvre(); }); await p.waitForTimeout(400);
+  const cd = await p.evaluate(() => (document.querySelector('#cleDlg') || {}).textContent || '');
+  ok(/deux clés différentes/.test(cd) && /jamais/.test(cd), nom + ' : le menu « Clé du lien » le dit aussi');
+  await p.evaluate(() => { const d = document.querySelector('#cleDlg'); if (d && d.close) d.close(); });
   ok(!q.enClair && q.svg, nom + ' : ni le lien ni le QR ne contiennent la clé en clair');
   ok(q.n === 29 && q.h === 303251190, nom + ' : le QR de référence est inchangé (taille ' + q.n + ', empreinte ' + q.h + ')');
   /* 5. lisibilité : du bleu Klein sur une surface sombre est corrigé */
