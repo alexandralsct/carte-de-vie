@@ -88,6 +88,19 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   ok(/il y a 5 ans/.test(await p.locator('#futurPage h2').textContent()), nom + ' : moi d\'il y a 5 ans');
   await p.locator('#futurPage [role=tab]', { hasText: 'Capsule' }).click();
   ok(await p.locator('#futurPage .futcf').count() === 1, nom + ' : capsule à sceller');
+  /* bouton « précédent » (app téléphone, 18/10) : il ferme seulement l'écran du dessus et revient là où l'on était, pas à la carte */
+  if (nom === 'App téléphone') {
+    const vis = () => p.evaluate(() => [...document.querySelectorAll('aside.page')].filter(x => !x.hidden).map(x => x.id).join(','));
+    await p.goBack(); await p.waitForTimeout(250);
+    ok(await vis() === '', nom + ' : précédent depuis Moi dans 5 ans ramène à la carte (' + (await vis() || 'carte') + ')');
+    await p.evaluate(() => window.__equipe.ASSIST.ouvre()); await p.locator('#assistPage .agposte').first().click(); await p.waitForTimeout(250);
+    await p.goBack(); await p.waitForTimeout(250);
+    ok(await vis() === 'assistPage', nom + ' : précédent depuis la fiche d\'un assistant revient à « Mes assistants » (' + await vis() + ')');
+    await p.goBack(); await p.waitForTimeout(250);
+    ok(await vis() === '', nom + ' : un second précédent revient à la carte (' + (await vis() || 'carte') + ')');
+    await p.goBack(); await p.waitForTimeout(250);
+    ok(/index\.html/.test(p.url()) && await p.locator('#board').count() === 1, nom + ' : un précédent de plus ne fait pas sortir de l\'app');
+  }
   const larg = await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1); ok(larg, nom + ' : aucun défilement horizontal');
   ok(!err.length, nom + ' : aucune erreur JavaScript' + (err.length ? ' : ' + err.slice(0, 2).join(' / ') : ''));
   await ctx.close();
