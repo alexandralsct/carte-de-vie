@@ -8,11 +8,11 @@ let ko = 0; const ok = (c, m) => { console.log((c ? 'OK  ' : 'KO  ') + m); if (!
 const j = n => { const q = new Date(); q.setDate(q.getDate() - n); return q.toISOString().slice(0, 10); };
 const EQUIPE = { liste: [
   { id: 'veilleur', nom: 'Veilleur', groupe: 'Démo', statut: 'actif', role: 'Surveille un sujet de démonstration.', dernier: j(0) + ' 07:30',
-    identite: { icone: 'loupe', couleur: '#ff0000', devise: 'Je regarde pour toi.', ton: 'calme' }, memoire: 'Tu préfères les synthèses courtes.',
+    identite: { icone: 'loupe', couleur: '#ff0000', devise: 'Je regarde pour toi.', ton: 'calme', image: 'avatars/demo.jpg' }, memoire: 'Tu préfères les synthèses courtes.',
     consignes: [{ id: 'c1', texte: 'Pas plus de trois pistes.', date: j(2) }],
     sorties: [{ id: 's1', date: j(0), titre: 'Trois pistes du jour', regarde: 'Dix sources.', trouve: 'Trois pistes.', propose: 'Lire la première.', attend: 'Ton avis.' },
       { id: 's2', date: j(1), titre: 'Rien à signaler' }] },
-  { id: 'scribe', nom: 'Scribe', groupe: 'Démo', statut: 'actif', role: 'Écrit des brouillons.', identite: { icone: 'plume' },
+  { id: 'scribe', nom: 'Scribe', groupe: 'Démo', statut: 'actif', role: 'Écrit des brouillons.', identite: { icone: 'plume', image: '../hors-dossier.jpg' },
     sorties: [{ id: 's3', date: j(30), titre: 'Un vieux brouillon', texte: 'Texte.' }] },
   { id: 'guide', nom: 'Guide', groupe: 'Démo', statut: 'specifie', role: 'Pas encore en service.', sorties: [] }] };
 const TEL = Object.assign({}, devices['Galaxy S9+'], { viewport: { width: 412, height: 915 } }), ORDI = { viewport: { width: 1280, height: 900 }, deviceScaleFactor: 1, isMobile: false, hasTouch: false };
@@ -34,6 +34,14 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
       futur: { ok: true, reponse: 'Je te parle depuis plus tard.', lecture: { possibles: ['Un possible'], blocages: ['Un blocage'], pourrait_advenir: ['Une issue'] } } }[c.type];
     return R ? { ok: true, j: R } : { ok: false, bientot: true, msg: 'Bientôt disponible' }; }; });
   await p.evaluate(d => { const { ASSIST } = window.__equipe; ASSIST.charge(d); ASSIST.ouvre(); }, EQUIPE);
+  /* avatars illustrés (V.218) : image lue dans le dépôt des compléments (simulée ici par une image fictive générée), seulement pour
+     un chemin « avatars/… » ; les autres gardent leur dessin */
+  await p.evaluate(() => { window.__imgs = []; window.__equipe.AGIMG.lire = () => async c => { window.__imgs.push(c); const k = document.createElement('canvas'); k.width = 100; k.height = 198;
+    const g = k.getContext('2d'); g.fillStyle = '#002fa7'; g.fillRect(0, 0, 100, 198); return k.toDataURL('image/png'); }; window.__equipe.ASSIST.ouvre(); });
+  await p.waitForSelector('#assistPage .agportrait .agimg', { timeout: 3000 }).catch(() => {});
+  const imgs = await p.evaluate(() => ({ demandes: window.__imgs, vues: document.querySelectorAll('#assistPage .agimg').length, dessins: document.querySelectorAll('#assistPage .agava').length }));
+  ok(imgs.vues === 1 && imgs.demandes.every(c => c === 'perso/avatars/demo.jpg'), nom + ' : avatar illustré affiché pour l\'assistant qui en a un, chemin contrôlé (' + JSON.stringify(imgs) + ')');
+  ok(imgs.dessins >= 2, nom + ' : les autres gardent leur dessin (' + imgs.dessins + ')');
   const n = await p.locator('#assistPage .agposte').count(); ok(n === 3, nom + ' : les 3 assistants en icônes (' + n + ')');
   ok(await p.locator('#assistPage .agposte .agpas').first().textContent() === '1', nom + ' : pastille « 1 à lire » (la sortie « rien à signaler » ne compte pas)');
   const coul = await p.locator('#assistPage .agposte').first().evaluate(e => getComputedStyle(e).getPropertyValue('--ag').trim());
@@ -42,6 +50,8 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   await p.locator('#assistPage .agposte').first().click(); await p.waitForTimeout(200);
   ok(await p.locator('#agentPage').isVisible(), nom + ' : un clic sur l\'icône ouvre la page de l\'assistant');
   ok(await p.locator('#agentPage .agsortie').count() === 2, nom + ' : ses restitutions (2)');
+  await p.waitForSelector('#agentPage .agrond.grand.portrait .agimg', { timeout: 3000 }).catch(() => {});
+  ok(await p.locator('#agentPage .agrond.grand.portrait .agimg').count() === 1, nom + ' : la fiche montre la carte entière (portrait)');
   ok(/Ce que je te propose/.test(await p.locator('#agentPage .agsortie').first().textContent()), nom + ' : restitution en 4 parties');
   await p.locator('#agentPage .agav', { hasText: 'utile' }).first().click(); await p.waitForTimeout(300);
   ok((await p.evaluate(() => window.__recu)).includes('avis_assistant') && await p.locator('#agentPage .agav.on').count() === 1, nom + ' : avis « utile » transmis');
