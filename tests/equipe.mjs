@@ -50,6 +50,16 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   await p.locator('#assistPage .agposte').first().click(); await p.waitForTimeout(200);
   ok(await p.locator('#agentPage').isVisible(), nom + ' : un clic sur l\'icône ouvre la page de l\'assistant');
   ok(await p.locator('#agentPage .agsortie').count() === 2, nom + ' : ses restitutions (2)');
+  /* balayer une remarque pour la masquer (V.218, app téléphone) : glissement simulé au doigt, puis « Annuler » */
+  if (nom === 'App téléphone') {
+    const bal = async () => p.evaluate(async () => { const c = document.querySelector('#agentPage .agsortie.agbalaie'); if (!c) return 'pas de carte balayable';
+      const r = c.getBoundingClientRect(), y = r.top + 20, ev = (t, x) => c.dispatchEvent(new PointerEvent(t, { pointerId: 7, pointerType: 'touch', clientX: x, clientY: y, bubbles: true, isPrimary: true }));
+      ev('pointerdown', r.left + 30); for (let i = 1; i <= 10; i++) ev('pointermove', r.left + 30 + i * r.width * 0.06); ev('pointerup', r.left + 30 + r.width * 0.6);
+      await new Promise(f => setTimeout(f, 450)); return document.querySelector('#agentPage .agmasquee') ? 'masquée' : 'toujours là'; });
+    ok(await bal() === 'masquée', nom + ' : balayer une remarque la masque (« Remarque masquée » + Annuler)');
+    await p.locator('#agentPage .agmasquee button').click(); await p.waitForTimeout(200);
+    ok(await p.locator('#agentPage .agmasquee').count() === 0 && await p.locator('#agentPage .agsortie').count() === 2, nom + ' : « Annuler » la fait revenir');
+  }
   await p.waitForSelector('#agentPage .agrond.grand.portrait .agimg', { timeout: 3000 }).catch(() => {});
   ok(await p.locator('#agentPage .agrond.grand.portrait .agimg').count() === 1, nom + ' : la fiche montre la carte entière (portrait)');
   ok(/Ce que je te propose/.test(await p.locator('#agentPage .agsortie').first().textContent()), nom + ' : restitution en 4 parties');
