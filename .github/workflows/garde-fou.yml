@@ -22,7 +22,7 @@ jobs:
         env:
           MOTS: ${{ secrets.MOTS_INTERDITS }}
         run: bash tests/garde-fou.sh
-      - name: Icônes et bibliothèque d'OCR inchangées (empreintes sha256)
+      - name: Icônes, polices et bibliothèque d'OCR inchangées (empreintes sha256)
         # Une image ou un fichier tiers modifié doit être vérifié puis son empreinte mise à jour ici.
         run: |
           sha256sum -c --strict <<'FIN'
@@ -35,6 +35,14 @@ jobs:
           ce20eda9533cbed1e6c2b4276fbae1e0adc61b6754b5513084be601787b457cf  vendor/tesseract/core/tesseract-core-simd-lstm.wasm.js
           d611139672b3752c7097e671e4a1d9209dfd37f2aeb081ef6487fba3351e9255  vendor/tesseract/lang/fra.traineddata.gz
           c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08  vendor/tesseract/LICENSE
+          7e6b2818edbd8f6a01ae80641cc8f16a51080d08fb4e532be3a0b6f74adb07da  fonts/OFL-IBMPlexMono.txt
+          9e27a72ed30eb49a08678f6a5d6ed98ec7ba5368f541637ee0683ec9134ef966  fonts/OFL-InstrumentSans.txt
+          6219bc4bfdfc5d9b2201dcdf046218b122a758f932e25ed5f168f929b7ca2311  fonts/instrument-sans.woff2
+          2665f5fbbb334780fa135c7f1dc6e2459061a2d6d44c32b7c1fdbc34cde65ede  fonts/plex-mono-400-italique.woff2
+          c36f509c0a8f9f85f29cb44bc8701d8a9e0b14c499e77a884f789ead7093a7ac  fonts/plex-mono-400.woff2
+          a76f53ca6612e7b3828eec2311098675b7f9849ae4169a8bcef6302aec02a6c0  fonts/plex-mono-500.woff2
+          ad4580d8cb4b5f627c2d18457656732f7f7b070f7837fbc380e08054157e6f6c  fonts/plex-mono-600.woff2
+          9e1455e6e9c5866f607e464fffb7855486dcf575b7e69b83a3d234e587fce41b  fonts/plex-mono-700.woff2
           FIN
   historique:
     # Chaque jour : tout l'historique public (lignes ajoutées et messages de commit) pour les secrets et les mots privés.
