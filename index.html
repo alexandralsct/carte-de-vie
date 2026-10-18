@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-3TZhsGKj35bIM/yehEhWB69S1fB6R3iwpLAWDOdLxfo=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-9XoO482rno8RKRPdsqZz46lA+6cG0M64mgXKBndP7AM=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud https://cocon.metamorphose-architecture.fr data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-1xyNMXcS0jbzEdlRaKEO55a0X9Kt7A7U6PXpVmdR3aQ=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-DPApF4XCOKH+QwvzUOlF8+XpONgHg1taE82RZvOhfOs=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud https://cocon.metamorphose-architecture.fr data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f4eee4">
@@ -2383,6 +2383,20 @@ html.ui-ecran #board.stack>.outilsb .otout.asspuce{margin-right:0!important}
 /* fonds pleins : toujours le vrai bleu Klein et du texte blanc (la variable --k1 s'éclaircit en mode sombre) */
 .cvb.cvmoi,.agchip.on,#futurPage .agseg button[aria-selected="true"]{background:#002fa7!important;color:#fff!important;border-color:#002fa7}
 #agentPage .agsortie small.mono{color:var(--ink)!important;opacity:.65}
+/* avatars des agents */
+.agava{overflow:visible}
+.agava .buste{fill:color-mix(in srgb,var(--agt,var(--ag)) 14%,transparent);stroke:var(--agt,var(--ag));stroke-width:1.8}
+.agava .tete{fill:var(--surface);stroke:var(--agt,var(--ag));stroke-width:1.8}
+.agava .coif{fill:var(--agt,var(--ag));opacity:.85}
+.agava .oeil{fill:var(--agt,var(--ag))}
+.agava .bouche,.agava .acc{fill:none;stroke:var(--agt,var(--ag));stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.agava .pastille{fill:var(--surface);stroke:var(--agt,var(--ag));stroke-width:2.6}
+.agava .embleme{fill:none;stroke:var(--agt,var(--ag));stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.agposte .agrond{overflow:visible}
+.agposte .agrond .agava{margin-top:6px}
+.agposte.on .agava .tete,.agposte.on .agava .pastille{fill:#fff}
+.agposte.s-veille .agrond{border-style:dotted}
+.agposte.s-essai .agrond{border-style:dashed}
 
 /* Version 215 : « Moi dans 5 ans », page autonome (téléphone d'abord) */
 #futurPage{--c:var(--ink);--ag:#002fa7;background:var(--bg)!important;z-index:61}
@@ -2418,6 +2432,7 @@ html.ui-ecran #board.stack>.outilsb .otout.asspuce{margin-right:0!important}
   .futboule{width:92px;height:92px;flex-basis:92px}
 }
 
+.pushdis{display:flex;align-items:center;gap:6px;font-size:.85rem;margin-top:4px}
 html.klein .node .ico svg,html.klein .node .ico{color:#002fa7!important;--c:#002fa7}
 html.demarre .wrap>:not(header){visibility:hidden!important}
 /* accessibilité (13/10) : titre de l'accueil lisible par les lecteurs d'écran seulement */
@@ -2539,6 +2554,7 @@ document.documentElement.classList.add("demarre"); setTimeout(()=>document.docum
       <li><div><b>Mes icônes</b><small>Importe tes PNG (fond transparent conseillé, plusieurs d'un coup) : ils apparaissent ensuite au choix quand tu touches l'icône d'un espace. <span id="icoLibN"></span></small></div><div class="petrow fondrow"><div class="lgg" id="icoLib"></div><label class="vbtn ghostb fondadd" tabindex="0">+ Importer des PNG<input type="file" id="icoImg" accept="image/png,image/webp,image/*" multiple hidden></label></div></li>
       <li><div><b>Fond de l'app</b><small>Uni, ou tes propres images (par exemple enregistrées depuis ton tableau Pinterest) : ajoute-en plusieurs, choisis-en une ou laisse l'app en tirer une au hasard à chaque ouverture</small></div><div class="petrow fondrow"><div class="typo fonds" id="fondSet" role="group" aria-label="Fond de l'app"></div><label class="vbtn ghostb fondadd" tabindex="0">+ Ajouter des images<input type="file" id="fondImg" accept="image/*" multiple hidden></label><button type="button" class="vbtn fondpin" id="pinBtn">Importer depuis Pinterest</button><div class="typo fonds" id="fondTaille" role="group" aria-label="Taille de l'image" hidden></div></div><section class="card pinbox" id="pinBox" hidden></section></li>
       <li><div><b>Mouvements</b><small>Animations, motifs flottants et éclats quand on coche</small></div><label class="switch"><input type="checkbox" id="motionSw" checked><span>Activés</span></label></li>
+      <li><div><b>Notifications</b><small id="pushMsg">Même quand l'app est fermée.</small><label class="pushdis"><input type="checkbox" id="pushDiscret"> Texte discret (sans le contenu)</label></div><button type="button" class="btn ghost" id="pushBtn">Activer</button></li>
       <li><div><b>Tout sur un écran</b><small>App téléphone : l'accueil tient sur un seul écran (Moi au centre, espaces en cases sans titre)</small></div><label class="switch"><input type="checkbox" id="ecranSw"><span>Désactivée</span></label></li>
       <li class="go"><button class="rowbtn" id="arrBtn"><span><b>Ranger la carte</b><small>Aligne tes espaces par catégorie ; tu pourras ensuite les déplacer librement</small></span><i aria-hidden="true">⌗</i></button></li>
       <li class="go"><button class="rowbtn" id="syncBtn"><span><b>Synchronisation</b><small id="syncSmall">Relier tes appareils à GitHub</small></span><i aria-hidden="true">→</i></button></li>
@@ -6591,7 +6607,7 @@ window.addEventListener("hashchange",()=>{ if(location.hash==="#life") LIFEP.ouv
   document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("#iaBtn"); if(!b) return; e.preventDefault(); e.stopImmediatePropagation(); MEMP.ouvre(); },true); }
 /* Réglages simplifiés : les lignes rangées en groupes repliables */
 { const G=[["Apparence","police, thème, icônes, fond, compagnon",/^(Typographie|Thème|Couleur des icônes|Icônes|Mes icônes|Fond de l'app|Mouvements|Tout sur un écran|Compagnon)$/],
-    ["Au quotidien","notes, rappels, rangement",/^(Mes notes|Rappel des trackers|Ranger la carte)$/],
+    ["Au quotidien","notes, rappels, rangement",/^(Mes notes|Rappel des trackers|Notifications|Ranger la carte)$/],
     ["Données et connexions","synchronisation, IA, sauvegardes",/^(Synchronisation|Intelligence artificielle|Exporter|Importer|Modifier les réglages de base)$/],
     ["Mon avis","dire ce qui va ou pas",/^(Donner mon avis)$/]];
   const range=()=>{ const ul=document.querySelector("#setPage ul.setlist"); if(!ul||ul.dataset.grp) return; ul.dataset.grp="1"; const li=[...ul.children]; let der=null;
@@ -6935,6 +6951,17 @@ const CONV={
       if(!r.ok||j.ok===false||j.statut==="ECHEC") return {ok:false,msg:"ÉCHEC — "+(typeof j.erreur==="string"&&j.erreur.trim()?j.erreur.trim().slice(0,300):"le système a répondu une erreur ("+r.status+").")};
       return {ok:true,j}; }
     catch{ return {ok:false,msg:"Le système n'a pas répondu (connexion ?). Ton message est gardé : réessaie dans un moment."}; } },
+  /* IA de secours : l'IA de la carte répond quand le système n'a pas encore branché ce type de conversation */
+  iaDispo(){ return typeof sampler!=="undefined"&&!!sampler; },
+  async ia(prompt){ if(!this.iaDispo()) return null; try{ const r=await sampler(prompt); const t=String(r&&r.text||"").trim(); return t||null; }catch{ return null; } },
+  /* ce que la carte sait de la personne : pour donner un contexte aux réponses (rien n'est envoyé ailleurs que l'IA de la carte) */
+  contexte(){ const L=[]; try{ const D=OMNI.d; if(D&&Array.isArray(D.fil)) D.fil.slice(0,40).forEach(x=>{ const c=x.id&&OMNI.corr[x.id]; L.push("- "+String(c?c.texte:x.contenu||"").slice(0,240)); }); }catch{ /* rien */ }
+    return L.length?"Ce que le système sait de la personne :\n"+L.join("\n"):""; },
+  historiqueTexte(H){ return (H||[]).map(m=>(m.de==="moi"?"La personne : ":"Toi : ")+m.texte).join("\n"); },
+  /* envoi au système, puis à l'IA de la carte si le système n'a pas (encore) répondu */
+  async demande(corps,promptSecours){ const r=await this.envoie(corps); if(r.ok) return r;
+    if(r.cle&&!this.iaDispo()) return r;
+    const t=await this.ia(promptSecours); return t?{ok:true,j:{ok:true,reponse:t},secours:true}:r; },
   /* une zone de discussion en bulles ; envoi(texte, historique) → Promise<{texte}|{erreur}> */
   zone(k,opt){ const w=el("div",{className:"conv"}), fil=el("div",{className:"convfil",role:"log"}), f=el("form",{className:"convf"}),
       ta=el("textarea",{rows:2,placeholder:opt.place||"Écris ton message…"}), bt=el("button",{type:"submit",className:"vbtn",textContent:"Envoyer"}), etat=el("p",{className:"convetat",role:"status"});
@@ -6985,6 +7012,26 @@ function agIcone(a,i,taille){ const NS="http://www.w3.org/2000/svg", s=document.
   p.setAttribute("d",AGIC[k]||AGIC[AGFORM[h%AGFORM.length]]); s.setAttribute("viewBox","0 0 40 40"); s.setAttribute("aria-hidden","true");
   s.setAttribute("width",taille||40); s.setAttribute("height",taille||40); s.setAttribute("class","agico"); s.appendChild(p); return s; }
 
+/* avatars des agents : un personnage au trait (coiffure, accessoire, emblème de son métier), stable pour un même assistant */
+const AGCOIF=["M19 25c0-9 6-14 13-14s13 5 13 14c-3-4-8-6-13-6s-10 2-13 6z","M18 27c0-10 6-16 14-16s14 6 14 16c0 6-1 11-3 14-1-8-3-13-4-15-4 1-10 1-14-1-2 3-4 8-4 16-2-4-3-9-3-14z",
+  "M20 22a12 12 0 0 1 24 0M28 9a4 4 0 1 1 8 0 4 4 0 0 1-8 0","M19 26c-2-9 4-16 13-16 8 0 14 6 13 16-2-3-3-6-3-8-4 3-12 3-17 0 0 3-2 6-6 8z",
+  "M17 24c0-8 7-13 15-13s15 5 15 13H17zM14 24h36","M20 25c0-9 5-14 12-14 8 0 12 5 12 14l-2-4-3 3-3-4-4 3-4-3-3 4-3-3z"];
+const AGACC={loupe:"M24 26h6M34 26h6M30 26h4",livre:"M24 26h6M34 26h6M30 26h4",micro:"M18 26v-4a14 14 0 0 1 28 0v4M16 24h4v8h-4zM44 24h4v8h-4z",
+  plume:"M44 14l-4 10",boussole:"M40 37l4 4",trophee:"M28 46l4 4 4-4",reseau:"M26 46h12",balance:"M26 46h12",equerre:"M44 14l-4 10",etoile:"M32 44v6",
+  horloge:"M40 37l4 4",enveloppe:"M26 46h12",ampoule:"M32 44v6",capsule:"M28 46l4 4 4-4",pont:"M26 46h12",miroir:"M24 26h6M34 26h6M30 26h4"};
+function agCle(a){ return String(a&&a.identite&&a.identite.icone||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
+function agAvatar(a,i,taille){ const NS="http://www.w3.org/2000/svg", s=document.createElementNS(NS,"svg"), mk=(t,at)=>{ const e=document.createElementNS(NS,t); Object.entries(at).forEach(([k,v])=>e.setAttribute(k,v)); return e; };
+  const h=[...String(a&&a.id||"")].reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,7), k=AGIC[agCle(a)]?agCle(a):AGFORM[h%AGFORM.length];
+  s.setAttribute("viewBox","0 0 64 64"); s.setAttribute("aria-hidden","true"); s.setAttribute("width",taille||48); s.setAttribute("height",taille||48); s.setAttribute("class","agava");
+  s.append(mk("path",{d:"M12 60c1-10 9-16 20-16s19 6 20 16",class:"buste"}),mk("circle",{cx:32,cy:28,r:12,class:"tete"}),
+    mk("path",{d:AGCOIF[h%AGCOIF.length],class:"coif"}),mk("circle",{cx:27.5,cy:28.5,r:1.3,class:"oeil"}),mk("circle",{cx:36.5,cy:28.5,r:1.3,class:"oeil"}),
+    mk("path",{d:h%3?"M28 33c2 2 6 2 8 0":"M29 33.5h6",class:"bouche"}));
+  if(AGACC[k]) s.appendChild(mk("path",{d:AGACC[k],class:"acc"}));
+  /* l'emblème de son métier, dans une pastille en bas à droite */
+  const g=mk("g",{transform:"translate(42 42) scale(.42)"}); g.append(mk("circle",{cx:20,cy:20,r:21,class:"pastille"}),mk("path",{d:AGIC[k],class:"embleme"})); s.appendChild(g);
+  return s; }
+
+Object.assign(ASSIST.ETAT,{actif:"actif",veille:"à relancer",essai:"premier passage à venir",specifie:"à brancher",pause:"en pause"});
 Object.assign(ASSIST,{
   vu(id){ try{ return localStorage.getItem("agvu:"+id)||""; }catch{ return ""; } },
   marqueVu(id){ try{ localStorage.setItem("agvu:"+id,new Date().toISOString().slice(0,16)); }catch{} },
@@ -6998,15 +7045,15 @@ Object.assign(ASSIST,{
     const L=this.d?this.d.liste:[];
     inn.appendChild(help("Ton équipe : chacun réfléchit dans son domaine, te propose et prépare. Touche une icône pour voir ce qu'il t'a rendu et lui parler."));
     if(!L.length){ inn.appendChild(help("Tes assistants apparaîtront ici au prochain passage du système (7 h 30 et 19 h 30).")); return; }
-    const g=el("div",{className:"aggrille",role:"list"});
-    L.forEach((a,i)=>{ const n=this.nonLues(a), st=String(a.statut||""), c=agCouleur(a,i);
+    const GR=[]; L.forEach(a=>{ const k=String(a.groupe||"Autres"); if(!GR.includes(k)) GR.push(k); });
+    const grilles={}; GR.forEach(k=>{ if(GR.length>1) inn.appendChild(el("h3",{className:"asshg",textContent:k})); grilles[k]=el("div",{className:"aggrille",role:"list"}); inn.appendChild(grilles[k]); });
+    L.forEach((a,i)=>{ const g=grilles[String(a.groupe||"Autres")]; const n=this.nonLues(a), st=String(a.statut||""), c=agCouleur(a,i);
       const b=el("button",{type:"button",className:"agposte s-"+st.replace(/[^a-z]/g,""),role:"listitem"});
       b.style.setProperty("--ag",c);
-      const rond=el("span",{className:"agrond"}); rond.appendChild(agIcone(a,i,34)); if(n) rond.appendChild(el("span",{className:"agpas",textContent:String(n)}));
+      const rond=el("span",{className:"agrond"}); rond.appendChild(agAvatar(a,i,58)); if(n) rond.appendChild(el("span",{className:"agpas",textContent:String(n)}));
       b.append(rond,el("span",{className:"agnom",textContent:String(a.nom||a.id||"")}),el("small",{className:"agst",textContent:this.ETAT[st]||st||"—"}));
       b.setAttribute("aria-label",String(a.nom||a.id)+", "+(this.ETAT[st]||st||"")+(n?", "+n+" nouvelle"+(n>1?"s":"")+" restitution"+(n>1?"s":""):""));
       b.onclick=()=>this.fiche(a.id); g.appendChild(b); });
-    inn.appendChild(g);
     const act=el("div",{className:"agact"}), rv=el("button",{type:"button",className:"vbtn",textContent:"La revue de la semaine"}), re=el("button",{type:"button",className:"vbtn ghostb",textContent:"Réunir plusieurs assistants"});
     rv.onclick=()=>this.revue(); re.onclick=()=>this.reunion(); act.append(rv,re); inn.appendChild(act); },
   /* ===== la page d'un assistant ===== */
@@ -7015,7 +7062,7 @@ Object.assign(ASSIST,{
     const inn=PAGEX("agentPage",String(a.nom||a.id)), c=agCouleur(a,i), st=String(a.statut||""), I=a.identite||{};
     $("agentPage").style.setProperty("--ag",c);
     const ret=inn.querySelector(".btn.ghost"); if(ret){ ret.textContent="← Mes assistants"; ret.onclick=()=>{ $("agentPage").hidden=true; this.ouvre(true); }; }
-    const tete=el("div",{className:"agtete"}), rond=el("span",{className:"agrond grand"}); rond.appendChild(agIcone(a,i,52));
+    const tete=el("div",{className:"agtete"}), rond=el("span",{className:"agrond grand"}); rond.appendChild(agAvatar(a,i,80));
     const txt=el("div",{});
     if(I.devise) txt.appendChild(el("p",{className:"agdevise",textContent:"« "+String(I.devise)+" »"}));
     if(a.role) txt.appendChild(el("p",{textContent:String(a.role)}));
@@ -7069,7 +7116,12 @@ Object.assign(ASSIST,{
   parle(a,pan){ const nom=String(a.nom||a.id);
     pan.appendChild(help("Vous parlez en direct, sans passer par LIFE. Il répond dans son domaine ; une consigne durable (« ne me propose plus… ») est retenue."));
     pan.appendChild(CONV.zone("ag:"+a.id,{qui:nom,place:"Écris à "+nom+"…",vide:"Pose-lui une question, demande-lui de creuser, donne-lui une consigne.",
-      envoi:async(t,H)=>{ const r=await CONV.envoie({type:"assistant",assistant:{id:String(a.id),texte:t,historique:H}});
+      envoi:async(t,H)=>{ const I=a.identite||{}, S=this.sorties(a).slice(0,5).map(x=>"- "+[x.date,x.titre,x.trouve,x.propose,x.texte].filter(Boolean).join(" · ").slice(0,400)).join("\n"), C=(Array.isArray(a.consignes)?a.consignes:[]).map(x=>"- "+x.texte).join("\n");
+        const ps="Tu es « "+nom+" », un agent du système personnel d'assistants de la personne qui te parle. Ton rôle : "+String(a.role||"")+(I.devise?"\nTa devise : "+I.devise:"")+(I.ton?"\nTon ton : "+I.ton:"")+
+          "\nTu réfléchis, tu comprends, tu proposes et tu prépares, dans ton domaine seulement. Tu n'envoies, ne publies, ne paies et ne réserves jamais rien : tu le proposes et c'est elle qui décide. Ne prétends jamais avoir fait une action."+
+          (S?"\nTes dernières restitutions :\n"+S:"")+(a.memoire?"\nCe que tu retiens d'elle : "+a.memoire:"")+(C?"\nSes consignes pour toi :\n"+C:"")+"\n"+CONV.contexte()+
+          "\nRéponds en français, en la tutoyant, de façon concrète et chaleureuse, en 2 à 8 phrases ; termine par une proposition ou une question utile.\n\nConversation :\n"+CONV.historiqueTexte(H)+"\nLa personne : "+t+"\nToi :";
+        const r=await CONV.demande({type:"assistant",assistant:{id:String(a.id),texte:t,historique:H}},ps);
         if(!r.ok) return {erreur:r.msg}; const j=r.j, rep=typeof j.reponse==="string"?j.reponse.trim():"";
         return rep?{texte:rep.slice(0,4000),note:j.consigne&&j.consigne.texte?"Consigne retenue : "+String(j.consigne.texte).slice(0,200):""}:{erreur:"Réponse vide : statut INCERTAIN."}; }}));
     const lv=el("button",{type:"button",className:"vbtn ghostb",textContent:"Le convoquer dans LIFE"});
@@ -7102,13 +7154,17 @@ Object.assign(ASSIST,{
     inn.appendChild(help("Choisis qui tu réunis, puis pose ta question : chacun répond depuis son domaine."));
     const g=el("div",{className:"aggrille petit",role:"group"}); g.setAttribute("aria-label","Qui participe");
     L.forEach((a,i)=>{ const on=this.choisis.includes(a.id), b=el("button",{type:"button",className:"agposte"+(on?" on":"")}); b.style.setProperty("--ag",agCouleur(a,i)); b.setAttribute("aria-pressed",String(on));
-      const r=el("span",{className:"agrond"}); r.appendChild(agIcone(a,i,26)); b.append(r,el("span",{className:"agnom",textContent:String(a.nom||a.id)}));
+      const r=el("span",{className:"agrond"}); r.appendChild(agAvatar(a,i,44)); b.append(r,el("span",{className:"agnom",textContent:String(a.nom||a.id)}));
       b.onclick=()=>{ this.choisis=on?this.choisis.filter(x=>x!==a.id):this.choisis.concat(a.id); this.reunion(); }; g.appendChild(b); });
     inn.appendChild(g);
     const ids=this.choisis.filter(x=>L.some(a=>a.id===x)), noms=ids.map(x=>{ const a=L.find(y=>y.id===x); return String(a.nom||a.id); });
     if(ids.length<2){ inn.appendChild(help("Choisis au moins deux assistants.")); return; }
     inn.appendChild(CONV.zone("reunion:"+ids.slice().sort().join("+"),{qui:"L'équipe",place:"Ta question à "+noms.join(", ")+"…",attente:"Ils se concertent…",
-      envoi:async(t)=>{ const r=await CONV.envoie({type:"reunion",reunion:{ids,texte:t}}); if(!r.ok) return {erreur:r.msg};
+      envoi:async(t)=>{ const ps="Tu animes une réunion d'agents du système personnel d'assistants de la personne. Participants :\n"+ids.map(x=>{ const a=L.find(y=>y.id===x); return "- "+String(a.nom||a.id)+" : "+String(a.role||""); }).join("\n")+
+          "\n"+CONV.contexte()+"\nQuestion de la personne : "+t+"\nRéponds UNIQUEMENT en JSON : {\"reponses\":[{\"id\":\"<identifiant>\",\"texte\":\"<2 à 5 phrases, en français, tutoiement, depuis son domaine>\"}]} avec les identifiants "+ids.join(", ")+". Aucun agent n'agit à sa place : ils proposent.";
+        let r=await CONV.envoie({type:"reunion",reunion:{ids,texte:t}});
+        if(!r.ok&&!(r.cle&&!CONV.iaDispo())){ const x=await CONV.ia(ps); if(x){ try{ const j=JSON.parse(x.slice(x.indexOf("{"),x.lastIndexOf("}")+1)); r={ok:true,j}; }catch{ r={ok:true,j:{reponses:[{id:ids[0],texte:x}]}}; } } }
+        if(!r.ok) return {erreur:r.msg};
         const R=Array.isArray(r.j.reponses)?r.j.reponses:[]; if(!R.length) return {erreur:"Réponse vide : statut INCERTAIN."};
         return {texte:R.map(x=>{ const a=L.find(y=>y.id===x.id); return (a?String(a.nom||a.id):String(x.id||""))+" : "+String(x.texte||"").trim(); }).join("\n\n").slice(0,6000)}; }})); } });
 /* la pastille de l'accueil compte les restitutions non lues */
@@ -7160,7 +7216,12 @@ const FUTUR={ d:null, moi:null, ong:"parle", horizon:5, scenario:"libre",
   cle(){ return "futur:"+this.horizon+":"+(this.horizon>0?this.scenario:"passe"); },
   parle(pan){ const w=CONV.zone(this.cle(),{qui:this.qui(),place:"Écris à "+(this.horizon<0?"toi d'il y a 5 ans":"toi en "+this.an())+"…",attente:"Je regarde le chemin…",
       vide:this.horizon<0?"Demande-lui ce que tu as déjà accompli, ce qui t'a fait grandir.":"Demande-lui ce qu'elle est devenue, ce qui l'a bloquée, ce qui a tout changé.",
-      envoi:async(t,Hs)=>{ const r=await CONV.envoie({type:"futur",futur:{texte:t,horizon:this.horizon,scenario:this.horizon>0?this.scenario:"passe",historique:Hs}});
+      envoi:async(t,Hs)=>{ const SC={libre:"la trajectoire actuelle, telle qu'elle va",prudent:"une version prudente",audacieux:"une version audacieuse",inchange:"le futur où rien n'a changé"}, an=this.an(), pa=this.horizon<0;
+        const ps=(pa?"Tu es la personne elle-même, telle qu'elle était en "+an+". Tu lui parles de ce qu'elle a traversé et accompli depuis, avec tendresse et lucidité.":
+          "Tu es la personne elle-même en "+an+" ("+SC[this.scenario]+"). Tu la connais aujourd'hui intimement : à partir de ce que tu sais d'elle, tu évalues les possibles, les blocages et ce qui pourrait advenir, sans certitudes inventées, et tu parles à la première personne avec des souvenirs plausibles (« je me rappelle quand tu… »).")+
+          "\n"+CONV.contexte()+(this.moi&&this.moi.lettre?"\nSa lettre à elle-même : "+String(this.moi.lettre).slice(0,1200):"")+
+          "\nRéponds en français, en la tutoyant, en 3 à 8 phrases, et termine par une question en retour.\n\nConversation :\n"+CONV.historiqueTexte(Hs)+"\nElle : "+t+"\nToi ("+an+") :";
+        const r=await CONV.demande({type:"futur",futur:{texte:t,horizon:this.horizon,scenario:this.horizon>0?this.scenario:"passe",historique:Hs}},ps);
         if(!r.ok) return {erreur:r.msg}; const j=r.j, rep=typeof j.reponse==="string"?j.reponse.trim():"";
         if(j.lecture&&typeof j.lecture==="object") this.lectureRecue=Object.assign({d:new Date().toISOString().slice(0,10)},j.lecture);
         return rep?{texte:rep.slice(0,4000)}:{erreur:"Réponse vide : statut INCERTAIN."}; }});
@@ -7204,6 +7265,41 @@ const FUTUR={ d:null, moi:null, ong:"parle", horizon:5, scenario:"libre",
 { let n=0; const go=()=>{ if(typeof db!=="undefined"&&db){ db.doc("meta/futur").onSnapshot(x=>FUTUR.charge(x.exists?x.data():null),()=>{}); db.doc("meta/futur_moi").onSnapshot(x=>FUTUR.chargeMoi(x.exists?x.data():null),()=>{}); } else if(++n<120) setTimeout(go,500); }; go(); }
 /* mode test (?test) seulement : les tests automatiques atteignent l'équipe et le moi futur */
 if(window._modeTest) window.__equipe={ASSIST,FUTUR,OMNI,CONV};
+
+/* ===== Version 216 (18/10) : vraies notifications, même app fermée (téléphone ; l'ordinateur peut les recevoir aussi) =====
+   Réglages → Au quotidien → Notifications : le téléphone s'abonne aux notifications « Web Push » ; l'abonnement (une adresse
+   d'envoi, rien de personnel) part au système par le lien (type push_abonne), avec le choix « texte discret ». Le système
+   envoie : énergie, bilan du soir, échéances et dates du jour, restitutions des assistants, lettre de « Moi dans 5 ans ».
+   La clé publique d'envoi est demandée au système (type push_cle) : elle n'est jamais écrite dans ce code. */
+const PUSH={ K:"carte-push-discret",
+  dispo(){ return "serviceWorker" in navigator&&"PushManager" in window&&"Notification" in window; },
+  discret(){ try{ return localStorage.getItem(this.K)==="1"; }catch{ return false; } },
+  dit(t){ const m=$("pushMsg"); if(m) m.textContent=t; },
+  b64(s){ const p="=".repeat((4-s.length%4)%4), b=atob((s+p).replace(/-/g,"+").replace(/_/g,"/")); return Uint8Array.from([...b].map(c=>c.charCodeAt(0))); },
+  async etat(){ const b=$("pushBtn"); if(!b) return; if(!this.dispo()){ b.disabled=true; this.dit("Ce navigateur ne sait pas recevoir de notifications."); return; }
+    if(Notification.permission==="denied"){ b.disabled=true; this.dit("Notifications bloquées dans les réglages du téléphone (Chrome → Paramètres du site)."); return; }
+    try{ const r=await navigator.serviceWorker.ready, s=await r.pushManager.getSubscription(); b.textContent=s?"Désactiver":"Activer"; this.dit(s?"Activées sur cet appareil.":"Même quand l'app est fermée."); }catch{ /* rien */ } },
+  async active(){ const b=$("pushBtn"); b.disabled=true;
+    try{ const r=await navigator.serviceWorker.ready, deja=await r.pushManager.getSubscription();
+      if(deja){ await deja.unsubscribe(); await CONV.envoie({type:"push_desabonne",push:{app:"carte",endpoint:deja.endpoint}}); this.dit("Désactivées sur cet appareil."); return; }
+      if(await Notification.requestPermission()!=="granted"){ this.dit("Tu n'as pas autorisé les notifications."); return; }
+      const c=await CONV.envoie({type:"push_cle"}), cle=c.ok&&typeof c.j.cle==="string"?c.j.cle.trim():"";
+      if(!/^[A-Za-z0-9_-]{40,}$/.test(cle)){ this.dit(c.bientot?"Bientôt disponible : le système n'a pas encore branché l'envoi des notifications. Réessaie un peu plus tard.":(c.msg||"Le système n'a pas donné sa clé d'envoi.")); return; }
+      const s=await r.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:this.b64(cle)});
+      const e=await CONV.envoie({type:"push_abonne",push:{app:"carte",abonnement:s.toJSON(),discret:this.discret(),appareil:/Android|iPhone|iPad/i.test(navigator.userAgent)?"telephone":"ordinateur"}});
+      if(!e.ok){ await s.unsubscribe().catch(()=>{}); this.dit(e.msg); return; }
+      this.dit("Activées : tu recevras tes rappels et les nouvelles de tes assistants, même app fermée.");
+    }catch(x){ this.dit("Impossible d'activer les notifications ("+String(x&&x.message||x).slice(0,80)+")."); }
+    finally{ b.disabled=false; this.etat(); } },
+  monte(){ const b=$("pushBtn"), d=$("pushDiscret"); if(!b||b.dataset.ok) return; b.dataset.ok="1"; b.onclick=()=>this.active();
+    if(d){ d.checked=this.discret(); d.onchange=async()=>{ try{ localStorage.setItem(this.K,d.checked?"1":"0"); }catch{ /* rien */ }
+      try{ const r=await navigator.serviceWorker.ready, s=await r.pushManager.getSubscription(); if(s) await CONV.envoie({type:"push_abonne",push:{app:"carte",abonnement:s.toJSON(),discret:d.checked}}); }catch{ /* rien */ } }; }
+    this.etat(); } };
+setTimeout(()=>PUSH.monte(),600);
+/* toucher une notification ouvre la bonne page : mes assistants, un assistant, « Moi dans 5 ans » */
+{ const v=RAPPELS.va.bind(RAPPELS); RAPPELS.va=function(h){ const k=String(h||"").replace(/^#/,"");
+    if(k==="assistants") return ASSIST.ouvre(); if(k.startsWith("assistant:")) return ASSIST.fiche(k.slice(10)); if(k==="futur") return FUTUR.ouvre(); return v(h); };
+  addEventListener("load",()=>setTimeout(()=>{ const k=location.hash.slice(1); if(/^(assistants|assistant:[\w-]+|futur)$/.test(k)) RAPPELS.va(k); },1200)); }
 
 /* A8 : une icône qui ne charge pas laisse la place au logo de l'app, plus de carré blanc */
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&!i.dataset.repli&&(i.classList.contains("lgimg")||i.closest(".node,.ico"))){ i.dataset.repli="1"; i.src="icon-192.png"; i.classList.add("repli"); } },true);
@@ -8253,7 +8349,7 @@ function start(){
       $("effBtn").onclick=async()=>{ const c=db.cfg&&db.cfg();
         const avert=c?(db.dirty?"Des modifications ne sont pas encore parties en ligne : elles seront perdues.\n\n":"")+"La carte en ligne (dépôt « "+c.repo+" ») n'est pas touchée.":"Cet appareil n'est relié à aucun dépôt : sans sauvegarde exportée, ta carte sera perdue.";
         if(!confirm("Effacer la carte de cet appareil ?\n\n"+avert)) return; const m=prompt("Pour confirmer, écris EFFACER"); if(String(m||"").trim().toUpperCase()!=="EFFACER") return;
-        window._efface=true; const CL=["agavis:", "agvu:", "animal", "animalImg", "atelier-gemini", "atelier-local", "base", "chatCircuit", "compagnon", "conv:", "formAvis", "hRap", "hRapH", "hRapVu", "icones", "klein", "livresT", "medDuree", "medEnCours", "mouvements", "notesApp", "notesApps", "nvVus", "outilsPos", "prenom", "range108", "sugVu", "theme", "typo2", "uiEcran"];
+        window._efface=true; const CL=["agavis:", "agvu:", "animal", "animalImg", "atelier-gemini", "atelier-local", "base", "carte-push-discret", "chatCircuit", "compagnon", "conv:", "formAvis", "hRap", "hRapH", "hRapVu", "icones", "klein", "livresT", "medDuree", "medEnCours", "mouvements", "notesApp", "notesApps", "nvVus", "outilsPos", "prenom", "range108", "sugVu", "theme", "typo2", "uiEcran"];
         try{ Object.keys(localStorage).forEach(k=>{ if(k.startsWith("carte-de-vie")||CL.includes(k)) localStorage.removeItem(k); }); }catch{ /* stockage bloqué */ }
         try{ const K=await caches.keys(); await Promise.all(K.filter(n=>n.startsWith("carte-de-vie-")||n==="carte-rappels").map(n=>caches.delete(n))); }catch{ /* pas de cache */ }
         try{ indexedDB.deleteDatabase("carte-audio"); }catch{ /* pas de base */ }
@@ -8324,8 +8420,8 @@ function start(){
    C'est elle qui fait foi : une copie gardée sur l'appareil, ou un fichier en ligne, n'est exécuté que si son texte a exactement
    cette empreinte. Une empreinte rangée dans le stockage de l'appareil n'est plus jamais utilisée (qui peut écrire l'un peut écrire
    l'autre). */
-const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=215;
-const PERSO_EMP="63d6867397c2cf87360287a6c4787de31ea2a377df6e15fc9e9172a6a8d0b285", PERSO_GIT="e847bbaebc1459d44955f5c423f2b5be3e57e80b", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
+const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=216;
+const PERSO_EMP="8b71c949935f4369ba8214f6abce3c6f1d64c3c47d77a6a610703fd98bb69df0", PERSO_GIT="c66d4b9640a6e584ee1e3c9d01b104b8aa7cae40", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
 try{ ["carte-de-vie-perso-sha","carte-de-vie-perso-suivant-sha"].forEach(k=>localStorage.removeItem(k)); }catch{ /* stockage bloqué */ }
 /* le module n'est jamais exécuté deux fois (il pose des minuteries et des écouteurs) */
 let persoFait=false;
@@ -8426,7 +8522,7 @@ function persoDepotUI(){ const pg=document.getElementById("syncLinked"); if(!pg|
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=215; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=216; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0="carte-de-vie-v"+APP_V, rec=false;
