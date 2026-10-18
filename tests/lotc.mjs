@@ -13,7 +13,7 @@ const DEMO = {
   'espaces/studio': esp('Studio de démo', 30, 30, [
     { id: 'a1', name: 'Un', items: [it('a')] }, { id: 'a2', name: 'Deux', items: [it('b')] }, { id: 'a3', name: 'Trois', items: [it('c')] }, { id: 'a4', name: 'Quatre', items: [it('d')] }],
     { links: [{ id: 'l1', url: 'https://exemple.org/outil', title: 'Un outil visible', page: 'Outils' }, { id: 'l2', url: 'https://exemple.org/autre', title: 'Un lien rangé' }],
-      disp: { page: { a4: 'Outils', a3: 'Outils' }, cachees: ['À faire'] } }),
+      disp: { page: { a4: 'Outils', a3: 'Outils' }, cachees: ['À faire'], envies: 'Mes envies' } }),
   'espaces/jardin': esp('Jardin', 65, 25, [{ id: 'j1', name: 'À planter', items: [it('Tomates')] }]),
   'meta/layout': { mx: 50, my: 50, sx: -1.5, sy: -900, _m: Date.now() },
 };
@@ -44,17 +44,21 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   if (iO >= 0) { await p.evaluate(i => document.querySelectorAll('#pane .rpnav .rpt')[i].click(), iO); await p.waitForTimeout(500);
     const l = await p.evaluate(() => [...document.querySelectorAll('#pane a.lvl')].map(a => a.textContent + '|' + a.getAttribute('href')));
     ok(l.length === 1 && /Un outil visible/.test(l[0]) && /exemple\.org\/outil$/.test(l[0]), nom + ' : le lien mis en avant est un bouton visible sur sa page (le lien rangé reste à sa place)'); }
+  const iE = onglets.indexOf('Mes envies'); ok(iE >= 0, nom + ' : la zone « Mes envies » a sa page');
+  if (iE >= 0) { await p.evaluate(i => document.querySelectorAll('#pane .rpnav .rpt')[i].click(), iE); await p.waitForTimeout(500);
+    await p.fill('#pane .envies textarea', 'Une soupe douce'); await p.evaluate(() => [...document.querySelectorAll('#pane .envies button')].find(b => /Garder/.test(b.textContent)).click()); await p.waitForTimeout(400);
+    ok(/gardée/.test(await p.evaluate(() => document.querySelector('#pane .envies [role=status]').textContent)), nom + ' : l\'envie est gardée (jeu.envies, avec sa date)'); }
   /* 3. frise de la famille depuis l'arbre : seulement la lignée directe */
   const fr = await p.evaluate(g => window.friseArbre({ jeu: { ged: g, gedRacine: 'r' } }), GED);
   ok(fr.length === 6 && !fr.some(e => /Cousin/.test(e.t)) && fr.every(e => e.auto), nom + " : la frise lit les naissances et décès de la lignée directe, pas des cousins (" + fr.length + ' événements)');
   ok(fr.some(e => /Père Dupont meurt · Menuisier/.test(e.t) && e.a === '2020') && fr.some(e => e.a === '1990' && /Aïeul Dupont meurt/.test(e.t)), nom + ' : années et métiers repris tels quels (« BEF 26 OCT 1990 » → 1990)');
   /* 4. QR de synchro : chiffré, jamais de clé en clair ; mauvais code refusé ; vecteur de référence du QR */
-  const q = await p.evaluate(async () => { const { APPAIR, QRG } = window.__lotc, code = APPAIR.code(), t = await APPAIR.chiffre({ r: 'compte-demo/depot-demo', t: '' + ['github', 'pat', 'JETON0123456789'].join('_') + '', e: Date.now() + 120000 }, code), lien = APPAIR.lien(t);
+  const q = await p.evaluate(async () => { const { APPAIR, QRG } = window.__lotc, code = APPAIR.code(), t = await APPAIR.chiffre({ r: 'compte-demo/depot-demo', t: '' + ['github', 'pat', 'JETON0123456789'].join('_') + '', k: 'cle-du-lien-demo-0123456789', e: Date.now() + 120000 }, code), lien = APPAIR.lien(t);
     const o = await APPAIR.recoit(lien, code.slice(0, 4) + ' ' + code.slice(4).toLowerCase()); let mauvais = 'accepté'; try { await APPAIR.recoit(lien, 'AAAAAAAA'); } catch (e) { mauvais = 'refusé'; }
     let perime = 'accepté'; try { await APPAIR.recoit(await APPAIR.chiffre({ r: 'a/b', t: 'x', e: Date.now() - 60000 }, code), code); } catch (e) { perime = 'refusé'; }
     const svg = QRG.svg(lien, 248), M = QRG.encode('lotc-test-vecteur-1234567890abcdef', 'M'), bits = M.map(l => l.map(b => b ? 1 : 0).join('')).join('');
     let h = 0; for (let i = 0; i < bits.length; i++) h = (h * 31 + (bits.charCodeAt(i) - 48 + 1)) >>> 0;
-    return { code, ok: o.r === 'compte-demo/depot-demo' && o.t === '' + ['github', 'pat', 'JETON0123456789'].join('_') + '', mauvais, perime, enClair: lien.includes('JETON0123') || svg.includes('JETON0123'), svg: /^<svg/.test(svg), n: M.length, h }; });
+    return { code, ok: o.k === 'cle-du-lien-demo-0123456789' && o.r === 'compte-demo/depot-demo' && o.t === '' + ['github', 'pat', 'JETON0123456789'].join('_') + '', mauvais, perime, enClair: lien.includes('JETON0123') || svg.includes('JETON0123'), svg: /^<svg/.test(svg), n: M.length, h }; });
   ok(/^[A-Z0-9]{8}$/.test(q.code) && q.ok, nom + ' : le code à 8 caractères déchiffre le dépôt et la clé (écrits en minuscules avec une espace : acceptés)');
   ok(q.mauvais === 'refusé' && q.perime === 'refusé', nom + ' : un mauvais code et un QR périmé sont refusés');
   ok(!q.enClair && q.svg, nom + ' : ni le lien ni le QR ne contiennent la clé en clair');
