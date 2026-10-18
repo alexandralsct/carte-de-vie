@@ -68,7 +68,7 @@ const tuile = (p, rid) => p.evaluate(rid => { const t = document.querySelector('
   for (const m of css.matchAll(/@media([^{]*)\{/g)) { const q = m[1].replace(/\s+/g, ' ').trim(); N[q] = (N[q] || 0) + 1; }
   const ORDI_Q = '(min-width:900px) and (pointer:fine)', TEL_Q = 'not all and (min-width:900px) and (pointer:fine)';
   const BASE = { '(min-width:700px)': 3, '(max-width:460px)': 1, '(max-width:720px)': 1, '(orientation:landscape) and (max-height:520px)': 1, '(max-width:760px)': 6, '(min-width:760px)': 1,
-    '(max-width:520px)': 1, '(max-width:420px)': 2, '(min-width:761px)': 11, '(min-width:821px)': 1, '(min-width:1000px)': 2, '(prefers-reduced-motion:reduce)': 5 /* pas un seuil de largeur : « moins de mouvement » */ };
+    '(max-width:520px)': 1, '(max-width:420px)': 2, '(min-width:761px)': 11, '(min-width:821px)': 1, '(min-width:1000px)': 2, '(prefers-reduced-motion:reduce)': 7 /* pas un seuil de largeur : « moins de mouvement » (+2 le 18/10 : conversation et boule de voyance) */ };
   const hors = Object.entries(N).filter(([q, n]) => q !== ORDI_Q && q !== TEL_Q && !(n <= (BASE[q] || 0)));
   ok(N[ORDI_Q] >= 1 && !hors.length, 'CSS : une seule référence pour l\'app ordinateur (' + (N[ORDI_Q] || 0) + ' blocs) et son complément pour l\'app téléphone (' + (N[TEL_Q] || 0) + ') ; aucun nouveau seuil' + (hors.length ? ' — nouveaux : ' + hors.map(([q, n]) => q + ' ×' + n).join(', ') : ''));
   const enMoins = Object.entries(BASE).filter(([q, n]) => (N[q] || 0) < n); if (enMoins.length) console.log('--  seuils en baisse (abaisser BASE) : ' + enMoins.map(([q]) => q).join(', ')); }

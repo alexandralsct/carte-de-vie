@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-sGeIw+HfVeO+wLrvD9+Hkt3vNeBQ3E/dSJdyb1BYo4c=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-p/K1vNOCW1AIeAv54cmjNekyzkqmRXP3/8O+kyzmy/Y=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud https://cocon.metamorphose-architecture.fr data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-XaczpHo8g1mVLu1Q4Tb80/8p0RhtgXA0xleKWauwX8g=' 'sha256-3TZhsGKj35bIM/yehEhWB69S1fB6R3iwpLAWDOdLxfo=' 'sha256-bK2Nqz/VkILnfX+ZU+KzsdHvWOsHf0vWI/hjIoDPdy4=' 'sha256-9XoO482rno8RKRPdsqZz46lA+6cG0M64mgXKBndP7AM=' 'unsafe-eval'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://api.anthropic.com https://script.google.com https://script.googleusercontent.com https://widgets.pinterest.com https://generativelanguage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://*.cloud https://cocon.metamorphose-architecture.fr data: blob:; img-src 'self' data: blob: https://i.pinimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f4eee4">
@@ -2298,6 +2298,125 @@ html.ui-ecran #board.stack>.outilsb .otout.asspuce{margin-right:0!important}
 .becosv{margin:0;padding-left:18px}
 .becoi{opacity:.75;font-size:.85rem;margin:8px 0 0}
 .becosrc{margin:8px 0 0;font-size:.85rem;overflow-wrap:anywhere}
+
+/* Version 215 : l'équipe d'agents (« Mes assistants ») et la conversation commune (téléphone d'abord) */
+#agentPage{--c:var(--ink);background:var(--bg)!important;z-index:61}
+#assistPage .aggrille,#agentPage .aggrille{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 8px;margin:14px 0 6px}
+#agentPage .aggrille.petit{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 6px}
+.agposte{all:unset;cursor:pointer;display:grid;justify-items:center;gap:4px;text-align:center;padding:6px 2px;border-radius:16px;--ag:#002fa7}
+.agposte:focus-visible{outline:2px solid var(--ag);outline-offset:2px}
+.agposte .agrond{position:relative;display:grid;place-items:center;width:64px;height:64px;border-radius:50%;border:1.5px solid var(--ag);color:var(--ag);background:var(--surface)}
+/* le « poste » : une fine ligne de bureau sous chaque assistant */
+.agposte .agrond::after{content:"";position:absolute;left:-6px;right:-6px;bottom:-7px;height:1.5px;background:var(--ag);opacity:.35;border-radius:2px}
+.agposte.s-actif .agrond{background:color-mix(in srgb,var(--ag) 9%,var(--surface))}
+.agposte.s-specifie .agrond,.agposte.s-brouillon .agrond{border-style:dashed}
+.agposte.s-pause{opacity:.55}
+.agposte.on .agrond{background:var(--ag);color:#fff}
+.agposte .agnom{font-weight:700;font-size:12px;line-height:1.2;overflow-wrap:anywhere;margin-top:4px}
+.agposte .agst{font-size:10px;opacity:.7}
+.agrond .agpas{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:999px;background:var(--ag);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;padding:0 5px;box-sizing:border-box}
+.agico{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.agact{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+#agentPage .agtete{display:flex;gap:14px;align-items:flex-start;margin:4px 0 8px}
+#agentPage .agtete p{margin:0 0 4px}
+#agentPage .agrond.grand{width:84px;height:84px;flex:0 0 84px;border-radius:50%;border:1.5px solid var(--ag);color:var(--ag);display:grid;place-items:center;background:color-mix(in srgb,var(--ag) 9%,var(--surface))}
+#agentPage .agdevise{font-style:italic;color:var(--ag)}
+#agentPage .agbilan{font-size:.85rem;margin:2px 0 8px;padding:6px 12px;border-radius:999px;border:1.5px solid color-mix(in srgb,var(--ag) 40%,transparent);display:inline-block}
+#agentPage .agpause{border:1.5px dashed var(--ag);border-radius:14px;padding:8px 12px;margin:6px 0 10px}
+#agentPage .agpause p{margin:0 0 6px}
+#agentPage .agseg button[aria-selected="true"]{background:var(--ag);color:#fff}
+#agentPage .agsortie{display:grid;gap:6px;margin:0 0 10px;border-left:4px solid var(--ag,#002fa7)}
+#agentPage .agsortie.neuve{box-shadow:0 0 0 1.5px var(--ag,#002fa7)}
+#agentPage .agsortie.rien{opacity:.6}
+#agentPage .agsortie h3{margin:2px 0 0;font-size:1rem}
+#agentPage .agsortie p{margin:0}
+#agentPage .agsh{display:grid;gap:2px}
+#agentPage .agqui{color:var(--ag,#002fa7);font-size:.8rem;text-transform:uppercase;letter-spacing:.04em}
+.agbt{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;opacity:.7;margin-bottom:2px}
+#agentPage .agavis{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:4px}
+#agentPage .agav{font:inherit;font-size:.8rem;font-weight:600;border:1.5px solid color-mix(in srgb,var(--ag,#002fa7) 45%,transparent);background:none;color:var(--ink);border-radius:999px;padding:4px 10px;cursor:pointer;min-height:32px}
+#agentPage .agav.on{background:var(--ag,#002fa7);border-color:var(--ag,#002fa7);color:#fff}
+.agchips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.agchip{font:inherit;font-size:.82rem;font-weight:600;border:1.5px solid var(--k1);background:none;color:var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer;min-height:34px}
+.agchip.on{background:var(--k1);color:#fff}
+#agentPage .agmem p{margin:0}
+#agentPage .agcons{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+#agentPage .agcons li{border:1.5px solid color-mix(in srgb,var(--ag) 35%,transparent);border-radius:12px;padding:6px 10px}
+#agentPage .agcons p{margin:0}
+/* la conversation en bulles (assistants et moi futur) */
+.conv{display:grid;gap:8px;margin:8px 0}
+.convfil{display:flex;flex-direction:column;gap:8px;max-height:56vh;overflow-y:auto;padding:4px 2px}
+.convvide{opacity:.7;font-size:.9rem;margin:6px 0}
+.cvb{max-width:86%;padding:8px 12px;border-radius:16px;line-height:1.4}
+.cvb p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.cvb.cvmoi{align-self:flex-end;background:var(--k1);color:#fff;border-bottom-right-radius:4px}
+.cvb.cvlui{align-self:flex-start;background:var(--surface);border:1.5px solid color-mix(in srgb,var(--ag,var(--k1)) 40%,transparent);border-bottom-left-radius:4px}
+.cvb .cvbqui{display:block;font-size:10.5px;font-weight:700;color:var(--ag,var(--k1));margin-bottom:2px}
+.cvb.cvatt{opacity:.65}
+.cvb .cvbatt{display:block;font-size:10px;margin-top:2px}
+.convetat{min-height:1.2em;margin:0;font-size:.85rem;opacity:.8}
+.conv.pense .convetat::after{content:" …";animation:convp 1.2s infinite}
+@keyframes convp{50%{opacity:.2}}
+.convf{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}
+.convf textarea{font:inherit;width:100%;box-sizing:border-box;border:1.5px solid var(--ink);border-radius:16px;padding:8px 12px;background:var(--surface);color:var(--fg,var(--ink));resize:vertical;min-height:44px}
+.convact{display:flex;flex-wrap:wrap;gap:6px}
+.convact .vbtn{font-size:.78rem;padding:4px 10px}
+@media (prefers-reduced-motion:reduce){.conv.pense .convetat::after{animation:none}}
+/* App ordinateur : plus de colonnes, une conversation plus haute */
+@media (min-width:900px) and (pointer:fine){
+  #assistPage .aggrille{grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:22px 14px;max-width:880px}
+  #agentPage .aggrille.petit{grid-template-columns:repeat(auto-fill,minmax(92px,1fr))}
+  .agposte .agrond{width:76px;height:76px}
+  .agposte:hover .agrond{background:color-mix(in srgb,var(--ag) 14%,var(--surface))}
+  #agentPage .page-in{max-width:860px}
+  #agentPage .agsortie{padding:14px 18px}
+  .convfil{max-height:62vh}
+  .cvb{max-width:70%}
+}
+/* lisibilité en mode sombre : le trait prend une teinte entre la couleur de l'assistant et celle du texte */
+.agposte,#agentPage{--agt:color-mix(in srgb,var(--ag) 55%,var(--ink))}
+.agposte .agrond,#agentPage .agrond.grand{color:var(--agt);border-color:var(--agt)}
+#agentPage .agdevise,#agentPage .agqui,.cvb .cvbqui{color:var(--agt,var(--ink))}
+#agentPage .agsortie h3{all:unset;display:block;font-weight:700;font-size:1rem;line-height:1.3;margin-top:2px}
+#agentPage .agsortie .mono{color:inherit;opacity:.7}
+#agentPage .agsortie{border-left-color:var(--agt)}
+/* fonds pleins : toujours le vrai bleu Klein et du texte blanc (la variable --k1 s'éclaircit en mode sombre) */
+.cvb.cvmoi,.agchip.on,#futurPage .agseg button[aria-selected="true"]{background:#002fa7!important;color:#fff!important;border-color:#002fa7}
+#agentPage .agsortie small.mono{color:var(--ink)!important;opacity:.65}
+
+/* Version 215 : « Moi dans 5 ans », page autonome (téléphone d'abord) */
+#futurPage{--c:var(--ink);--ag:#002fa7;background:var(--bg)!important;z-index:61}
+#futurPage .futtete{display:flex;gap:14px;align-items:center;margin:4px 0 6px}
+#futurPage .futqui{display:block;font-size:1.05rem;color:var(--k1)}
+.futboule{width:72px;height:72px;flex:0 0 72px;color:var(--k1)}
+.futboule .plein{fill:currentColor}
+.futboule .verre{fill:color-mix(in srgb,var(--k1) 8%,transparent);stroke:currentColor;stroke-width:1.8}
+.futboule .reflet,.futboule .brume{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}
+.futboule .brume{opacity:.45}
+/* la brume tourne pendant qu'il écrit */
+#futurPage.pense .futboule .b1{animation:futb 2.4s ease-in-out infinite}
+#futurPage.pense .futboule .b2{animation:futb 2.4s ease-in-out infinite reverse}
+#futurPage.pense .futboule .etin{animation:futs 1.2s ease-in-out infinite}
+@keyframes futb{50%{transform:translateX(3px);opacity:.9}}
+@keyframes futs{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){#futurPage.pense .futboule *{animation:none!important}}
+#futurPage .agseg button[aria-selected="true"]{background:var(--k1);color:#fff}
+#futurPage{--agt:color-mix(in srgb,var(--k1) 55%,var(--ink))}
+#futurPage .futqui,.futboule{color:var(--agt)}
+#futurPage .futl{margin:0 0 6px;padding-left:1.2em;display:grid;gap:4px}
+#futurPage .futsujet,#futurPage .futlettre,#futurPage .futcaps{margin:0 0 8px}
+#futurPage .futsujet p,#futurPage .futlettre p,#futurPage .futcaps p{margin:4px 0 0;white-space:pre-wrap}
+#futurPage .futlettre summary{cursor:pointer;font-weight:700}
+#futurPage .futcaps:not(.ouverte){border-style:dashed}
+#futurPage .futta,#futurPage .futcf textarea{font:inherit;width:100%;box-sizing:border-box;border:1.5px solid var(--ink);border-radius:16px;padding:8px 12px;background:var(--surface);color:var(--fg,var(--ink));resize:vertical}
+#futurPage .futcf{display:grid;gap:8px;margin-top:8px}
+#futurPage .futdl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#futurPage .futdl input{font:inherit;border:1.5px solid var(--ink);border-radius:999px;padding:6px 12px;background:var(--surface);color:var(--fg,var(--ink))}
+/* App ordinateur : lecture en deux colonnes, page plus large */
+@media (min-width:900px) and (pointer:fine){
+  #futurPage .page-in{max-width:860px}
+  .futboule{width:92px;height:92px;flex-basis:92px}
+}
 
 html.klein .node .ico svg,html.klein .node .ico{color:#002fa7!important;--c:#002fa7}
 html.demarre .wrap>:not(header){visibility:hidden!important}
@@ -6795,6 +6914,297 @@ function briefEco(c,r){ const A=(r.analyses||[]).filter(x=>x&&x.d).slice().sort(
   box.appendChild(el("p",{className:"becoi",textContent:"Information seulement : ni conseil d'achat, ni de vente, ni de placement."}));
   return box; }
 
+/* ===== Version 215 (18/10) : « Mes assistants » devient l'équipe d'agents (téléphone et ordinateur) =====
+   En ouvrant le bouton : tous les assistants en icônes ; une icône → sa page : ses restitutions, la discussion directe
+   (sans LIFE), ce qu'il retient de toi et tes consignes. En plus : la revue de la semaine (toute l'équipe), la réunion
+   (une question à plusieurs), les avis sur chaque restitution, la lecture à voix haute, le bilan du mois.
+   Données : meta/assistants (posé par le système) { liste:[{ id, nom, groupe, statut, role, identite:{icone,couleur,devise,ton},
+   dernier, sorties:[{id,date,titre,regarde,trouve,propose,attend,texte,lien}], memoire, consignes:[{id,texte,date}] }] }.
+   Échanges : lien avec le système, types assistant · assistant_relance · avis_assistant · reunion. Ils réfléchissent,
+   proposent, préparent ; ils n'envoient, ne publient et ne paient jamais rien sans toi. Aucun nom d'assistant dans ce code. */
+const CONV={
+  /* la conversation reste sur l'appareil (40 derniers messages) */
+  lit(k){ try{ const x=JSON.parse(localStorage.getItem("conv:"+k)||"[]"); return Array.isArray(x)?x:[]; }catch{ return []; } },
+  ecrit(k,L){ try{ localStorage.setItem("conv:"+k,JSON.stringify(L.slice(-40))); }catch{} },
+  /* envoi au système ; renvoie {ok, j} ou {ok:false, msg} */
+  async envoie(corps){ if(!LIEN_URL) return {ok:false,msg:"Le lien avec le système n'est pas activé sur cet appareil."};
+    const cle=lienCle(); if(!cle) return {ok:false,cle:true,msg:"Colle d'abord la clé du lien avec le système (menu → Clé du lien)."};
+    try{ const r=await lienPost(corps,cle), j=await r.json().catch(()=>({}));
+      if(r.status===401||r.status===403) return {ok:false,msg:"Clé du lien refusée : vérifie-la (menu → Clé du lien)."};
+      if(r.status===404||/type inconnu/i.test(String(j&&j.erreur||""))) return {ok:false,bientot:true,msg:"Bientôt disponible : le système n'a pas encore branché cette conversation. Ton message est gardé ici."};
+      if(!r.ok||j.ok===false||j.statut==="ECHEC") return {ok:false,msg:"ÉCHEC — "+(typeof j.erreur==="string"&&j.erreur.trim()?j.erreur.trim().slice(0,300):"le système a répondu une erreur ("+r.status+").")};
+      return {ok:true,j}; }
+    catch{ return {ok:false,msg:"Le système n'a pas répondu (connexion ?). Ton message est gardé : réessaie dans un moment."}; } },
+  /* une zone de discussion en bulles ; envoi(texte, historique) → Promise<{texte}|{erreur}> */
+  zone(k,opt){ const w=el("div",{className:"conv"}), fil=el("div",{className:"convfil",role:"log"}), f=el("form",{className:"convf"}),
+      ta=el("textarea",{rows:2,placeholder:opt.place||"Écris ton message…"}), bt=el("button",{type:"submit",className:"vbtn",textContent:"Envoyer"}), etat=el("p",{className:"convetat",role:"status"});
+    fil.setAttribute("aria-live","polite"); ta.setAttribute("aria-label",opt.place||"Ton message");
+    const rend=()=>{ fil.textContent=""; const L=this.lit(k);
+      if(!L.length&&opt.vide) fil.appendChild(el("p",{className:"convvide",textContent:opt.vide}));
+      L.forEach(m=>{ const b=el("div",{className:"cvb "+(m.de==="moi"?"cvmoi":"cvlui")+(m.attente?" cvatt":"")});
+        if(m.de!=="moi"&&opt.qui) b.appendChild(el("small",{className:"cvbqui",textContent:opt.qui}));
+        b.appendChild(el("p",{textContent:String(m.texte||"")}));
+        if(m.attente) b.appendChild(el("small",{className:"cvbatt",textContent:"gardé, pas encore envoyé"}));
+        fil.appendChild(b); }); fil.scrollTop=fil.scrollHeight; };
+    const part=async(t)=>{ const L=this.lit(k); L.push({de:"moi",texte:t,t:new Date().toISOString()}); this.ecrit(k,L); rend();
+      bt.disabled=true; etat.textContent=opt.attente||"Il réfléchit…"; w.classList.add("pense");
+      const H=L.filter(m=>!m.attente).slice(-11,-1).map(m=>({de:m.de==="moi"?"moi":"assistant",texte:String(m.texte).slice(0,1500)}));
+      const r=await opt.envoi(t,H); const M=this.lit(k);
+      if(r&&r.texte){ M.push({de:"lui",texte:r.texte,t:new Date().toISOString()}); etat.textContent=r.note||""; }
+      else { const d=M[M.length-1]; if(d&&d.de==="moi") d.attente=true; etat.textContent=r&&r.erreur||"Pas de réponse."; }
+      this.ecrit(k,M); bt.disabled=false; w.classList.remove("pense"); rend(); };
+    f.onsubmit=e=>{ e.preventDefault(); const t=ta.value.trim(); if(!t||bt.disabled) return; ta.value=""; part(t); };
+    ta.addEventListener("keydown",e=>{ if(e.key==="Enter"&&(e.metaKey||e.ctrlKey)){ e.preventDefault(); f.requestSubmit(); } });
+    /* renvoyer ce qui a été gardé faute de réponse */
+    const renv=el("button",{type:"button",className:"vbtn ghostb convrenv",textContent:"Renvoyer ce qui est gardé"});
+    renv.onclick=()=>{ const L=this.lit(k), g=L.filter(m=>m.attente); if(!g.length) return; const t=g.map(m=>m.texte).join("\n"); this.ecrit(k,L.filter(m=>!m.attente)); part(t); };
+    const neuf=el("button",{type:"button",className:"vbtn ghostb",textContent:"Nouvelle conversation"});
+    neuf.onclick=()=>{ this.ecrit(k,[]); rend(); etat.textContent=""; };
+    f.append(ta,bt); w.append(fil,etat,f,el("div",{className:"convact"},renv,neuf)); rend();
+    w.pose=t=>{ ta.value=t; ta.focus(); }; w.part=part; return w; } };
+
+/* icônes des assistants : un mot (identite.icone) → un dessin au trait ; sinon une forme tirée de son identifiant */
+const AGIC={
+  loupe:"M27 27l9 9M17 30a13 13 0 1 1 0-26 13 13 0 0 1 0 26z", plume:"M8 36c6-14 14-24 28-30-2 14-10 22-24 26M14 28l-6 8",
+  boussole:"M20 36a16 16 0 1 1 0-32 16 16 0 0 1 0 32zM26 14l-4 9-8 3 4-9z", micro:"M20 4a5 5 0 0 1 5 5v9a5 5 0 0 1-10 0V9a5 5 0 0 1 5-5zM10 18a10 10 0 0 0 20 0M20 28v8",
+  trophee:"M12 6h16v8a8 8 0 0 1-16 0zM12 9H6a5 5 0 0 0 6 6M28 9h6a5 5 0 0 1-6 6M20 22v8M13 36h14", reseau:"M10 10a4 4 0 1 1 0 .1M30 10a4 4 0 1 1 0 .1M20 32a4 4 0 1 1 0 .1M13 12l5 17M27 12l-5 17M14 10h12",
+  livre:"M6 8c5-2 10-2 14 2 4-4 9-4 14-2v24c-5-2-10-2-14 2-4-4-9-4-14-2zM20 10v24", balance:"M20 6v28M12 34h16M8 12h24M8 12l-5 10h10zM32 12l-5 10h10z",
+  pont:"M4 28h32M6 28c4-10 24-10 28 0M12 28v-6M20 28v-8M28 28v-6", miroir:"M20 32a11 13 0 1 1 0-26 11 13 0 0 1 0 26zM15 12c2-2 4-3 7-3M20 32v4",
+  equerre:"M6 6v28h28zM12 18v10h10", capsule:"M8 20a8 8 0 0 1 8-8h8a8 8 0 0 1 0 16h-8a8 8 0 0 1-8-8zM20 12v16",
+  etoile:"M20 4l4 11h12l-10 7 4 12-10-7-10 7 4-12-10-7h12z", horloge:"M20 36a16 16 0 1 1 0-32 16 16 0 0 1 0 32zM20 10v10l7 4",
+  enveloppe:"M5 10h30v20H5zM5 10l15 11 15-11", ampoule:"M14 24a9 9 0 1 1 12 0c-2 2-2 4-2 6h-8c0-2 0-4-2-6zM16 34h8"};
+const AGFORM=["etoile","boussole","ampoule","plume","loupe","horloge"];
+const AGBLEUS=["#002fa7","#2f5fd8","#0b2a6b","#4f7be0","#1d4ed8","#3b5bdb"];
+function agCouleur(a,i){ const c=String(a&&a.identite&&a.identite.couleur||"").trim();
+  /* seulement des bleus de la charte : une couleur reçue hors de la famille des bleus est remplacée */
+  const m=/^#([0-9a-f]{6})$/i.exec(c); if(m){ const n=parseInt(m[1],16), r=n>>16, g=(n>>8)&255, b=n&255; if(b>r+30&&b>=g) return c; }
+  return AGBLEUS[i%AGBLEUS.length]; }
+function agIcone(a,i,taille){ const NS="http://www.w3.org/2000/svg", s=document.createElementNS(NS,"svg"), p=document.createElementNS(NS,"path");
+  const k=String(a&&a.identite&&a.identite.icone||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+  const h=[...String(a&&a.id||"")].reduce((n,c)=>n+c.charCodeAt(0),0);
+  p.setAttribute("d",AGIC[k]||AGIC[AGFORM[h%AGFORM.length]]); s.setAttribute("viewBox","0 0 40 40"); s.setAttribute("aria-hidden","true");
+  s.setAttribute("width",taille||40); s.setAttribute("height",taille||40); s.setAttribute("class","agico"); s.appendChild(p); return s; }
+
+Object.assign(ASSIST,{
+  vu(id){ try{ return localStorage.getItem("agvu:"+id)||""; }catch{ return ""; } },
+  marqueVu(id){ try{ localStorage.setItem("agvu:"+id,new Date().toISOString().slice(0,16)); }catch{} },
+  sorties(a){ return (Array.isArray(a.sorties)?a.sorties:[]).slice().sort((x,y)=>String(y.date||"").localeCompare(String(x.date||""))); },
+  nonLues(a){ const v=this.vu(a.id); return this.sorties(a).filter(x=>String(x.date||"")>v&&!this.rien(x)).length; },
+  rien(x){ return !x.trouve&&!x.propose&&!x.attend&&/rien (à|a) signaler/i.test(String(x.titre||"")+" "+String(x.texte||"")); },
+  /* la pastille du bouton compte ce qui n'a pas encore été lu */
+  nouveau(){ return (this.d?this.d.liste:[]).reduce((n,a)=>n+this.nonLues(a),0); },
+  /* ===== la page de l'équipe : les icônes, la revue, la réunion ===== */
+  ouvre(garde){ const p=$("assistPage"), y=garde&&p?p.scrollTop:0, inn=PAGEX("assistPage","Mes assistants"); if(garde) $("assistPage").scrollTop=y;
+    const L=this.d?this.d.liste:[];
+    inn.appendChild(help("Ton équipe : chacun réfléchit dans son domaine, te propose et prépare. Touche une icône pour voir ce qu'il t'a rendu et lui parler."));
+    if(!L.length){ inn.appendChild(help("Tes assistants apparaîtront ici au prochain passage du système (7 h 30 et 19 h 30).")); return; }
+    const g=el("div",{className:"aggrille",role:"list"});
+    L.forEach((a,i)=>{ const n=this.nonLues(a), st=String(a.statut||""), c=agCouleur(a,i);
+      const b=el("button",{type:"button",className:"agposte s-"+st.replace(/[^a-z]/g,""),role:"listitem"});
+      b.style.setProperty("--ag",c);
+      const rond=el("span",{className:"agrond"}); rond.appendChild(agIcone(a,i,34)); if(n) rond.appendChild(el("span",{className:"agpas",textContent:String(n)}));
+      b.append(rond,el("span",{className:"agnom",textContent:String(a.nom||a.id||"")}),el("small",{className:"agst",textContent:this.ETAT[st]||st||"—"}));
+      b.setAttribute("aria-label",String(a.nom||a.id)+", "+(this.ETAT[st]||st||"")+(n?", "+n+" nouvelle"+(n>1?"s":"")+" restitution"+(n>1?"s":""):""));
+      b.onclick=()=>this.fiche(a.id); g.appendChild(b); });
+    inn.appendChild(g);
+    const act=el("div",{className:"agact"}), rv=el("button",{type:"button",className:"vbtn",textContent:"La revue de la semaine"}), re=el("button",{type:"button",className:"vbtn ghostb",textContent:"Réunir plusieurs assistants"});
+    rv.onclick=()=>this.revue(); re.onclick=()=>this.reunion(); act.append(rv,re); inn.appendChild(act); },
+  /* ===== la page d'un assistant ===== */
+  ong:{},
+  fiche(id){ const L=this.d?this.d.liste:[], i=L.findIndex(a=>a.id===id), a=L[i]; if(!a) return this.ouvre();
+    const inn=PAGEX("agentPage",String(a.nom||a.id)), c=agCouleur(a,i), st=String(a.statut||""), I=a.identite||{};
+    $("agentPage").style.setProperty("--ag",c);
+    const ret=inn.querySelector(".btn.ghost"); if(ret){ ret.textContent="← Mes assistants"; ret.onclick=()=>{ $("agentPage").hidden=true; this.ouvre(true); }; }
+    const tete=el("div",{className:"agtete"}), rond=el("span",{className:"agrond grand"}); rond.appendChild(agIcone(a,i,52));
+    const txt=el("div",{});
+    if(I.devise) txt.appendChild(el("p",{className:"agdevise",textContent:"« "+String(I.devise)+" »"}));
+    if(a.role) txt.appendChild(el("p",{textContent:String(a.role)}));
+    txt.appendChild(el("small",{className:"mut",textContent:[this.ETAT[st]||st,a.dernier?"dernier passage : "+String(a.dernier):""].filter(Boolean).join(" · ")}));
+    tete.append(rond,txt); inn.appendChild(tete);
+    /* le bilan du mois : ce qu'il t'a rendu, ce que tu as jugé utile */
+    const S=this.sorties(a), mois=new Date().toISOString().slice(0,7), SM=S.filter(x=>String(x.date||"").slice(0,7)===mois&&!this.rien(x)), av=this.avis(a.id);
+    const ut=SM.filter(x=>av[x.id]==="utile").length, pr=SM.filter(x=>x.propose).length;
+    inn.appendChild(el("p",{className:"agbilan",textContent:"Ce mois-ci : "+SM.length+" restitution"+(SM.length>1?"s":"")+" · "+pr+" proposition"+(pr>1?"s":"")+" · "+ut+" jugée"+(ut>1?"s":"")+" utile"+(ut>1?"s":"")}));
+    /* rien d'utile depuis trois semaines : il propose lui-même sa pause (c'est toi qui décides) */
+    const der=S.find(x=>!this.rien(x)), vieux=new Date(Date.now()-21*864e5).toISOString().slice(0,10);
+    if(st==="actif"&&S.length&&(!der||String(der.date||"")<vieux)){ const z=el("div",{className:"agpause"});
+      z.append(el("p",{textContent:"Je n'ai rien trouvé d'utile pour toi depuis trois semaines. Veux-tu me mettre en pause ?"}));
+      const o=el("button",{type:"button",className:"vbtn ghostb",textContent:"Demander ma pause"}); o.onclick=()=>{ this.ong[id]="parle"; this.fiche(id); setTimeout(()=>{ const w=document.querySelector("#agentPage .conv"); if(w) w.pose("Je voudrais te mettre en pause : prépare la demande, je la validerai."); },30); };
+      z.appendChild(o); inn.appendChild(z); }
+    const O=[["rend","Ses restitutions"],["parle","Lui parler"],["sait","Ce qu'il retient"]], cur=this.ong[id]||"rend", seg=el("div",{className:"seg agseg",role:"tablist"});
+    O.forEach(([k,n])=>{ const b=el("button",{type:"button",role:"tab",textContent:n}); b.setAttribute("aria-selected",String(cur===k)); b.onclick=()=>{ this.ong[id]=k; this.fiche(id); }; seg.appendChild(b); });
+    inn.appendChild(seg); const pan=el("div",{className:"agpan"}); inn.appendChild(pan);
+    if(cur==="rend"){ this.restitutions(a,pan); this.marqueVu(a.id); try{ CATOUT.pose(); }catch{} }
+    else if(cur==="parle") this.parle(a,pan);
+    else this.sait(a,pan); },
+  restitutions(a,pan){ const S=this.sorties(a), v=this.vu(a.id);
+    const ou=el("div",{className:"agact"}), ec=el("button",{type:"button",className:"vbtn ghostb",textContent:"Écouter la dernière"}), rl=el("button",{type:"button",className:"vbtn ghostb",textContent:"Refais ton passage maintenant"}), m=el("p",{className:"convetat",role:"status"});
+    ec.disabled=!S.length||!("speechSynthesis" in window);
+    ec.onclick=()=>{ const x=S[0]; if(!x) return; try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance([x.titre,x.trouve,x.propose,x.attend,x.texte].filter(Boolean).map(String).join(". ").slice(0,1200)); u.lang="fr-FR"; speechSynthesis.speak(u); }catch{} };
+    rl.onclick=async()=>{ rl.disabled=true; m.textContent="Je relance son passage…"; const r=await CONV.envoie({type:"assistant_relance",assistant:{id:String(a.id)}});
+      m.textContent=r.ok?(typeof r.j.reponse==="string"&&r.j.reponse.trim()?r.j.reponse.trim().slice(0,400):"C'est parti : sa restitution arrivera ici."):r.msg; rl.disabled=false; };
+    ou.append(ec,rl); pan.append(ou,m);
+    if(!S.length){ pan.appendChild(help(String(a.statut)==="actif"?"Rien à te dire pour l'instant : il se manifeste dès qu'il a quelque chose.":"Il n'a encore rien rendu.")); return; }
+    S.slice(0,20).forEach(x=>pan.appendChild(this.carteSortie(a,x,String(x.date||"")>v))); },
+  carteSortie(a,x,neuve,avecNom){ const c=el("article",{className:"card agsortie"+(this.rien(x)?" rien":"")+(neuve?" neuve":"")});
+    const h=el("div",{className:"agsh"}); if(avecNom) h.appendChild(el("b",{className:"agqui",textContent:String(a.nom||a.id)}));
+    h.append(el("small",{className:"mono",textContent:String(x.date||"")}),el("h3",{textContent:String(x.titre||"Restitution")})); c.appendChild(h);
+    [["regarde","Ce que j'ai regardé"],["trouve","Ce que j'ai trouvé"],["propose","Ce que je te propose"],["attend","Ce que j'attends de toi"]].forEach(([k,t])=>{
+      if(x[k]) c.appendChild(el("div",{className:"agbloc"},el("small",{className:"agbt",textContent:t}),el("p",{textContent:String(x[k]).slice(0,1500)}))); });
+    if(x.texte) c.appendChild(el("p",{textContent:String(x.texte).slice(0,1500)}));
+    const u=this.lien(x.lien); if(u) c.appendChild(el("a",{href:u,target:"_blank",rel:"noopener",textContent:"Ouvrir ↗"}));
+    if(!this.rien(x)&&x.id) c.appendChild(this.boutonsAvis(a,x));
+    return c; },
+  /* tes avis : renvoyés à l'assistant, gardés sur l'appareil pour le bilan */
+  avis(id){ try{ return JSON.parse(localStorage.getItem("agavis:"+id)||"{}")||{}; }catch{ return {}; } },
+  boutonsAvis(a,x){ const z=el("div",{className:"agavis",role:"group"}), A=this.avis(a.id), m=el("small",{className:"convetat",role:"status"});
+    z.setAttribute("aria-label","Ton avis sur cette restitution");
+    [["utile","✓ utile"],["a_cote","✕ à côté"],["arrete","■ arrête ça"],["creuse","↻ creuse"]].forEach(([k,t])=>{ const b=el("button",{type:"button",className:"agav"+(A[x.id]===k?" on":""),textContent:t});
+      b.setAttribute("aria-pressed",String(A[x.id]===k));
+      b.onclick=async()=>{ const B=this.avis(a.id); B[x.id]=k; try{ localStorage.setItem("agavis:"+a.id,JSON.stringify(B)); }catch{}
+        z.querySelectorAll(".agav").forEach(y=>{ y.classList.toggle("on",y===b); y.setAttribute("aria-pressed",String(y===b)); });
+        m.textContent="J'envoie ton avis…"; const r=await CONV.envoie({type:"avis_assistant",assistant:{id:String(a.id),sortie:String(x.id),avis:k}});
+        m.textContent=r.ok?"Avis transmis.":r.bientot?"Avis gardé : il partira quand le système sera branché.":r.msg; };
+      z.appendChild(b); }); z.appendChild(m); return z; },
+  parle(a,pan){ const nom=String(a.nom||a.id);
+    pan.appendChild(help("Vous parlez en direct, sans passer par LIFE. Il répond dans son domaine ; une consigne durable (« ne me propose plus… ») est retenue."));
+    pan.appendChild(CONV.zone("ag:"+a.id,{qui:nom,place:"Écris à "+nom+"…",vide:"Pose-lui une question, demande-lui de creuser, donne-lui une consigne.",
+      envoi:async(t,H)=>{ const r=await CONV.envoie({type:"assistant",assistant:{id:String(a.id),texte:t,historique:H}});
+        if(!r.ok) return {erreur:r.msg}; const j=r.j, rep=typeof j.reponse==="string"?j.reponse.trim():"";
+        return rep?{texte:rep.slice(0,4000),note:j.consigne&&j.consigne.texte?"Consigne retenue : "+String(j.consigne.texte).slice(0,200):""}:{erreur:"Réponse vide : statut INCERTAIN."}; }}));
+    const lv=el("button",{type:"button",className:"vbtn ghostb",textContent:"Le convoquer dans LIFE"});
+    lv.onclick=()=>{ try{ OMNI.prepare("@"+a.id+" ","general"); }catch{} }; pan.appendChild(el("div",{className:"agact"},lv)); },
+  sait(a,pan){ if(a.memoire) pan.appendChild(el("div",{className:"card agmem"},el("small",{className:"agbt",textContent:"Ce qu'il retient de toi"}),el("p",{textContent:String(a.memoire).slice(0,2000)})));
+    else pan.appendChild(help("Il n'a encore rien retenu de toi."));
+    const C=Array.isArray(a.consignes)?a.consignes:[];
+    pan.appendChild(el("h3",{className:"asshg",textContent:"Tes consignes"}));
+    if(C.length){ const ul=el("ul",{className:"agcons"}); C.forEach(x=>ul.appendChild(el("li",{},el("p",{textContent:String(x.texte||"")}),el("small",{className:"mono",textContent:String(x.date||"")})))); pan.appendChild(ul); }
+    else pan.appendChild(help("Aucune consigne pour l'instant : donne-la-lui dans « Lui parler »."));
+    if(a.identite&&a.identite.ton) pan.appendChild(el("p",{className:"mut",textContent:"Son ton : "+String(a.identite.ton)})); },
+  /* ===== la revue de la semaine : toute l'équipe, du plus récent au plus ancien, filtrable ===== */
+  filtre:null,
+  revue(){ const inn=PAGEX("agentPage","La revue de la semaine"), L=this.d?this.d.liste:[], s=new Date(Date.now()-7*864e5).toISOString().slice(0,10);
+    $("agentPage").style.setProperty("--ag","#002fa7");
+    const ret=inn.querySelector(".btn.ghost"); if(ret){ ret.textContent="← Mes assistants"; ret.onclick=()=>{ $("agentPage").hidden=true; this.ouvre(true); }; }
+    const T=[]; L.forEach((a,i)=>this.sorties(a).forEach(x=>{ if(String(x.date||"")>=s&&!this.rien(x)) T.push([a,x,i]); }));
+    T.sort((p,q)=>String(q[1].date||"").localeCompare(String(p[1].date||"")));
+    const ch=el("div",{className:"agchips"}), mk=(k,t)=>{ const b=el("button",{type:"button",className:"agchip"+(this.filtre===k?" on":""),textContent:t}); b.setAttribute("aria-pressed",String(this.filtre===k)); b.onclick=()=>{ this.filtre=k; this.revue(); }; ch.appendChild(b); };
+    mk(null,"Tous"); L.filter(a=>T.some(t=>t[0]===a)).forEach(a=>mk(a.id,String(a.nom||a.id))); inn.appendChild(ch);
+    const silence=L.filter(a=>String(a.statut)==="actif"&&!T.some(t=>t[0]===a));
+    inn.appendChild(help(T.length?T.length+" restitution"+(T.length>1?"s":"")+" ces sept derniers jours"+(silence.length?" · "+silence.length+" assistant"+(silence.length>1?"s":"")+" sans rien à signaler":"")+".":"Rien de neuf cette semaine."));
+    T.filter(t=>!this.filtre||t[0].id===this.filtre).forEach(([a,x])=>{ const c=this.carteSortie(a,x,false,true); c.style.setProperty("--ag",agCouleur(a,L.indexOf(a))); pan(c); });
+    function pan(c){ inn.appendChild(c); } },
+  /* ===== la réunion : une même question à plusieurs assistants ===== */
+  choisis:[],
+  reunion(){ const inn=PAGEX("agentPage","Réunir plusieurs assistants"), L=(this.d?this.d.liste:[]).filter(a=>String(a.statut)!=="pause");
+    $("agentPage").style.setProperty("--ag","#002fa7");
+    const ret=inn.querySelector(".btn.ghost"); if(ret){ ret.textContent="← Mes assistants"; ret.onclick=()=>{ $("agentPage").hidden=true; this.ouvre(true); }; }
+    inn.appendChild(help("Choisis qui tu réunis, puis pose ta question : chacun répond depuis son domaine."));
+    const g=el("div",{className:"aggrille petit",role:"group"}); g.setAttribute("aria-label","Qui participe");
+    L.forEach((a,i)=>{ const on=this.choisis.includes(a.id), b=el("button",{type:"button",className:"agposte"+(on?" on":"")}); b.style.setProperty("--ag",agCouleur(a,i)); b.setAttribute("aria-pressed",String(on));
+      const r=el("span",{className:"agrond"}); r.appendChild(agIcone(a,i,26)); b.append(r,el("span",{className:"agnom",textContent:String(a.nom||a.id)}));
+      b.onclick=()=>{ this.choisis=on?this.choisis.filter(x=>x!==a.id):this.choisis.concat(a.id); this.reunion(); }; g.appendChild(b); });
+    inn.appendChild(g);
+    const ids=this.choisis.filter(x=>L.some(a=>a.id===x)), noms=ids.map(x=>{ const a=L.find(y=>y.id===x); return String(a.nom||a.id); });
+    if(ids.length<2){ inn.appendChild(help("Choisis au moins deux assistants.")); return; }
+    inn.appendChild(CONV.zone("reunion:"+ids.slice().sort().join("+"),{qui:"L'équipe",place:"Ta question à "+noms.join(", ")+"…",attente:"Ils se concertent…",
+      envoi:async(t)=>{ const r=await CONV.envoie({type:"reunion",reunion:{ids,texte:t}}); if(!r.ok) return {erreur:r.msg};
+        const R=Array.isArray(r.j.reponses)?r.j.reponses:[]; if(!R.length) return {erreur:"Réponse vide : statut INCERTAIN."};
+        return {texte:R.map(x=>{ const a=L.find(y=>y.id===x.id); return (a?String(a.nom||a.id):String(x.id||""))+" : "+String(x.texte||"").trim(); }).join("\n\n").slice(0,6000)}; }})); } });
+/* la pastille de l'accueil compte les restitutions non lues */
+{ const t=ASSIST.tuile.bind(ASSIST); ASSIST.tuile=function(){ const b=t(), n=this.nouveau(), s=b.querySelector("span"); if(s&&this.d) s.textContent=this.d.liste.length+" assistants"+(n?" · "+n+" à lire":""); return b; }; }
+/* la page d'un assistant suit les données en direct */
+{ const c=ASSIST.charge.bind(ASSIST); ASSIST.charge=function(d){ c(d); const p=$("agentPage"); if(p&&!p.hidden&&!p.querySelector(".conv textarea:focus")){ const h=p.querySelector("h2"), a=(this.d?this.d.liste:[]).find(x=>String(x.nom||x.id)===(h&&h.textContent)); if(a) this.fiche(a.id); } }; }
+
+/* ===== Version 215 (18/10) : « Moi dans 5 ans » devient autonome dans la carte (téléphone et ordinateur) =====
+   Plus de saut vers LIFE : une page à part, ouverte par la boule de voyance d'Omni. Le moi futur comprend le moi
+   d'aujourd'hui (trajectoire, aspirations, ce que LIFE sait, décisions) pour évaluer les possibles, les blocages et ce qui
+   pourrait advenir ; il parle depuis l'année choisie, à la première personne, et pose une question en retour.
+   Onglets : Lui parler · Ma lecture (possibles, blocages, ce qui pourrait advenir, une phrase par grand sujet, ce que tu
+   lui as promis) · Lettres (sa lettre du dimanche, ta lettre à toi-même) · Capsule (scellée jusqu'à sa date).
+   Données : meta/futur (posé par le système) { lecture:{d, possibles, blocages, pourrait_advenir, sujets:[{sujet,phrase}],
+   engagements:[…]}, lettres:[{id,d,texte}] } ; meta/futur_moi (écrit ici) { lettre, capsules:[{id,t,ouvre,texte}] }.
+   Échange : lien avec le système, type futur. La conversation reste sur l'appareil. */
+const FUTUR={ d:null, moi:null, ong:"parle", horizon:5, scenario:"libre",
+  H:[[-5,"Moi d'il y a 5 ans"],[1,"Dans 1 an"],[5,"Dans 5 ans"],[10,"Dans 10 ans"]],
+  SC:[["libre","Tel que je vais"],["prudent","Version prudente"],["audacieux","Version audacieuse"],["inchange","Si je ne change rien"]],
+  an(){ return new Date().getFullYear()+this.horizon; },
+  qui(){ return "Moi, "+new Date().toLocaleDateString("fr-FR",{month:"long"})+" "+this.an(); },
+  charge(d){ this.d=d&&typeof d==="object"?d:null; this.rafraichit(); },
+  chargeMoi(d){ this.moi=d&&typeof d==="object"?d:{}; this.rafraichit(); },
+  rafraichit(){ const p=$("futurPage"), a=document.activeElement; if(p&&!p.hidden&&!(a&&p.contains(a)&&/TEXTAREA|INPUT/.test(a.tagName))) this.ouvre(true); },
+  ecritMoi(champs){ this.moi=Object.assign({},this.moi||{},champs); if(typeof db!=="undefined"&&db) db.doc("meta/futur_moi").set(this.moi).catch(()=>{}); },
+  /* la boule de voyance, animée pendant qu'il écrit */
+  boule(){ const NS="http://www.w3.org/2000/svg", s=document.createElementNS(NS,"svg"), mk=(t,at)=>{ const e=document.createElementNS(NS,t); Object.entries(at).forEach(([k,v])=>e.setAttribute(k,v)); return e; };
+    s.setAttribute("viewBox","0 0 64 64"); s.setAttribute("aria-hidden","true"); s.setAttribute("class","futboule");
+    s.append(mk("path",{d:"M18 58h28l-3-7H21z",class:"plein"}),mk("path",{d:"M23 51c-6-4-9-10-9-17 0-10 8-18 18-18s18 8 18 18c0 7-3 13-9 17",class:"verre"}),
+      mk("path",{d:"M20 36c5-4 9 2 14-1s7-6 11-3",class:"brume b1"}),mk("path",{d:"M21 29c4-3 8 1 12-1s6-4 9-2",class:"brume b2"}),
+      mk("path",{d:"M21 30c1-6 5-10 11-11",class:"reflet"}),mk("path",{d:"M52 8l1.4 3.6L57 13l-3.6 1.4L52 18l-1.4-3.6L47 13l3.6-1.4z",class:"plein etin"}));
+    return s; },
+  ouvre(garde){ const p=$("futurPage"), y=garde&&p?p.scrollTop:0, inn=PAGEX("futurPage","Moi dans 5 ans"); if(garde) $("futurPage").scrollTop=y;
+    const h=inn.querySelector("h2"); if(h) h.textContent=this.horizon<0?"Moi d'il y a 5 ans":"Moi dans "+this.horizon+" an"+(this.horizon>1?"s":"");
+    const tete=el("div",{className:"futtete"}); tete.append(this.boule(),el("div",{},el("b",{className:"futqui",textContent:this.qui()}),
+      el("small",{className:"mut",textContent:this.horizon<0?"Je te parle de ce que tu as déjà traversé et accompli.":"Je te connais aujourd'hui ; je regarde ce qui peut advenir."})));
+    inn.appendChild(tete);
+    /* horizon et scénario */
+    const hz=el("div",{className:"agchips",role:"group"}); hz.setAttribute("aria-label","Horizon");
+    this.H.forEach(([n,t])=>{ const b=el("button",{type:"button",className:"agchip"+(this.horizon===n?" on":""),textContent:t}); b.setAttribute("aria-pressed",String(this.horizon===n)); b.onclick=()=>{ this.horizon=n; this.ouvre(); }; hz.appendChild(b); });
+    inn.appendChild(hz);
+    if(this.horizon>0){ const sc=el("div",{className:"agchips",role:"group"}); sc.setAttribute("aria-label","Quel futur");
+      this.SC.forEach(([k,t])=>{ const b=el("button",{type:"button",className:"agchip"+(this.scenario===k?" on":""),textContent:t}); b.setAttribute("aria-pressed",String(this.scenario===k)); b.onclick=()=>{ this.scenario=k; this.ouvre(); }; sc.appendChild(b); });
+      inn.appendChild(sc); }
+    const O=[["parle","Lui parler"],["lecture","Ma lecture"],["lettres","Lettres"],["capsule","Capsule"]], seg=el("div",{className:"seg agseg",role:"tablist"});
+    O.forEach(([k,n])=>{ const b=el("button",{type:"button",role:"tab",textContent:n}); b.setAttribute("aria-selected",String(this.ong===k)); b.onclick=()=>{ this.ong=k; this.ouvre(); }; seg.appendChild(b); });
+    inn.appendChild(seg); const pan=el("div",{className:"agpan"}); inn.appendChild(pan);
+    this[this.ong](pan); },
+  cle(){ return "futur:"+this.horizon+":"+(this.horizon>0?this.scenario:"passe"); },
+  parle(pan){ const w=CONV.zone(this.cle(),{qui:this.qui(),place:"Écris à "+(this.horizon<0?"toi d'il y a 5 ans":"toi en "+this.an())+"…",attente:"Je regarde le chemin…",
+      vide:this.horizon<0?"Demande-lui ce que tu as déjà accompli, ce qui t'a fait grandir.":"Demande-lui ce qu'elle est devenue, ce qui l'a bloquée, ce qui a tout changé.",
+      envoi:async(t,Hs)=>{ const r=await CONV.envoie({type:"futur",futur:{texte:t,horizon:this.horizon,scenario:this.horizon>0?this.scenario:"passe",historique:Hs}});
+        if(!r.ok) return {erreur:r.msg}; const j=r.j, rep=typeof j.reponse==="string"?j.reponse.trim():"";
+        if(j.lecture&&typeof j.lecture==="object") this.lectureRecue=Object.assign({d:new Date().toISOString().slice(0,10)},j.lecture);
+        return rep?{texte:rep.slice(0,4000)}:{erreur:"Réponse vide : statut INCERTAIN."}; }});
+    const p=$("futurPage"), obs=new MutationObserver(()=>{ if(p) p.classList.toggle("pense",w.classList.contains("pense")); }); obs.observe(w,{attributes:true,attributeFilter:["class"]});
+    pan.appendChild(w);
+    /* avant une décision importante */
+    const dq=el("button",{type:"button",className:"vbtn ghostb",textContent:"J'hésite sur une décision"}); dq.onclick=()=>w.pose("J'hésite sur une décision : … Qu'est-ce que tu regrettes ou te réjouis d'avoir fait ?");
+    const bq=el("button",{type:"button",className:"vbtn ghostb",textContent:"Qu'est-ce qui m'a bloquée ?"}); bq.onclick=()=>w.pose("Qu'est-ce qui m'a bloquée, et comment je m'en suis sortie ?");
+    pan.appendChild(el("div",{className:"agact"},dq,bq)); },
+  liste(pan,titre,L){ const A=(Array.isArray(L)?L:[]).map(x=>typeof x==="string"?x:String(x&&(x.texte||x.phrase)||"")).filter(Boolean); if(!A.length) return 0;
+    pan.appendChild(el("h3",{className:"asshg",textContent:titre})); const ul=el("ul",{className:"futl"}); A.slice(0,12).forEach(t=>ul.appendChild(el("li",{textContent:t}))); pan.appendChild(ul); return A.length; },
+  lecture(pan){ const D=this.d&&this.d.lecture||{}, R=this.lectureRecue||{}, X=Object.assign({},D,...Object.keys(R).filter(k=>Array.isArray(R[k])&&R[k].length).map(k=>({[k]:R[k]})));
+    pan.appendChild(help("Ce que ton moi futur voit de toi aujourd'hui : ce qui est possible, ce qui bloque, ce qui pourrait advenir."+(X.d?" Mise à jour : "+String(X.d)+".":"")));
+    let n=0; n+=this.liste(pan,"Les possibles",X.possibles); n+=this.liste(pan,"Les blocages",X.blocages); n+=this.liste(pan,"Ce qui pourrait advenir",X.pourrait_advenir);
+    const S=Array.isArray(X.sujets)?X.sujets:[]; if(S.length){ n+=S.length; pan.appendChild(el("h3",{className:"asshg",textContent:"Ce que sont devenus tes grands sujets"}));
+      S.slice(0,8).forEach(x=>pan.appendChild(el("div",{className:"card futsujet"},el("small",{className:"agbt",textContent:String(x.sujet||"")}),el("p",{textContent:String(x.phrase||"")})))); }
+    n+=this.liste(pan,"Ce que tu m'as dit vouloir faire",X.engagements);
+    if(!n) pan.appendChild(help("Pas encore de lecture : parle-lui, ou attends sa première lettre du dimanche.")); },
+  lettres(pan){ const L=(this.d&&Array.isArray(this.d.lettres)?this.d.lettres:[]).slice().sort((a,b)=>String(b.d||"").localeCompare(String(a.d||"")));
+    pan.appendChild(el("h3",{className:"asshg",textContent:"Ses lettres du dimanche"}));
+    if(L.length) L.slice(0,6).forEach((x,i)=>{ const d=el("details",{className:"card futlettre"}); d.open=i===0; d.append(el("summary",{textContent:"Lettre du "+String(x.d||"")}),el("p",{textContent:String(x.texte||"")})); pan.appendChild(d); });
+    else pan.appendChild(help("Chaque dimanche matin, une courte lettre de toi depuis "+(new Date().getFullYear()+5)+" arrivera ici."));
+    /* ta lettre à toi-même, sans IA, relue quand tu veux */
+    pan.appendChild(el("h3",{className:"asshg",textContent:"Ta lettre à toi-même"}));
+    const ta=el("textarea",{className:"futta",rows:6,placeholder:"Écris à la personne que tu seras en "+(new Date().getFullYear()+5)+"…",value:String(this.moi&&this.moi.lettre||"")});
+    ta.setAttribute("aria-label","Ta lettre à toi-même"); const m=el("small",{className:"convetat",role:"status"});
+    ta.addEventListener("change",()=>{ this.ecritMoi({lettre:ta.value.slice(0,6000),lettre_t:new Date().toISOString()}); m.textContent="Gardée."; });
+    pan.append(ta,m); },
+  capsule(pan){ const C=(this.moi&&Array.isArray(this.moi.capsules)?this.moi.capsules:[]).slice().sort((a,b)=>String(a.ouvre).localeCompare(String(b.ouvre))), j=new Date().toISOString().slice(0,10);
+    pan.appendChild(help("Écris un message à toi-même : il reste scellé jusqu'à la date choisie, même pour toi."));
+    C.forEach(x=>{ const ouv=String(x.ouvre||"")<=j, c=el("div",{className:"card futcaps"+(ouv?" ouverte":"")});
+      c.appendChild(el("small",{className:"agbt",textContent:(ouv?"Ouverte · écrite le ":"Scellée jusqu'au "+String(x.ouvre||"")+" · écrite le ")+String(x.t||"").slice(0,10)}));
+      if(ouv) c.appendChild(el("p",{textContent:String(x.texte||"")})); pan.appendChild(c); });
+    const f=el("form",{className:"futcf"}), ta=el("textarea",{rows:4,placeholder:"Ce que tu veux te dire…"}), dt=el("input",{type:"date",min:j,value:String(new Date().getFullYear()+5)+j.slice(4)}), bt=el("button",{type:"submit",className:"vbtn",textContent:"Sceller"});
+    ta.setAttribute("aria-label","Message de la capsule"); dt.setAttribute("aria-label","Date d'ouverture");
+    f.onsubmit=e=>{ e.preventDefault(); const t=ta.value.trim(), o=dt.value; if(!t||!o||o<=j) return;
+      const id=Math.random().toString(36).slice(2,13); this.ecritMoi({capsules:C.concat({id,t:new Date().toISOString(),ouvre:o,texte:t.slice(0,6000)})}); this.ouvre(); };
+    f.append(ta,el("label",{className:"futdl"},el("span",{textContent:"S'ouvre le"}),dt),bt); pan.appendChild(f); } };
+/* la boule d'Omni ouvre désormais la page « Moi dans 5 ans » (plus de saut vers LIFE) */
+{ const f=OMNI.futur.bind(OMNI); OMNI.futur=function(){ const b=f(); b.onclick=()=>FUTUR.ouvre(); b.setAttribute("aria-label","Moi dans 5 ans : ouvrir la conversation avec moi en "+(new Date().getFullYear()+5)); return b; }; }
+{ let n=0; const go=()=>{ if(typeof db!=="undefined"&&db){ db.doc("meta/futur").onSnapshot(x=>FUTUR.charge(x.exists?x.data():null),()=>{}); db.doc("meta/futur_moi").onSnapshot(x=>FUTUR.chargeMoi(x.exists?x.data():null),()=>{}); } else if(++n<120) setTimeout(go,500); }; go(); }
+/* mode test (?test) seulement : les tests automatiques atteignent l'équipe et le moi futur */
+if(window._modeTest) window.__equipe={ASSIST,FUTUR,OMNI,CONV};
+
 /* A8 : une icône qui ne charge pas laisse la place au logo de l'app, plus de carré blanc */
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&!i.dataset.repli&&(i.classList.contains("lgimg")||i.closest(".node,.ico"))){ i.dataset.repli="1"; i.src="icon-192.png"; i.classList.add("repli"); } },true);
 
@@ -7843,7 +8253,7 @@ function start(){
       $("effBtn").onclick=async()=>{ const c=db.cfg&&db.cfg();
         const avert=c?(db.dirty?"Des modifications ne sont pas encore parties en ligne : elles seront perdues.\n\n":"")+"La carte en ligne (dépôt « "+c.repo+" ») n'est pas touchée.":"Cet appareil n'est relié à aucun dépôt : sans sauvegarde exportée, ta carte sera perdue.";
         if(!confirm("Effacer la carte de cet appareil ?\n\n"+avert)) return; const m=prompt("Pour confirmer, écris EFFACER"); if(String(m||"").trim().toUpperCase()!=="EFFACER") return;
-        window._efface=true; const CL=["animal", "animalImg", "atelier-gemini", "atelier-local", "base", "chatCircuit", "compagnon", "formAvis", "hRap", "hRapH", "hRapVu", "icones", "klein", "livresT", "medDuree", "medEnCours", "mouvements", "notesApp", "notesApps", "nvVus", "outilsPos", "prenom", "range108", "sugVu", "theme", "typo2", "uiEcran"];
+        window._efface=true; const CL=["agavis:", "agvu:", "animal", "animalImg", "atelier-gemini", "atelier-local", "base", "chatCircuit", "compagnon", "conv:", "formAvis", "hRap", "hRapH", "hRapVu", "icones", "klein", "livresT", "medDuree", "medEnCours", "mouvements", "notesApp", "notesApps", "nvVus", "outilsPos", "prenom", "range108", "sugVu", "theme", "typo2", "uiEcran"];
         try{ Object.keys(localStorage).forEach(k=>{ if(k.startsWith("carte-de-vie")||CL.includes(k)) localStorage.removeItem(k); }); }catch{ /* stockage bloqué */ }
         try{ const K=await caches.keys(); await Promise.all(K.filter(n=>n.startsWith("carte-de-vie-")||n==="carte-rappels").map(n=>caches.delete(n))); }catch{ /* pas de cache */ }
         try{ indexedDB.deleteDatabase("carte-audio"); }catch{ /* pas de base */ }
@@ -7914,8 +8324,8 @@ function start(){
    C'est elle qui fait foi : une copie gardée sur l'appareil, ou un fichier en ligne, n'est exécuté que si son texte a exactement
    cette empreinte. Une empreinte rangée dans le stockage de l'appareil n'est plus jamais utilisée (qui peut écrire l'un peut écrire
    l'autre). */
-const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=214;
-const PERSO_EMP="f51e716a1feb26a58a809b19f517521e70953ba437b9289d0a566229ccbbfe8b", PERSO_GIT="e1c32e4efe12e118e6b72abf7d399148c2f46522", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
+const PERSO_K="carte-de-vie-perso", PERSO_K2="carte-de-vie-perso-suivant", PERSO_DEPOT="carte-de-vie-perso-depot", PERSO_V=215;
+const PERSO_EMP="63d6867397c2cf87360287a6c4787de31ea2a377df6e15fc9e9172a6a8d0b285", PERSO_GIT="e847bbaebc1459d44955f5c423f2b5be3e57e80b", REGION_EMP="e9b398de5062fd9b827e36a9c2866027868aae2ec29fc4468b21f83c3e775166";
 try{ ["carte-de-vie-perso-sha","carte-de-vie-perso-suivant-sha"].forEach(k=>localStorage.removeItem(k)); }catch{ /* stockage bloqué */ }
 /* le module n'est jamais exécuté deux fois (il pose des minuteries et des écouteurs) */
 let persoFait=false;
@@ -8016,7 +8426,7 @@ function persoDepotUI(){ const pg=document.getElementById("syncLinked"); if(!pg|
 <script>if(!window.claude&&"serviceWorker" in navigator){ addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{})); }
 /* numéro de version affiché dans Réglages */
 /* la version qui tourne vraiment ici (APP_V), et celle en ligne si elle est plus récente */
-const APP_V=214; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
+const APP_V=215; (function(){ const e=document.getElementById("appVer"); if(e) e.textContent="Version "+APP_V+" de l'app"; })();
 fetch("sw.js",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=/carte-de-vie-v(\d+)/.exec(t), e=document.getElementById("appVer"); if(m&&e&&+m[1]>APP_V) e.textContent="Version "+APP_V+" de l'app · la version "+m[1]+" est prête : ferme complètement l'app puis rouvre-la"; }).catch(()=>{});
 /* mise à jour automatique : quand une nouvelle version est en ligne, l'app se recharge d'elle-même (au retour sur l'app, ou toutes les 20 min) */
 (function(){ if(window.claude) return; let v0="carte-de-vie-v"+APP_V, rec=false;
