@@ -76,23 +76,13 @@
     ok.disabled = true; ok.textContent = 'Je connecte…'; attente = null;
     C.retirer('transfert=' + (function () { var s = JSON.stringify({ a: n.a, i: n.i, k: n.k }); return btoa(unescape(encodeURIComponent(s))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); })()).then(function (r) {
       C.appliquer(r); var att = C.enAttente(); if (att) lieSynchro(att);
-      var lignes = C.lignes().filter(function (l) { return l.ok === true; }).map(function (l) { return '✓ ' + l.nom + ' — ' + l.detail; });
-      lignes.push(att ? 'La synchro de la carte se relie (jeton GitHub reçu) : l\'écran Synchronisation te dit quand c\'est fini.' : 'Touche « Tout tester » dans Connexion pour vérifier chaque lien.');
+      var lignes = [C.resume()];   // une seule ligne : quelles apps sont connectées
       fin(d, 'Appareil connecté ✓', lignes, [bouton('Fermer', '', function () { d.close(); }), bouton('Ouvrir Connexion', 'ghost', function () { d.close(); window.CLEF.ouvre(); })]);
     }, function (x) {
       fin(d, 'Connexion impossible', [C.messageErreur(x) + ' Montre un nouveau QR sur l\'autre appareil.'], [bouton('Fermer', '', function () { d.close(); })]);
     });
   }
   window.RECOIT = { ouvre: ouvre };
-  /* l'écran Connexion de la carte rappelle la différence entre les deux clés (le module commun reste identique à celui de LIFE) */
-  if (window.CLEF && window.CLEF.ouvre) {
-    var ouvreCx = window.CLEF.ouvre;
-    window.CLEF.ouvre = function () {
-      var r = ouvreCx.apply(this, arguments), d = document.getElementById('cleDlg');
-      if (d && !d.querySelector('.cxcles')) { var p = el('p', 'help cxcles', NOTE); d.insertBefore(p, d.querySelector('.clefin')); }
-      return r;
-    };
-  }
   window.addEventListener('hashchange', function () {   // appli déjà ouverte : le lien arrive comme un simple changement de #
     var m = /^#transfert=([A-Za-z0-9_-]+)$/.exec(location.hash); if (!m) return;
     try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* sans effet */ }

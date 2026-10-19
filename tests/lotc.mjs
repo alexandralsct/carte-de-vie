@@ -211,7 +211,7 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   ok(/deux clés différentes/i.test(dc.sync) && /jamais/.test(dc.sync), nom + ' : la page Synchronisation dit que le jeton GitHub et la clé du lien sont deux clés différentes');
   await p.evaluate(() => { window.__lotc.CLEF.ouvre(); }); await p.waitForTimeout(400);
   const cd = await p.evaluate(() => (document.querySelector('#cleDlg') || {}).textContent || '');
-  ok(/Connexion/.test(cd) && /Tout tester/.test(cd) && /Connecter un autre appareil/.test(cd) && /Coller un code de connexion/.test(cd), nom + ' : le menu « Connexion » ouvre l\'écran commun (3 boutons, une ligne par lien)');
+  ok(/Connexion/.test(cd) && /Générer un QR/.test(cd) && /Saisir les codes à la main/.test(cd) && !/Tout tester/.test(cd), nom + ' : le menu « Connexion » ouvre l\'écran commun (un QR par bouton, saisie à la main)');
   await p.evaluate(() => { const d = document.querySelector('#cleDlg'); if (d && d.close) d.close(); });
   ok(!q.enClair && q.svg, nom + ' : ni le lien ni le QR ne contiennent la clé en clair');
   ok(q.n === 29 && q.h === 303251190, nom + ' : le QR de référence est inchangé (taille ' + q.n + ', empreinte ' + q.h + ')');

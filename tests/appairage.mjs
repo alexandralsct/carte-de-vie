@@ -35,9 +35,9 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   const c1 = await contexte(profil, ANCIEN), p = await c1.newPage(), err = []; p.on('pageerror', e => err.push(e.message)); p.on('dialog', d => d.accept());
   await p.goto(URL); await p.waitForTimeout(1500);
   await p.click('.top3a button[aria-label="Réglages"]'); await p.waitForTimeout(400);
-  await p.click('#cxBtn'); await p.waitForSelector('#cleDlg .cx .cx-actions button');
-  ok(/Deux clés différentes/.test(await p.textContent('#cleDlg .cxcles')) && /jeton GitHub/.test(await p.textContent('#cleDlg .cxcles')) && /clé des apps/.test(await p.textContent('#cleDlg .cxcles')), nom + ' : l\'écran Connexion dit clairement : deux clés différentes (jeton GitHub de synchro, clé des apps), l\'une ne remplace pas l\'autre');
-  await p.click('#cleDlg .cx .cx-actions button:nth-child(1)'); await p.waitForSelector('#cleDlg .cx-qr', { timeout: 8000 });
+  await p.click('#cxBtn'); await p.waitForSelector('#cleDlg .cx .cx-bloc button');
+  ok(/Jeton de synchro GitHub/.test(await p.textContent('#cleDlg .cx')) && /Clé des apps/.test(await p.textContent('#cleDlg .cx')), nom + ' : l\'écran Connexion sépare clairement le jeton de synchro (GitHub) et la clé des apps');
+  await p.click('#cleDlg .cx button:has-text("Générer un QR")'); await p.waitForSelector('#cleDlg .cx-qr', { timeout: 8000 });
   await p.waitForFunction(() => /Vise ce QR avec l'appareil photo.*une seule fois/.test((document.querySelector('#cleDlg .cx-plus') || {}).textContent || ''), null, { timeout: 8000 });
   ok(await p.$eval('#cleDlg .cx-qr', i => /^data:image\/svg\+xml/.test(i.src)), nom + ' : l\'ordinateur affiche le QR et dit « vise-le avec l\'appareil photo, une seule fois »');
   const lien = await p.evaluate(() => Connexion.deposer({ carteUrl: location.href.split('#')[0] }));   // le lien que porte le QR, tel que l'appareil photo l'ouvre
@@ -56,7 +56,7 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   const n = await lit(q);
   ok(n.lien === K && n.life === K && n.pi && n.pi.cle === PIL && n.cc && n.cc.depot === 'compte-demo/etat-demo', nom + ' : « Appareil connecté ✓ » : clé des apps (carte et LIFE), pilotage et lecture de Coulisses enregistrés');
   ok(n.repo === 'compte-demo/depot-demo' && n.tok === J, nom + ' : le jeton GitHub de synchro est transmis à part et remplit la liaison de la carte');
-  ok(/✓ Assistants/.test(await q.textContent('#cxRecoit')) && !(await q.textContent('#cxRecoit')).includes(K) && !(await q.textContent('#cxRecoit')).includes(J), nom + ' : le message final liste ce qui marche, sans montrer aucun secret');
+  ok(/Connectées sur cet appareil : Ma carte de vie, LIFE, Coulisses/.test(await q.textContent('#cxRecoit')) && !(await q.textContent('#cxRecoit')).includes(K) && !(await q.textContent('#cxRecoit')).includes(J), nom + ' : le message final liste ce qui marche, sans montrer aucun secret');
   await q.screenshot({ path: '/tmp/appairage-' + (profil === TEL ? 'tel' : 'ordi') + '.png' });
   /* 3. le même QR ne sert qu'une fois */
   const c3 = await contexte(profil, {}), r = await c3.newPage(); await r.goto(lien); await r.waitForSelector('#cxRecoit[open]'); await r.fill('#cxRecoitSaisie', 'serveur-demo.cloud'); await r.click('#cxRecoitOk');

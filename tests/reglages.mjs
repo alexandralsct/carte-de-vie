@@ -38,14 +38,14 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   ok(perdus.length === 0, nom + ' : aucune des 20 lignes d’avant n’a disparu' + (perdus.length ? ' (manque : ' + perdus + ')' : ''));
   ok(tous.length === new Set(tous).size, nom + ' : pas de doublon');
   ok(!rangees.some(r => r[0] === 'Autres') && !(await p.$$('#setPage > .page-in > ul.setlist > li')).length, nom + ' : plus de rubrique « Autres » ni de ligne hors rubrique');
-  ok(JSON.stringify(rangees.find(r => r[0] === 'Connexion')[1]) === JSON.stringify(['Code et clé du lien', 'Synchronisation', 'Intelligence artificielle']), nom + ' : Connexion = code et clé du lien, synchronisation, IA');
+  ok(JSON.stringify(rangees.find(r => r[0] === 'Connexion')[1]) === JSON.stringify(['Connexion', 'Synchronisation', 'Intelligence artificielle']), nom + ' : Connexion = Connexion, synchronisation, IA');
   ok(JSON.stringify(rangees.find(r => r[0] === 'Apparence')[1].slice(0, 4)) === JSON.stringify(['Typographie', 'Thème', 'Couleur des icônes', 'Icônes']), nom + ' : Apparence commence par typographie, thème, couleurs, icônes');
   ok(await p.$$eval('#setPage summary .stico', n => n.length) === 5, nom + ' : une icône par rubrique');
   for (const id of ['typo', 'themeSet', 'kleinSet', 'icostyle', 'syncBtn', 'iaSet', 'expBtn', 'effBtn', 'avisBtn', 'baseBtn', 'arrBtn', 'pushBtn', 'motionSw', 'hRapSw']) if (!(await p.$('#' + id))) ok(false, nom + ' : élément #' + id + ' toujours présent');
   ok(true, nom + ' : les commandes (thème, icônes, synchro, IA, export, effacer, avis, ranger…) sont toujours là');
   /* les lignes déplacées font encore leur travail */
   await p.click('#cxBtn'); await p.waitForSelector('#cleDlg .cx', { timeout: 8000 });
-  ok(await p.$eval('#cleDlg', d => d.open), nom + ' : « Code et clé du lien » ouvre l’écran Connexion');
+  ok(await p.$eval('#cleDlg', d => d.open), nom + ' : « Connexion » ouvre l’écran Connexion');
   await p.keyboard.press('Escape'); await p.waitForTimeout(300);
   await p.click('#syncBtn'); await p.waitForTimeout(400);
   ok(await p.$eval('#syncPage', e => !e.hidden), nom + ' : « Synchronisation » (déplacée) ouvre toujours sa page');

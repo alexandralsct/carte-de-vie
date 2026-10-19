@@ -31,7 +31,7 @@
   sm.append(ic, sp); cx.appendChild(sm);
   var ul = document.createElement('ul'); ul.className = 'setlist'; cx.appendChild(ul);
   var li = document.createElement('li'); li.className = 'go';
-  li.innerHTML = '<button type="button" class="rowbtn" id="cxBtn"><span><b>Code et clé du lien</b><small>Connecter un appareil, coller un code, tout tester</small></span><i aria-hidden="true">→</i></button>';
+  li.innerHTML = '<button type="button" class="rowbtn" id="cxBtn"><span><b>Connexion</b><small>Un QR pour tout connecter, ou saisir les codes à la main</small></span><i aria-hidden="true">→</i></button>';
   li.querySelector('button').onclick = function () { if (window.CLEF && window.CLEF.ouvre) window.CLEF.ouvre(); };
   ul.appendChild(li);
   ['syncBtn', 'iaSet'].forEach(function (id) { var l = ligne(id); if (l) ul.appendChild(l); });
