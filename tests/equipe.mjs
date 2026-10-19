@@ -60,6 +60,19 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
     await p.locator('#agentPage .agmasquee button').click(); await p.waitForTimeout(200);
     ok(await p.locator('#agentPage .agmasquee').count() === 0 && await p.locator('#agentPage .agsortie').count() === 2, nom + ' : « Annuler » la fait revenir');
   }
+  /* archiver une restitution (v231, téléphone et ordinateur) : elle quitte la liste, reste dans « Archivés » (repliée), se désarchive ; marqueur synchronisé, rien d'effacé */
+  await p.locator('#agentPage .agsortie .agarchbt').first().click(); await p.waitForTimeout(300);
+  ok(await p.locator('#agentPage .agsortie:not(.agarch .agsortie)').count() === 1, nom + ' : « Archiver » retire la restitution de la liste (1 reste)');
+  ok(await p.locator('#agentPage details.agarch summary').textContent() === 'Archivés (1)' && !(await p.locator('#agentPage details.agarch').evaluate(e => e.open)), nom + ' : elle est dans « Archivés (1) », section repliée');
+  const mq = await p.evaluate(() => { const A = window.__equipe.ASSIST, k = Object.keys(A.A).filter(n => n[0] !== '_'); return { n: k.length, a: k.length && A.A[k[0]].a, gardees: (A.d.liste[0].sorties || []).length }; });
+  ok(mq.n === 1 && mq.a === 1 && mq.gardees === 2, nom + ' : un marqueur d\'archivage (champ par champ), les 2 restitutions sont toujours dans les données');
+  await p.waitForTimeout(900);
+  const st = await p.evaluate(() => { try { const c = JSON.parse(localStorage.getItem('carte-de-vie-v1') || '{}')['meta/assist_archives'] || {}, k = Object.keys(c).filter(n => n[0] !== '_'); return { f: !!(c._m && k.length && c._f && c._f[k[0]]), x: (c._x || []).length, k: k.length }; } catch (e) { return { k: -1 }; } });
+  ok(st.k === 1 && st.f && st.x === 0, nom + ' : le marqueur est enregistré daté champ par champ (_m, _f) et n\'est pas une suppression (_x vide)');
+  await p.locator('#agentPage details.agarch summary').click(); await p.waitForTimeout(150);
+  ok(await p.locator('#agentPage details.agarch .agarchbt').textContent() === 'Désarchiver', nom + ' : « Désarchiver » est proposé dans la section');
+  await p.locator('#agentPage details.agarch .agarchbt').click(); await p.waitForTimeout(300);
+  ok(await p.locator('#agentPage .agsortie').count() === 2 && await p.locator('#agentPage details.agarch').count() === 0, nom + ' : désarchivée, elle revient dans la liste (2) et la section disparaît');
   await p.waitForSelector('#agentPage .agrond.grand.portrait .agimg', { timeout: 3000 }).catch(() => {});
   ok(await p.locator('#agentPage .agrond.grand.portrait .agimg').count() === 1, nom + ' : la fiche montre la carte entière (portrait)');
   ok(/Ce que je te propose/.test(await p.locator('#agentPage .agsortie').first().textContent()), nom + ' : restitution en 4 parties');
