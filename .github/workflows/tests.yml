@@ -46,5 +46,7 @@ jobs:
         run: node tests/lotc.mjs
       - name: Connexion unique, écran commun (téléphone puis ordinateur)
         run: node tests/connexion.mjs
+      - name: Réglages rangés et bouton Réglages (téléphone puis ordinateur)
+        run: node tests/reglages.mjs
       - name: Mesures de performance (indicatives)
         run: BUDGETS=0 COURT=1 node tests/mesures.mjs
