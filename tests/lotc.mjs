@@ -186,7 +186,7 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   ancien = true; const e2 = await dep(K);
   ok(!e2.qr && /pas encore à jour/.test(e2.msg) && /jamais dans un lien/.test(e2.msg) && !/#transfert=|#appairage=/.test(e2.vu), nom + ' : système pas à jour : QR refusé avec un message clair, aucun lien portant une clé');
   ancien = false; const e3 = await p.evaluate(async () => { localStorage.removeItem('carte-de-vie-lien'); const z = document.createElement('div'); document.body.appendChild(z); await window.__lotc.APPAIR.montre(z); return z.textContent; });
-  ok(/clé du lien manque/.test(e3), nom + ' : sans clé du lien sur l\'appareil, le QR est refusé avec un message clair');
+  ok(/plus connecté/.test(e3), nom + ' : sans clé du lien sur l\'appareil, le QR est refusé avec un message clair');
   const ol = await p.evaluate(async () => { const { APPAIR } = window.__lotc, code = APPAIR.code(), t = await APPAIR.chiffre({ r: 'compte-demo/depot-demo', t: 'x'.repeat(12), k: 'cle-du-lien-de-demonstration-0123456789', e: Date.now() + 120000 }, code); const o = await APPAIR.recoit(APPAIR.lien(t), code); return o.k && o.r; });
   ok(!!ol, nom + " : l'ancien format #appairage= (code à 8 caractères) peut toujours être reçu");
   /* 4 ter. « Maintenant », propositions à décider, entrées sans suite dans Mon suivi */
@@ -196,7 +196,7 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   ok(/Lancé, résultat d'ici une minute/.test(m1) && maintVu && maintVu.cle === K && maintVu.corps.type === 'maintenant', nom + ' : « Maintenant » (Mes entrées) appelle carte-entrees avec la clé du lien et affiche « Lancé » (' + m1 + ')');
   maintMode = 'limite'; const m2 = await mt(); ok(/trop de demandes/.test(m2), nom + ' : au-delà de 6 demandes par heure, le message du système est montré');
   maintMode = 404; const m3 = await mt(); ok(/pas encore à jour/.test(m3), nom + ' : système pas à jour : message clair'); maintMode = 'ok';
-  await p.evaluate(() => { localStorage.removeItem('carte-de-vie-lien'); }); const m4 = await mt(); ok(/clé du lien manque/.test(m4), nom + ' : sans clé du lien, « Maintenant » le dit');
+  await p.evaluate(() => { localStorage.removeItem('carte-de-vie-lien'); }); const m4 = await mt(); ok(/plus connecté/.test(m4), nom + ' : sans clé du lien, « Maintenant » le dit');
   await p.evaluate(() => { document.getElementById('entPage').hidden = true; window.__v227.ESSAI.ouvreVal(); }); await p.waitForTimeout(500);
   ok(await p.evaluate(() => !!document.querySelector('#valIn .maint .btn')), nom + ' : le bouton « Maintenant » est aussi dans À valider');
   const ad = await p.evaluate(() => { const b = [...document.querySelectorAll('#valIn .vprop')].find(x => /Une tâche à décider/.test((x.querySelector('input,textarea') || {}).value || '')); return b ? b.textContent : ''; });
@@ -211,7 +211,7 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   ok(/deux clés différentes/i.test(dc.sync) && /jamais/.test(dc.sync), nom + ' : la page Synchronisation dit que le jeton GitHub et la clé du lien sont deux clés différentes');
   await p.evaluate(() => { window.__lotc.CLEF.ouvre(); }); await p.waitForTimeout(400);
   const cd = await p.evaluate(() => (document.querySelector('#cleDlg') || {}).textContent || '');
-  ok(/deux clés différentes/.test(cd) && /jamais/.test(cd), nom + ' : le menu « Clé du lien » le dit aussi');
+  ok(/Connexion/.test(cd) && /Tout tester/.test(cd) && /Connecter un autre appareil/.test(cd) && /Coller un code de connexion/.test(cd), nom + ' : le menu « Connexion » ouvre l\'écran commun (3 boutons, une ligne par lien)');
   await p.evaluate(() => { const d = document.querySelector('#cleDlg'); if (d && d.close) d.close(); });
   ok(!q.enClair && q.svg, nom + ' : ni le lien ni le QR ne contiennent la clé en clair');
   ok(q.n === 29 && q.h === 303251190, nom + ' : le QR de référence est inchangé (taille ' + q.n + ', empreinte ' + q.h + ')');

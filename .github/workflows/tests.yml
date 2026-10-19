@@ -44,5 +44,7 @@ jobs:
         run: node tests/semaine.mjs
       - name: "Lot C, Moi borné, pages retirables, liens visibles, frise, QR chiffré, lisibilité (téléphone puis ordinateur)"
         run: node tests/lotc.mjs
+      - name: Connexion unique, écran commun (téléphone puis ordinateur)
+        run: node tests/connexion.mjs
       - name: Mesures de performance (indicatives)
         run: BUDGETS=0 COURT=1 node tests/mesures.mjs
