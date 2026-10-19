@@ -58,3 +58,5 @@ jobs:
         run: node tests/offres.mjs
       - name: Mesures de performance (indicatives)
         run: BUDGETS=0 COURT=1 node tests/mesures.mjs
+      - name: Mes objectifs, la frise (téléphone puis ordinateur)
+        run: node tests/objectifs.mjs
