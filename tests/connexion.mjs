@@ -16,7 +16,7 @@ async function contexte(profil, init) {
   const ctx = await b.newContext(Object.assign({}, profil, { serviceWorkers: 'block', locale: 'fr-FR', timezoneId: 'Europe/Paris' }));
   await ctx.addInitScript(([carte, init]) => { if (sessionStorage.getItem('init')) return; sessionStorage.setItem('init', '1'); localStorage.clear(); localStorage.setItem('carte-de-vie-v1', carte);
     ['hRap', 'compagnon', 'mouvements'].forEach(k => localStorage.setItem(k, '0')); ['compagnonChoisi', 'carte-de-vie-vu'].forEach(k => localStorage.setItem(k, '1'));
-    localStorage.setItem('carte-de-vie-passerelle', JSON.stringify({ url: 'https://serveur-demo.cloud/crochets/app-lien' })); for (const k in init) localStorage.setItem(k, init[k]); }, [CARTE, init]);
+    localStorage.setItem('carte-de-vie-passerelle', JSON.stringify({ url: 'https://serveur-demo.cloud/crochets/app-lien' })); for (const k in init) localStorage.setItem(k, init[k]); if (init.vierge) { localStorage.removeItem('vierge'); localStorage.removeItem('carte-de-vie-passerelle'); } }, [CARTE, init]);   // vierge : aucune adresse de serveur enregistrée (comme un vrai téléphone neuf : la règle de sécurité serrée ne connaît pas encore le système)
   await ctx.route('https://api.github.com/**', r => r.abort());
   await ctx.route(/api\.github\.com\/repos\/compte-demo\/depot-demo$/, r => r.fulfill({ status: 200, headers: { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'content-type': 'application/json' }, body: '{}' }));
   await ctx.route(/\/index\.html/, async r => { const rep = await r.fetch(); await r.fulfill({ response: rep, body: (await rep.text()).replace("connect-src 'self'", "connect-src 'self' https://serveur-demo.cloud") }); });
@@ -56,7 +56,7 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   const lien = await p.evaluate(() => Connexion.deposer({ carteUrl: location.href.split('#')[0] }));
   ok(/#transfert=/.test(lien) && !lien.includes(K) && !lien.includes(J), nom + ' : le lien du QR ne porte ni clé ni jeton');
   /* UN SEUL QR connecte les trois apps : appareil neuf, trois rangements écrits */
-  const ctx2 = await contexte(profil, {}), q = await ctx2.newPage(); q.on('dialog', d => d.accept());
+  const ctx2 = await contexte(profil, { vierge: '1' }), q = await ctx2.newPage(); const csp = []; q.on('console', m => { if (/Content Security Policy|violates/.test(m.text())) csp.push(m.text()); }); q.on('dialog', d => d.accept());
   await q.goto(lien); await q.waitForSelector('#cxRecoit[open]', { timeout: 8000 });
   await q.fill('#cxRecoitSaisie', 'serveur-demo.cloud'); await q.click('#cxRecoitOk');
   await q.waitForFunction(() => /Appareil connecté/.test((document.getElementById('cxRecoit') || {}).textContent || ''), null, { timeout: 8000 });
@@ -68,6 +68,7 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   ok(n.pi && n.pi.cle === PIL && n.pi.adresse === SRV && n.cc && n.cc.depot === 'compte-demo/etat-demo' && n.cc.jeton === J, nom + ' : UN SEUL QR → rangements de Coulisses (pilotage, lecture) écrits');
   ok(n.repo === 'compte-demo/depot-demo' && n.tok === J, nom + ' : UN SEUL QR → synchro de la carte : dépôt et jeton remis à son propre bouton (' + (n.sync ? 'carte-de-vie-sync écrit' : 'liaison lancée') + ')');
   ok(/Connectées sur cet appareil : Ma carte de vie, LIFE, Coulisses\./.test(n.texte) && !n.texte.includes(K) && !n.texte.includes(J), nom + ' : une ligne confirme les apps connectées, sans montrer aucun secret');
+  ok(csp.length === 0, nom + ' : téléphone vierge : la règle de sécurité ne bloque pas l\'appel au système' + (csp.length ? ' : ' + csp[0].slice(0, 120) : ''));
   await ctx2.close();
   /* saisie à la main sur un appareil neuf */
   const ctx3 = await contexte(profil, {}), r = await ctx3.newPage(); r.on('dialog', d => d.accept()); await r.goto(URL); await r.waitForTimeout(1200);
