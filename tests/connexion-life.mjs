@@ -29,7 +29,8 @@ async function ecran(profil, app) {
   if (app === 'carte') { await p.goto(CARTE_URL); await p.waitForTimeout(1500); await p.evaluate(() => CLEF.ouvre()); sel = '#cleDlg .cx'; }
   else { await p.goto(LIFE_URL); await p.waitForTimeout(1500); await p.evaluate(() => ouvrirReglages()); sel = '#connexion-ecran.cx, #connexion-ecran .cx'; }
   await p.waitForSelector(sel, { timeout: 8000 }); await p.waitForTimeout(500);
-  const r = await p.$eval(sel, e => ({ html: e.innerHTML, texte: e.innerText, boutons: [...e.querySelectorAll('button')].map(x => x.textContent), lignes: [...e.querySelectorAll('.cx-lien')].map(x => x.textContent), h: Math.round(e.getBoundingClientRect().width), ok: e.getBoundingClientRect().height > 0 }));
+  /* le filet de lisibilité de la carte (le soir, thème sombre) peut poser un attribut data-lis et une couleur en ligne sur un bouton : ce n'est pas du contenu */
+  const r = await p.$eval(sel, e => ({ html: e.innerHTML.replace(/ data-lis="1"/g, '').replace(/ style="color: [^"]*!important;"/g, ''), texte: e.innerText, boutons: [...e.querySelectorAll('button')].map(x => x.textContent), lignes: [...e.querySelectorAll('.cx-lien')].map(x => x.textContent), h: Math.round(e.getBoundingClientRect().width), ok: e.getBoundingClientRect().height > 0 }));
   /* même message d'erreur : le texte commun, et ce que chaque app affiche pour « pas connecté » */
   r.erreur = await p.evaluate(() => window.Connexion && window.Connexion.ERREUR); r.err = err;
   await ctx.close(); return r;
@@ -38,7 +39,8 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   console.log('— ' + nom);
   const c = await ecran(profil, 'carte'), v = await ecran(profil, 'life');
   ok(c.ok && v.ok, nom + ' : les deux écrans s\'affichent');
-  ok(c.html === v.html, nom + ' : même contenu, mêmes textes et mêmes boutons (HTML identique, ' + c.html.length + ' car.)');
+  { let i = 0; while (i < c.html.length && c.html[i] === v.html[i]) i++;
+    ok(c.html === v.html, nom + ' : même contenu, mêmes textes et mêmes boutons (HTML identique, ' + c.html.length + ' car.)' + (c.html === v.html ? '' : ' — premier écart : carte « ' + c.html.slice(i, i + 80) + ' » / LIFE « ' + v.html.slice(i, i + 80) + ' »')); }
   ok(c.boutons.join('|') === v.boutons.join('|') && c.boutons.slice(0, 3).join('|') === 'Connecter un autre appareil|Coller un code de connexion|Tout tester', nom + ' : mêmes boutons : ' + c.boutons.slice(0, 3).join(' · '));
   ok(c.lignes.length === 4 && c.lignes.join('|') === v.lignes.join('|'), nom + ' : mêmes quatre lignes de liens');
   ok(c.erreur && c.erreur === v.erreur, nom + ' : même message d\'erreur : « ' + c.erreur + ' »');

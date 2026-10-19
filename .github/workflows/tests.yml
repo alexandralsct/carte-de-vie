@@ -48,5 +48,7 @@ jobs:
         run: node tests/connexion.mjs
       - name: Réglages rangés et bouton Réglages (téléphone puis ordinateur)
         run: node tests/reglages.mjs
+      - name: Connecter un téléphone par QR, comme dans LIFE (téléphone puis ordinateur)
+        run: node tests/appairage.mjs
       - name: Mesures de performance (indicatives)
         run: BUDGETS=0 COURT=1 node tests/mesures.mjs

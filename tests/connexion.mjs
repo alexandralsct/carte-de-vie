@@ -57,9 +57,9 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   const lien = await p.evaluate(() => Connexion.deposer({ carteUrl: location.href.split('#')[0] }));
   ok(/#transfert=/.test(lien) && !lien.includes(K) && !lien.includes(J), nom + ' : le lien du QR ne porte ni clé ni jeton');
   const ctx2 = await contexte(profil, {}), q = await ctx2.newPage(); q.on('dialog', d => d.accept());
-  await q.goto(lien); await q.waitForTimeout(1500);
-  await q.evaluate(() => { const bl = document.querySelector('.qrrecoit'); bl.querySelector('button').click(); });
-  await q.waitForFunction(() => /code de connexion/.test((document.querySelector('.qrrecoit .help[role=status]') || {}).textContent || ''), null, { timeout: 8000 });
+  await q.goto(lien); await q.waitForSelector('#cxRecoit[open]', { timeout: 8000 });   // parcours de LIFE (19/10) : la boîte « Connecter cet appareil ? », détaillée dans tests/appairage.mjs
+  await q.fill('#cxRecoitSaisie', 'serveur-demo.cloud'); await q.click('#cxRecoitOk');
+  await q.waitForFunction(() => /Appareil connecté/.test((document.getElementById('cxRecoit') || {}).textContent || ''), null, { timeout: 8000 });
   const n = await q.evaluate(() => ({ lien: localStorage.getItem('carte-de-vie-lien'), life: JSON.parse(localStorage.getItem('life.cle') || '""'), pi: JSON.parse(localStorage.getItem('coulisses-pilote') || 'null'), cc: JSON.parse(localStorage.getItem('coulisses-config') || 'null'), repo: document.getElementById('syncRepo').value, tok: document.getElementById('syncToken').value, sync: localStorage.getItem('carte-de-vie-sync') }));
   ok(n.lien === K && n.life === K && n.pi && n.pi.cle === PIL && n.pi.adresse === SRV && n.cc && n.cc.depot === 'compte-demo/etat-demo', nom + ' : appareil neuf : clé des apps (carte et LIFE), pilotage et lecture de Coulisses reçus d\'un seul QR');
   ok(n.repo === 'compte-demo/depot-demo' && n.tok === J, nom + ' : le dépôt et le jeton de synchro remplissent le formulaire (liaison par le bouton de la carte)');
