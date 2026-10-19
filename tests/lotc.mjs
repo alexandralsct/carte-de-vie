@@ -17,7 +17,7 @@ const DEMO = {
   'espaces/cuisine-demo': esp('Cuisine de démo', 20, 62, [{ id: 'k1', name: 'Menus', items: [it('Un menu')] }], { disp: { envies: 'Mes envies' }, jeu: { envies: [{ id: 'abcdefghij1', txt: 'Une soupe', t: '2026-10-10T10:00:00.000Z' }] } }),
   'espaces/boutique-demo': esp('Boutique de démo', 78, 62, [{ id: 'm1', name: 'Offre', items: [it('Une offre')] }, { id: 'm2', name: 'Tarifs', items: [it('Un tarif')] }], { disp: { cachees: ['Page retirée'] } }),
   'espaces/a-traiter': esp('À traiter', 50, 85, [{ id: 't1', name: 'Vrac', items: [] }]),
-  'meta/propositions': { liste: ['tache:Une tâche proposée', 'idee:Une idée proposée', 'rubrique:Une rubrique proposée', 'tache:Une tâche à annuler tard'].map((v, i) => ({ id: 'prop' + i, type: v.split(':')[0], titre: null, pourquoi: 'Pour la démonstration', source: 'Claude', t: new Date().toISOString(), quand: new Date().toISOString(), p: 1, etat: 'nouvelle', data: { text: v.split(':')[1], cat: 'jardin' } })), _m: Date.now() },
+  'meta/propositions': { liste: ['tache:Une tâche proposée', 'idee:Une idée proposée', 'rubrique:Une rubrique proposée', 'tache:Une tâche à annuler tard'].map((v, i) => ({ id: 'prop' + i, type: v.split(':')[0], titre: null, pourquoi: 'Pour la démonstration', source: 'Claude', t: new Date().toISOString(), quand: new Date().toISOString(), p: 1, etat: 'nouvelle', data: { text: v.split(':')[1], cat: 'jardin' } })).concat([{ id: 'prop9', type: 'tache', titre: null, pourquoi: 'Pour la démonstration', source: 'Système', t: new Date().toISOString(), quand: new Date().toISOString(), p: 1, etat: 'a_decider', raison: "l'espace a changé depuis la proposition", data: { text: 'Une tâche à décider', cat: 'jardin' } }]), _m: Date.now() },
   'espaces/jardin': esp('Jardin', 65, 25, [{ id: 'j1', name: 'À planter', items: [it('Tomates')] }]),
   'meta/layout': { mx: 50, my: 50, sx: -1.5, sy: -900, _m: Date.now() },
 };
@@ -133,13 +133,14 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   ok(q.mauvais === 'refusé' && q.perime === 'refusé', nom + ' : un mauvais code et un QR périmé sont refusés');
   /* 4 bis. QR à usage unique géré par le système (protocole « transfert » de LIFE) : faux serveur de démonstration */
   const K = 'cle-du-lien-de-demonstration-0123456789', SRV = 'https://serveur-demo.cloud/crochets/app-lien';
-  let paquets = {}, ancien = false, depots = 0, cleVue = '';
+  let paquets = {}, ancien = false, depots = 0, cleVue = '', maintMode = 'ok', maintVu = null;
   await ctx.route('https://serveur-demo.cloud/**', async r => { const q = r.request(), c = JSON.parse(q.postData() || '{}'), u = q.url(), h = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'content-type': 'application/json' };
     if (q.method() === 'OPTIONS') return r.fulfill({ status: 204, headers: h });
     if (u.endsWith('/app-lien')) { cleVue = q.headers()['x-cle-app'] || ''; if (cleVue !== K) return r.fulfill({ status: 403, headers: h, body: '{}' });
       if (ancien || c.type !== 'transfert_deposer') return r.fulfill({ status: 200, headers: h, body: JSON.stringify({ ok: false, erreur: 'type inconnu' }) });
       depots++; paquets[c.id] = c.donnees; return r.fulfill({ status: 200, headers: h, body: JSON.stringify({ ok: true, transfert: true, expire: 120 }) }); }
     if (u.endsWith('/app-lien-transfert')) { const d = paquets[c.id]; delete paquets[c.id]; return r.fulfill({ status: d ? 200 : 404, headers: h, body: JSON.stringify(d ? { ok: true, donnees: d } : { ok: false, erreur: 'inconnu' }) }); }
+    if (u.endsWith('/carte-entrees')) { maintVu = { cle: q.headers()['x-cle-app'] || '', corps: c }; return r.fulfill({ status: maintMode === 404 ? 404 : 200, headers: h, body: JSON.stringify(maintMode === 'limite' ? { ok: false, erreur: 'trop de demandes : réessaie dans une heure' } : maintMode === 404 ? {} : { ok: true, statut: 'lance', reponse: 'ok' }) }); }
     return r.abort(); });
   const dep = async K => p.evaluate(async K => { const { APPAIR, QRG, setLien } = window.__lotc; localStorage.setItem('carte-de-vie-lien', K); setLien('https://serveur-demo.cloud/crochets/app-lien');
     let vu = ''; const sv = QRG.svg; QRG.svg = (t, px) => { vu = t; return sv.call(QRG, t, px); };
@@ -160,6 +161,24 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   ok(/clé du lien manque/.test(e3), nom + ' : sans clé du lien sur l\'appareil, le QR est refusé avec un message clair');
   const ol = await p.evaluate(async () => { const { APPAIR } = window.__lotc, code = APPAIR.code(), t = await APPAIR.chiffre({ r: 'compte-demo/depot-demo', t: 'x'.repeat(12), k: 'cle-du-lien-de-demonstration-0123456789', e: Date.now() + 120000 }, code); const o = await APPAIR.recoit(APPAIR.lien(t), code); return o.k && o.r; });
   ok(!!ol, nom + " : l'ancien format #appairage= (code à 8 caractères) peut toujours être reçu");
+  /* 4 ter. « Maintenant », propositions à décider, entrées sans suite dans Mon suivi */
+  await p.evaluate(K => { localStorage.setItem('carte-de-vie-lien', K); window.__lotc.setLien('https://serveur-demo.cloud/crochets/app-lien'); window.__v227.ENT.ouvre(); }, K); await p.waitForTimeout(400);
+  const mt = async () => p.evaluate(async () => { const z = document.querySelector('#entIn .maint'); z.querySelector('.btn').click(); await new Promise(r => setTimeout(r, 900)); return z.querySelector('[role=status]').textContent; });
+  const m1 = await mt();
+  ok(/Lancé, résultat d'ici une minute/.test(m1) && maintVu && maintVu.cle === K && maintVu.corps.type === 'maintenant', nom + ' : « Maintenant » (Mes entrées) appelle carte-entrees avec la clé du lien et affiche « Lancé » (' + m1 + ')');
+  maintMode = 'limite'; const m2 = await mt(); ok(/trop de demandes/.test(m2), nom + ' : au-delà de 6 demandes par heure, le message du système est montré');
+  maintMode = 404; const m3 = await mt(); ok(/pas encore à jour/.test(m3), nom + ' : système pas à jour : message clair'); maintMode = 'ok';
+  await p.evaluate(() => { localStorage.removeItem('carte-de-vie-lien'); }); const m4 = await mt(); ok(/clé du lien manque/.test(m4), nom + ' : sans clé du lien, « Maintenant » le dit');
+  await p.evaluate(() => { document.getElementById('entPage').hidden = true; window.__v227.ESSAI.ouvreVal(); }); await p.waitForTimeout(500);
+  ok(await p.evaluate(() => !!document.querySelector('#valIn .maint .btn')), nom + ' : le bouton « Maintenant » est aussi dans À valider');
+  const ad = await p.evaluate(() => { const b = [...document.querySelectorAll('#valIn .vprop')].find(x => /Une tâche à décider/.test((x.querySelector('input,textarea') || {}).value || '')); return b ? b.textContent : ''; });
+  ok(/l'espace a changé depuis la proposition/.test(ad), nom + ' : une proposition repassée « à décider » revient dans À valider avec sa raison');
+  await p.evaluate(() => [...document.querySelectorAll('#valIn .vprop')].find(x => /Une tâche à décider/.test((x.querySelector('input,textarea') || {}).value || '')).querySelectorAll('.btn')[2].click()); await p.waitForTimeout(1500);
+  st = await lisDonnees(); ok(st.pr.find(x => x.id === 'prop9').etat === 'refusee', nom + ' : la retrancher (« Non merci ») la ferme');
+  await p.evaluate(() => { document.getElementById('valPage').hidden = true; window.SUIVI.charge({ liste: [{ id: 's1', titre: 'Entrée sans suite : appeler le garage', contexte: 'Notée il y a plus de 24 h, sans suite.', source: 'Mes entrées', etat: 'a_decider', entree: 'abc', t: new Date().toISOString() }] }); window.SUIVI.ouvre(); }); await p.waitForTimeout(500);
+  const sv = await p.evaluate(() => document.getElementById('suiviPage').textContent);
+  ok(/appeler le garage/.test(sv) && /Mes entrées/.test(sv), nom + ' : une entrée « sans suite 24 h » écrite par le système s\'affiche dans Mon suivi');
+  await p.evaluate(() => { document.getElementById('suiviPage').hidden = true; });
   const dc = await p.evaluate(() => { const t = document.querySelector('#syncPage .deuxcles'); return { sync: t ? t.textContent : '' }; });
   ok(/deux clés différentes/i.test(dc.sync) && /jamais/.test(dc.sync), nom + ' : la page Synchronisation dit que le jeton GitHub et la clé du lien sont deux clés différentes');
   await p.evaluate(() => { window.__lotc.CLEF.ouvre(); }); await p.waitForTimeout(400);
