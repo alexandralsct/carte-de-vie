@@ -58,7 +58,7 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   /* UN SEUL QR connecte les trois apps : appareil neuf, trois rangements écrits */
   const ctx2 = await contexte(profil, { vierge: '1' }), q = await ctx2.newPage(); const csp = []; q.on('console', m => { if (/Content Security Policy|violates/.test(m.text())) csp.push(m.text()); }); q.on('dialog', d => d.accept());
   await q.goto(lien); await q.waitForSelector('#cxRecoit[open]', { timeout: 8000 });
-  await q.fill('#cxRecoitSaisie', 'serveur-demo.cloud'); await q.click('#cxRecoitOk');
+  await q.click('#cxRecoitOk');
   await q.waitForFunction(() => /Appareil connecté/.test((document.getElementById('cxRecoit') || {}).textContent || ''), null, { timeout: 8000 });
   await q.waitForTimeout(600);
   const n = await q.evaluate(() => ({ cx: JSON.parse(localStorage.getItem('connexion') || 'null'), lien: localStorage.getItem('carte-de-vie-lien'), sync: JSON.parse(localStorage.getItem('carte-de-vie-sync') || 'null'), repo: document.getElementById('syncRepo').value, tok: document.getElementById('syncToken').value,

@@ -45,27 +45,21 @@
       d.textContent = '';
       var h = el('h2', null, refuse ? 'Lien refusé' : 'Connecter cet appareil ?'); h.id = 'cxRecoitTitre'; d.appendChild(h);
       d.appendChild(el('p', 'help', 'Ce lien relie la carte au serveur :'));
-      d.appendChild(el('p', 'mono', hote));
+      var gros = el('p', null, hote); gros.id = 'cxRecoitHote'; gros.style.margin = '6px 0'; gros.style.fontFamily = 'var(--mono)'; gros.style.color = 'var(--fg)'; gros.style.fontSize = '1.3rem'; gros.style.fontWeight = '700'; gros.style.textTransform = 'none'; gros.style.letterSpacing = 'normal'; gros.style.opacity = '1'; gros.style.overflowWrap = 'anywhere'; d.appendChild(gros);
       d.appendChild(el('p', 'help', refuse ? 'Cet appareil est relié au serveur « ' + actuel + ' ». Un lien ne peut pas le remplacer : rien n\'a changé. Pour changer de serveur, utilise l\'écran Connexion.'
         : meme ? 'C\'est le serveur déjà enregistré sur cet appareil : seules les clés seront mises à jour.'
         : 'Ne continue que si c\'est toi qui as créé ce QR (affiché par ton autre appareil).'));
       if (!refuse) d.appendChild(el('p', 'help', NOTE));
-      var saisie = null, ok = null;
-      if (!refuse && !actuel) {
-        var lab = el('label', 'help', 'Pour confirmer, tape le nom du serveur ci-dessus :'); saisie = el('input'); saisie.type = 'text'; saisie.id = 'cxRecoitSaisie';
-        saisie.setAttribute('autocomplete', 'off'); saisie.setAttribute('autocapitalize', 'off'); saisie.setAttribute('spellcheck', 'false'); saisie.setAttribute('inputmode', 'url'); lab.htmlFor = 'cxRecoitSaisie';
-        d.append(lab, saisie);
-      }
+      var ok = null;
       var non = bouton(refuse ? 'Fermer' : 'Refuser', 'ghost', function () {
         attente = null; fin(d, refuse ? 'Lien refusé' : 'Lien ignoré', ['Rien n\'a changé sur cet appareil.'], [bouton('Fermer', '', function () { d.close(); })]); });
       non.id = 'cxRecoitNon';
       var barre = el('div', 'fbbar');
       if (!refuse) {
-        ok = bouton('Connecter', '', function () { connecte(d, n, hote, C, ok); }); ok.id = 'cxRecoitOk'; ok.disabled = !meme;
-        if (saisie) saisie.addEventListener('input', function () { ok.disabled = saisie.value.trim().toLowerCase() !== hote; });
+        ok = bouton('Connecter', '', function () { connecte(d, n, hote, C, ok); }); ok.id = 'cxRecoitOk';
         barre.append(non, ok);
       } else barre.append(non);
-      d.appendChild(barre); if (!d.open) d.showModal(); (saisie || non).focus();
+      d.appendChild(barre); if (!d.open) d.showModal(); (refuse ? non : ok).focus();
     }, function () {
       fin(d, 'Connexion impossible', ['L\'écran Connexion n\'est pas disponible hors ligne : ouvre ce lien avec du réseau.'], [bouton('Fermer', '', function () { d.close(); })]); if (!d.open) d.showModal();
     });

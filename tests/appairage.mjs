@@ -46,12 +46,11 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   const c2 = await contexte(profil, {}), q = await c2.newPage(); q.on('pageerror', e => err.push(e.message));
   await q.goto(lien); await q.waitForSelector('#cxRecoit[open]', { timeout: 8000 });
   const t = await q.textContent('#cxRecoit');
-  ok(/Connecter cet appareil \?/.test(t) && /Ce lien relie la carte au serveur/.test(t) && await q.$eval('#cxRecoit .mono', e => e.textContent) === 'serveur-demo.cloud', nom + ' : le téléphone demande « Connecter cet appareil ? » et montre le serveur');
+  ok(/Connecter cet appareil \?/.test(t) && /Ce lien relie la carte au serveur/.test(t) && await q.$eval('#cxRecoitHote', e => e.textContent) === 'serveur-demo.cloud', nom + ' : le téléphone demande « Connecter cet appareil ? » et montre le serveur');
   ok(/Deux clés différentes/.test(t) && /ne remplace jamais l'autre/.test(t), nom + ' : la boîte sépare le jeton de synchro et la clé des apps');
   ok((await lit(q)).hash === '' && (await lit(q)).lien === null, nom + ' : rien n\'est encore enregistré (le lien est effacé de la barre d\'adresse)');
-  ok(await q.$eval('#cxRecoitOk', e => e.disabled), nom + ' : « Connecter » est grisé tant que le nom du serveur n\'est pas retapé');
-  await q.fill('#cxRecoitSaisie', 'autre-serveur.cloud'); ok(await q.$eval('#cxRecoitOk', e => e.disabled), nom + ' : un mauvais nom ne suffit pas');
-  await q.fill('#cxRecoitSaisie', 'serveur-demo.cloud'); ok(!(await q.$eval('#cxRecoitOk', e => e.disabled)), nom + ' : le bon nom active « Connecter »');
+  ok(!(await q.$('#cxRecoitSaisie')) && !(await q.$eval('#cxRecoitOk', e => e.disabled)), nom + ' : appareil neuf : aucune saisie, « Connecter » est actif tout de suite');
+  ok(parseFloat(await q.$eval('#cxRecoitHote', e => getComputedStyle(e).fontSize)) > parseFloat(await q.$eval('#cxRecoit .help', e => getComputedStyle(e).fontSize)), nom + ' : le nom du serveur est affiché en gros');
   await q.click('#cxRecoitOk'); await q.waitForFunction(() => /Appareil connecté ✓/.test((document.getElementById('cxRecoit') || {}).textContent || ''), null, { timeout: 10000 });
   const n = await lit(q);
   ok(n.lien === K && n.life === K && n.pi && n.pi.cle === PIL && n.cc && n.cc.depot === 'compte-demo/etat-demo', nom + ' : « Appareil connecté ✓ » : clé des apps (carte et LIFE), pilotage et lecture de Coulisses enregistrés');
@@ -59,7 +58,7 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   ok(/Connectées sur cet appareil : Ma carte de vie, LIFE, Coulisses/.test(await q.textContent('#cxRecoit')) && !(await q.textContent('#cxRecoit')).includes(K) && !(await q.textContent('#cxRecoit')).includes(J), nom + ' : le message final liste ce qui marche, sans montrer aucun secret');
   await q.screenshot({ path: '/tmp/appairage-' + (profil === TEL ? 'tel' : 'ordi') + '.png' });
   /* 3. le même QR ne sert qu'une fois */
-  const c3 = await contexte(profil, {}), r = await c3.newPage(); await r.goto(lien); await r.waitForSelector('#cxRecoit[open]'); await r.fill('#cxRecoitSaisie', 'serveur-demo.cloud'); await r.click('#cxRecoitOk');
+  const c3 = await contexte(profil, {}), r = await c3.newPage(); await r.goto(lien); await r.waitForSelector('#cxRecoit[open]'); await r.click('#cxRecoitOk');
   await r.waitForFunction(() => /Connexion impossible/.test((document.getElementById('cxRecoit') || {}).textContent || ''), null, { timeout: 10000 });
   ok(/déjà servi/.test(await r.textContent('#cxRecoit')) && (await lit(r)).lien === null, nom + ' : le même QR, relu, est refusé (« déjà servi ») et ne change rien');
   /* 4. appareil déjà relié au même serveur : un seul toucher ; à un autre serveur : refus */
