@@ -21,9 +21,9 @@ async function contexte(profil, init) {
   await ctx.route(/\/index\.html/, async r => { const rep = await r.fetch(); await r.fulfill({ response: rep, body: (await rep.text()).replace("connect-src 'self'", "connect-src 'self' https://serveur-demo.cloud") }); });
   await ctx.route(SRV + '/**', async r => { const q = r.request(), c = JSON.parse(q.postData() || '{}'), h = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'content-type': 'application/json' }, u = q.url();
     if (q.method() === 'OPTIONS') return r.fulfill({ status: 204, headers: h });
-    if (u.endsWith('/app-lien-transfert')) { const d = paquets[c.id]; delete paquets[c.id]; return r.fulfill({ status: d ? 200 : 404, headers: h, body: JSON.stringify(d ? { ok: true, donnees: d } : { ok: false }) }); }
-    if (u.endsWith('/app-lien')) { if (q.headers()['x-cle-app'] !== K) return r.fulfill({ status: 403, headers: h, body: '{"ok":false}' });
-      if (c.type === 'transfert_deposer') { paquets[c.id] = c.donnees; return r.fulfill({ status: 200, headers: h, body: '{"ok":true,"transfert":true,"expire":1}' }); }
+    if (u.endsWith('/life-transfert')) { const d = paquets[c.id]; delete paquets[c.id]; return r.fulfill({ status: d ? 200 : 404, headers: h, body: JSON.stringify(d ? { ok: true, donnees: d } : { ok: false }) }); }
+    if (u.endsWith('/app-lien') || u.endsWith('/life')) { if (q.headers()['x-cle-app'] !== K) return r.fulfill({ status: 403, headers: h, body: '{"ok":false}' });
+      if (c.action === 'transfert_deposer') { paquets[c.id] = c.donnees; return r.fulfill({ status: 200, headers: h, body: '{"ok":true,"transfert":true,"expire":1}' }); }
       return r.fulfill({ status: 200, headers: h, body: '{"ok":true}' }); }
     return r.abort(); });
   return ctx;

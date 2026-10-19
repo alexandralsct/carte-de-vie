@@ -12,7 +12,7 @@
   function lis(corps) {   // mêmes formes exactes que le module Connexion ; sinon null
     try {
       var n = JSON.parse(new TextDecoder().decode(deb64u(corps)));
-      if (n && /^[a-z0-9]{20,40}$/.test(n.i || '') && /^[A-Za-z0-9_-]{22}$/.test(n.k || '') && /^https:\/\/[^\s?#]+\/app-lien\/?$/.test(n.a || '') && hoteDe(n.a)) return n;
+      if (n && /^[a-z0-9]{20,40}$/.test(n.i || '') && /^[A-Za-z0-9_-]{22}$/.test(n.k || '') && /^https:\/\/[^\s?#]+\/life\/?$/.test(n.a || '') && hoteDe(n.a)) return n;
     } catch (e) { /* illisible */ }
     return null;
   }

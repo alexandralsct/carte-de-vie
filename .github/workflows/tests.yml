@@ -50,5 +50,7 @@ jobs:
         run: node tests/reglages.mjs
       - name: Connecter un téléphone par QR, comme dans LIFE (téléphone puis ordinateur)
         run: node tests/appairage.mjs
+      - name: Conversations après connexion (téléphone puis ordinateur)
+        run: node tests/conv_connexion.mjs
       - name: Mesures de performance (indicatives)
         run: BUDGETS=0 COURT=1 node tests/mesures.mjs
