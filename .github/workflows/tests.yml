@@ -52,5 +52,7 @@ jobs:
         run: node tests/appairage.mjs
       - name: Conversations après connexion (téléphone puis ordinateur)
         run: node tests/conv_connexion.mjs
+      - name: Boutons Oui / Non sur les documents à valider (téléphone puis ordinateur)
+        run: node tests/documents.mjs
       - name: Mesures de performance (indicatives)
         run: BUDGETS=0 COURT=1 node tests/mesures.mjs
