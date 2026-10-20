@@ -44,6 +44,20 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   ok(imgs.dessins >= 2, nom + ' : les autres gardent leur dessin (' + imgs.dessins + ')');
   const n = await p.locator('#assistPage .agposte').count(); ok(n === 3, nom + ' : les 3 assistants en icônes (' + n + ')');
   ok(await p.locator('#assistPage .agposte .agpas').first().textContent() === '1', nom + ' : pastille « 1 à lire » (la sortie « rien à signaler » ne compte pas)');
+  /* « à lire » partagé (V.245) : le document meta/assist_vus rend le compte identique sur téléphone et ordinateur ; l'écriture est simulée */
+  const vus = await p.evaluate(([d0, d1]) => { const A = window.ASSIST, sortie = [], o = A.ecritVus; A.ecritVus = x => sortie.push(JSON.parse(JSON.stringify(x)));
+    const pastille = () => [...document.querySelectorAll('#assistPage .agposte .agpas')].reduce((n, e) => n + (+e.textContent || 0), 0);
+    const remet = () => { A.V = {}; A.Vok = false; A.chargeVus({}); }, r = { fenetre: !!A, avant: pastille() };
+    remet(); A.chargeVus({ veilleur: d0 + 'T23:59', _m: 1, _f: {} }); r.apres = pastille(); r.nonLues = A.nonLues(A.d.liste[0]);
+    A.chargeVus({ veilleur: '2000-01-01T00:00' }); r.garde = A.vu('veilleur') === d0 + 'T23:59';
+    remet(); localStorage.setItem('agvu:scribe', d0 + 'T10:00'); sortie.length = 0; A.chargeVus({ guide: d1 + 'T08:00' });
+    const m = sortie[sortie.length - 1] || {}; r.migre = m.scribe === d0 + 'T10:00' && m.guide === d1 + 'T08:00';
+    sortie.length = 0; A.marqueVu('veilleur'); r.marque = sortie.length === 1 && !!sortie[0].veilleur && sortie[0].guide === d1 + 'T08:00' && sortie[0].scribe === d0 + 'T10:00';
+    localStorage.removeItem('agvu:scribe'); localStorage.removeItem('agvu:veilleur'); remet(); A.ecritVus = o; A.ouvre(); return r; }, [j(0), j(1)]);
+  ok(vus.fenetre, nom + ' : la page expose ASSIST (le document des archivés peut être relu)');
+  ok(vus.avant >= 1 && vus.apres === vus.avant - 1 && vus.nonLues === 0, nom + ' : lu sur l\'autre appareil → plus « à lire » ici (' + JSON.stringify(vus) + ')');
+  ok(vus.garde === true, nom + ' : une date plus ancienne ne fait jamais reculer le « lu »');
+  ok(vus.migre === true && vus.marque === true, nom + ' : ce qui n\'était que sur l\'appareil monte dans la carte, et une ouverture est écrite sans effacer les autres (' + JSON.stringify(vus) + ')');
   const coul = await p.locator('#assistPage .agposte').first().evaluate(e => getComputedStyle(e).getPropertyValue('--ag').trim());
   ok(coul === '#002fa7', nom + ' : une couleur hors charte est remplacée par un bleu (' + coul + ')');
   if (CAP) await p.screenshot({ path: CAP + '/equipe-' + (profil === TEL ? 'tel' : 'ordi') + '.png' });
