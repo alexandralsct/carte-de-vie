@@ -101,6 +101,22 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   ok(/il y a 5 ans/.test(await p.locator('#futurPage h2').textContent()), nom + ' : moi d\'il y a 5 ans');
   await p.locator('#futurPage [role=tab]', { hasText: 'Capsule' }).click();
   ok(await p.locator('#futurPage .futcf').count() === 1, nom + ' : capsule à sceller');
+  /* v244 (App téléphone) : les quatre onglets tiennent sans glisser, la zone d'écriture et « Envoyer » sont entiers ; l'app ordinateur garde ses onglets d'origine */
+  await p.evaluate(() => { window.__equipe.FUTUR.ong = 'parle'; window.__equipe.FUTUR.ouvre(); }); await p.waitForTimeout(250);
+  const g = await p.evaluate(() => { const s = document.querySelector('#futurPage .agseg'), q = document.querySelector('#futurPage .convf'), t = q.querySelector('textarea').getBoundingClientRect(), bt = q.querySelector('.vbtn').getBoundingClientRect(), W = innerWidth;
+    return { disp: getComputedStyle(s).display, sw: s.scrollWidth <= s.clientWidth + 1, onglets: [...s.querySelectorAll('button')].every(x => { const r = x.getBoundingClientRect(); return r.left >= 0 && r.right <= W; }),
+      ecrit: t.left >= 0 && t.right <= W && bt.left >= 0 && bt.right <= W && bt.bottom <= innerHeight }; });
+  if (nom === 'App téléphone') ok(g.sw && g.onglets && g.ecrit, nom + ' : onglets entiers sans glisser, zone d\'écriture et « Envoyer » entiers (' + JSON.stringify(g) + ')');
+  else ok(g.disp === 'flex', nom + ' : onglets inchangés (' + g.disp + ')');
+  /* v244 : ce qui a été gardé faute de réponse repart seul dès que le système répond ; s'il ne répond pas, rien ne change */
+  const rep = await p.evaluate(async () => { const C = window.__equipe.CONV, F = window.__equipe.FUTUR, ancien = C.envoie, k = 'conv:' + F.cle(); let n = 0, recu = null;
+    const lire = () => JSON.parse(localStorage.getItem(k) || '[]').map(m => m.de + ':' + m.texte + (m.attente ? '*' : ''));
+    localStorage.setItem(k, JSON.stringify([{ de: 'moi', texte: 'Un', attente: true }, { de: 'moi', texte: 'Deux', attente: true }]));
+    sessionStorage.clear(); C.envoie = async () => { n++; return { ok: false, bientot: true, msg: 'Bientôt disponible' }; }; F.ouvre(); await new Promise(r => setTimeout(r, 400)); const muet = { n, L: lire() };
+    sessionStorage.clear(); n = 0; C.envoie = async c => { n++; recu = c.futur.texte; return { ok: true, j: { ok: true, reponse: 'Reçu.' } }; }; F.ouvre(); await new Promise(r => setTimeout(r, 500)); const branche = { n, recu, L: lire() };
+    C.envoie = ancien; localStorage.removeItem(k); return { muet, branche }; });
+  ok(rep.muet.n === 1 && rep.muet.L.join('|') === 'moi:Un*|moi:Deux*', nom + ' : système muet, les messages gardés restent gardés, un par un (' + rep.muet.L.join('|') + ')');
+  ok(rep.branche.n === 1 && rep.branche.recu === 'Un\nDeux' && rep.branche.L.join('|') === 'moi:Un|moi:Deux|lui:Reçu.', nom + ' : système branché, les messages gardés partent seuls et la réponse arrive (' + rep.branche.L.join('|') + ')');
   /* bouton « précédent » (app téléphone, 18/10) : il ferme seulement l'écran du dessus et revient là où l'on était, pas à la carte */
   if (nom === 'App téléphone') {
     const vis = () => p.evaluate(() => [...document.querySelectorAll('aside.page')].filter(x => !x.hidden).map(x => x.id).join(','));
