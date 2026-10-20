@@ -106,6 +106,8 @@ for (const [nom, profil] of [['App téléphone', TEL], ['App ordinateur', ORDI]]
   /* Moi dans 5 ans : la boule d'Omni ouvre la page autonome (plus LIFE) */
   await p.evaluate(() => { document.querySelectorAll('aside.page').forEach(x => { x.hidden = true; }); window.__equipe.OMNI.futur().click(); });
   ok(await p.locator('#futurPage').isVisible() && !(await p.locator('#lifeP').isVisible().catch(() => false)), nom + ' : Moi dans 5 ans s\'ouvre dans la carte, pas dans LIFE');
+  /* v246 : le moi futur ne répond qu'à partir d'un portrait validé par la personne (portrait vide : « je ne sais pas encore », rien n'est envoyé) */
+  await p.evaluate(() => window.__equipe.PORTRAIT.charge({ elements: [{ id: 't1', famille: 'valeurs', text: 'Je préfère un petit pas.', etat: 'valide' }] }));
   await p.fill('#futurPage .convf textarea', 'Qui es-tu ?'); await p.locator('#futurPage .convf button').click(); await p.waitForTimeout(400);
   ok(await p.locator('#futurPage .cvb.cvlui').count() === 1, nom + ' : conversation avec le moi futur');
   if (CAP) await p.screenshot({ path: CAP + '/futur-' + (profil === TEL ? 'tel' : 'ordi') + '.png' });
