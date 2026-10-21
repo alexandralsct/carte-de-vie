@@ -40,6 +40,15 @@ for (const [nom, cle, opt] of PROFILS) {
   await ouvre();
   const image = (type, nomf, w, h) => p.evaluateHandle(([t, n, w, h]) => new Promise(ok => { const k = document.createElement('canvas'); k.width = w; k.height = h; const g = k.getContext('2d'); g.fillStyle = '#002fa7'; g.fillRect(0, 0, w, h); k.toBlob(bl => ok(new File([bl], n, { type: t })), 'image/png'); }), [type, nomf, w, h]);
   const evt = (type, f) => p.evaluate(([t, f]) => { const dt = new DataTransfer(); if (f) dt.items.add(f); const e = new DragEvent(t, { bubbles: true, cancelable: true, dataTransfer: dt }); (document.querySelector('#agentPage .agrond') || document.getElementById('agentPage')).dispatchEvent(e); return e.defaultPrevented; }, [type, f]);
+  /* image entière dans le cadre (ordinateur) ; le téléphone garde l'ancien cadrage */
+  const cadrage = async () => p.evaluate(async () => { const { ASSIST, AGIMG } = window.__equipe; AGIMG.lire = () => async () => { const k = document.createElement('canvas'); k.width = 100; k.height = 198; k.getContext('2d').fillRect(0, 0, 100, 198); return k.toDataURL('image/png'); };
+    ASSIST.charge({ liste: [{ id: 'veilleur', nom: 'Veilleur', statut: 'actif', role: 'x', identite: { icone: 'loupe', image: 'avatars/veilleur.jpg' }, sorties: [] }] }); ASSIST.ouvre();
+    await new Promise(r => setTimeout(r, 800)); const i = document.querySelector('#assistPage .agimg'); const c = i && getComputedStyle(i); const g = {fit: c && c.objectFit, tr: c && c.transform};
+    ASSIST.fiche('veilleur'); await new Promise(r => setTimeout(r, 800)); const j = document.querySelector('#agentPage .agimg'); const d = j && getComputedStyle(j); return { grille: g, fiche: { fit: d && d.objectFit, tr: d && d.transform } }; });
+  const cd = await cadrage();
+  if (cle === 'ordinateur') ok(cd.grille.fit === 'contain' && cd.grille.tr === 'none' && cd.fiche.fit === 'contain' && cd.fiche.tr === 'none', nom + ' : l\'image est vue en entier, grille et fiche (' + JSON.stringify(cd) + ')');
+  else ok(cd.grille.fit === 'cover' && cd.fiche.fit === 'cover', nom + ' : l\'app téléphone garde son cadrage (' + JSON.stringify(cd) + ')');
+  await ouvre();
   const aide = await p.evaluate(() => { const e = document.querySelector('#agentPage .avaide'); return !!e && getComputedStyle(e).display !== 'none'; });
   ok(aide === (cle === 'ordinateur'), nom + ' : la consigne « glisse une image » ' + (cle === 'ordinateur' ? 'est visible' : 'reste cachée'));
   const f1 = await image('image/png', 'portrait.png', 800, 600);
