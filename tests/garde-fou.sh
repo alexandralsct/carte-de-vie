@@ -13,7 +13,7 @@ if [ -z "$MOTS" ] && [ -n "${MOTS_FICHIER:-}" ] && [ -f "$MOTS_FICHIER" ]; then
   MOTS=$(grep -v '^\s*#' "$MOTS_FICHIER" | sed '/^\s*$/d' | paste -sd'|')
 fi
 if [ -z "$MOTS" ]; then echo "::error::Liste des mots privés absente (secret MOTS_INTERDITS, ou MOTS_FICHIER en local) : contrôle impossible."; exit 1; fi
-OK=${GF_OK:-'^(\.nojekyll|\.github/workflows/[^/]+\.yml|\.githooks/pre-commit|CLAUDE\.md|README\.md|index\.html|sw\.js|monde\.js|lecture\.js|reglages\.js|recevoir\.js|connexion\.(js|css)|manifest(-test)?\.webmanifest|icon-(192|512|maskable-512)\.png|fonts/(instrument-sans|plex-mono-[0-9]{3}(-italique)?)\.woff2|fonts/OFL-[A-Za-z]+\.txt|tests/[^/]+\.(mjs|sh)|passerelle/[^/]+\.gs|life/(index\.html|sw\.js)|vendor/tesseract/(LICENSE|tesseract\.min\.js|worker\.min\.js|core/tesseract-core(-simd)?-lstm\.wasm\.js|lang/fra\.traineddata\.gz))$'}
+OK=${GF_OK:-'^(\.nojekyll|\.github/workflows/[^/]+\.yml|\.githooks/pre-commit|CLAUDE\.md|README\.md|index\.html|sw\.js|monde\.js|lecture\.js|reglages\.js|recevoir\.js|reinit\.(html|js)|connexion\.(js|css)|manifest(-test)?\.webmanifest|icon-(192|512|maskable-512)\.png|fonts/(instrument-sans|plex-mono-[0-9]{3}(-italique)?)\.woff2|fonts/OFL-[A-Za-z]+\.txt|tests/[^/]+\.(mjs|sh)|passerelle/[^/]+\.gs|life/(index\.html|sw\.js)|vendor/tesseract/(LICENSE|tesseract\.min\.js|worker\.min\.js|core/tesseract-core(-simd)?-lstm\.wasm\.js|lang/fra\.traineddata\.gz))$'}
 SECRETS='sk-ant-[A-Za-z0-9_-]{10,}|ghp_[A-Za-z0-9]{20,}|gh[ousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{20,}|AIza[0-9A-Za-z_-]{30,}|xox[abp]-[A-Za-z0-9-]{10,}|-----BEGIN [A-Z ]*PRIVATE KEY'
 EMAIL='[A-Z0-9._%+-]+@[A-Z0-9.-]+\.(fr|com|net|org|archi|io)\b'
 ko=0; err(){ echo "::error::$1"; ko=1; }
