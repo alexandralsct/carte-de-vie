@@ -6,6 +6,16 @@
 (function () {
   var journal = document.getElementById('journal');
   var dit = function (t) { var li = document.createElement('li'); li.textContent = t; journal.appendChild(li); };
+  var ko = function (n) { return Math.round(n / 1024) + ' Ko'; };
+  /* Constat avant effacement : noms et tailles seulement (jamais le contenu), pour trouver ce qui se remplit. */
+  try {
+    var L = [], tot = 0;
+    for (var i = 0; i < localStorage.length; i++) { var c = localStorage.key(i), t = (localStorage.getItem(c) || '').length * 2 + c.length * 2; tot += t; L.push([c, t]); }
+    L.sort(function (a, b) { return b[1] - a[1]; });
+    dit('Mémoire locale de l\'adresse (toutes les apps) : ' + ko(tot) + ' pour ' + L.length + ' entrées. Les plus grosses :');
+    L.slice(0, 8).forEach(function (x) { dit('· ' + x[0].slice(0, 40) + ' : ' + ko(x[1])); });
+  } catch (_) { dit('Mémoire locale illisible.'); }
+  if (navigator.storage && navigator.storage.estimate) navigator.storage.estimate().then(function (e) { dit('Stockage total utilisé par l\'adresse : ' + ko(e.usage || 0) + ' sur ' + ko(e.quota || 0) + '.'); }).catch(function () {});
   var A_EFFACER = ['carte-de-vie-v1', 'carte-de-vie-perso'];
   var copie = {};
   A_EFFACER.forEach(function (k) { try { var v = localStorage.getItem(k); if (v != null) copie[k] = v; } catch (_) {} });
@@ -39,8 +49,8 @@
     return Promise.all([caches_, sw]);
   }).then(function () {
     var lien = false; try { lien = !!localStorage.getItem('carte-de-vie-sync'); } catch (_) {}
-    document.getElementById('etat').textContent = lien ? 'Terminé. L\'app va se rouvrir et recharger ta carte depuis le dépôt.' : 'Terminé. Attention : aucun lien avec le dépôt n\'est enregistré sur cet appareil.';
+    document.getElementById('etat').textContent = lien ? 'Terminé. Fais une capture de cette page : l\'app se rouvre d\'elle-même dans 12 secondes et recharge ta carte depuis le dépôt.' : 'Terminé. Attention : aucun lien avec le dépôt n\'est enregistré sur cet appareil.';
     document.getElementById('suite').hidden = false;
-    if (lien) setTimeout(function () { location.replace('./index.html'); }, 2500);
+    if (lien) setTimeout(function () { location.replace('./index.html'); }, 12000);
   });
 })();
