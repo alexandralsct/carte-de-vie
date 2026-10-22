@@ -201,4 +201,15 @@ if (process.env.CARTES) {
     ok(!perdus && !sPerdus && idem, path.basename(F[i]) + ' ' + sens + ' ' + path.basename(F[j]) + ' : ' + Object.keys(m).length + ' documents ; éléments de la version la plus récente : ' + avant + ', après fusion : ' + apres + ' ; perdus : ' + perdus + (docs ? ' (dans ' + docs + ' documents)' : '') + ' ; repris de l\'autre version : ' + repris + ' ; valeurs sans id : ' + sAvant + ', perdues : ' + sPerdus + ', reprises : ' + sRepris + ' ; ' + ms + ' ms');
   }
 }
+/* Plantage du 21-22/10 : un écrivain externe a mis plusieurs éléments au même id dans une liste. Des deux côtés, la fusion
+   suivait « après A » vers A et tournait sans fin jusqu'à saturer la mémoire. Elle doit finir vite et ne rien perdre. */
+{ const el = (id, c) => ({ id, contenu: c, date: '2026-10-22' });
+  const loc = { fil: [el('a', 1), el('f', 2), el('f', 3), el('f', 4), el('b', 5)], _m: 100 };
+  const sys = { fil: [el('a', 1), el('e', 6), el('e', 7), el('d', 8), el('d', 9), el('d', 10)], _m: 200 };
+  const t0 = Date.now(); let res = null, err = '';
+  try { res = A.fusion(clone(sys), clone(loc)); } catch (e) { err = e.message; }
+  const dt = Date.now() - t0, n = res && Array.isArray(res.fil) ? res.fil.length : -1;
+  ok(!err && dt < 1000 && n > 0 && n <= loc.fil.length + sys.fil.length, 'ids en double des deux côtés : la fusion se termine (' + dt + ' ms, ' + n + ' éléments)' + (err ? ' — ' + err : ''));
+  const c = res ? new Set(res.fil.map(x => x.contenu)) : new Set();
+  ok([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].every(v => c.has(v)), 'ids en double : aucun élément perdu, d\'un côté comme de l\'autre'); }
 console.log(ko ? '\n' + ko + ' échec(s)' : '\nTout est bon.'); process.exit(ko ? 1 : 0);
