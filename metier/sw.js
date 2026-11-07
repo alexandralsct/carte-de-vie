@@ -6,15 +6,15 @@
 // Ce fichier change dès qu'un fichier change (empreintes) : le navigateur installe alors la nouvelle version, d'un bloc.
 // Seules les réponses de CE dossier sont gardées, et seulement à l'installation : une réponse de l'API GitHub ou du serveur (autres hôtes) n'est jamais interceptée ni mise en cache.
 // Recalcul : python3 scripts/metier_empreintes.py (vérifié par tests/test_metier_autonome.py).
-const CACHE = 'metier-v1-234db0e14a9a';
+const CACHE = 'metier-v1-71f6bf36fb26';
 const COQUILLE = ['./', 'index.html', 'app.css', 'connexion.css', 'app.js', 'logique.js', 'connexion.js', 'synchro.js', 'qr.js', 'donnees.js', 'enquete.js', 'porteurs.js', 'porteurs_donnees.js', 'installation.js',
   'manifest.webmanifest', 'icon.svg', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png',
   'fonts/instrument-sans.woff2', 'fonts/plex-mono-400.woff2', 'fonts/plex-mono-400-italique.woff2', 'fonts/plex-mono-500.woff2',
   'fonts/plex-mono-600.woff2', 'fonts/plex-mono-700.woff2', 'fonts/OFL-InstrumentSans.txt', 'fonts/OFL-IBMPlexMono.txt'];
 // EMPREINTES:début
 const EMPREINTES = {
-  'index.html': '7743cee09ddba4bad1d076983720d5b7d164ec728ef7cb289fd63198728731a5',
-  'app.css': '20ecac10954154ab93fff19457173f93ff567383938ec87ed613b9a818202b01',
+  'index.html': 'ba57cb779567118bc8378a22dd53fbcf15a7079f4b24d8e45553bc7292ae3d25',
+  'app.css': 'cdc578ddb407607a01f798026a9825ec5ce0fedba86cd33fe010f5e4c111200d',
   'connexion.css': '01bf86c5c909a65f76fd2a55214ead405d8ce57ff1d2d394ab7eac950c8819ce',
   'app.js': '32b888e0adbddfb2ea9869c3e7de397e93e035ced5491a1c988e8f303271db60',
   'logique.js': '6fe6286c7dcfec357c870e19b557c3e10cb587ab75910626c7414073c17e638c',
@@ -25,7 +25,7 @@ const EMPREINTES = {
   'enquete.js': '35849771b85284cf244eca5a5642e7a74f1c7eaf7d8751167f08c0dc156c71df',
   'porteurs.js': '6cafca448f57660716848c358363c794ecca0b1bfba4cd679f45591bfca78b74',
   'porteurs_donnees.js': '8d5f339ca5de255bc5b05a8cca17853fa6b9a612b7c9133ad32028d33a06514e',
-  'installation.js': 'bf1bbea60b4a709c3c25ee31dcdbb83f97beb6ff3ee1f37b81d1e67b8096c0d5',
+  'installation.js': '7b65f755117edb9e9f9325766e21b4ec13b111502b49acc130b8e63d2c4d024d',
   'manifest.webmanifest': '6dece9ae3e2b40c0e7f6b5716a660ff7ea2c91da63d21f3410bccd127b07f09f',
   'icon.svg': '14366397b9eedd7119e0ab4b96aeddd333f86ed56d67f28a08d34f1177a92db2',
   'icon-192.png': 'cb5500aae3ac01bdf9b10c5a3177367d947b83f21aab25539fd177af893a253a',

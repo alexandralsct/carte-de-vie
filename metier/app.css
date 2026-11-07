@@ -145,3 +145,8 @@ svg text { font-family: var(--mono); font-size: 10px; fill: var(--encre-2); }
 .plus-liste button { text-align: left; }
 @media (min-width: 600px) { .filtres .onglet { flex: 0 0 auto; min-width: 130px; } }
 @media (min-width: 900px) { .pistes-liste { gap: var(--e-3); } .piste-ligne { padding: var(--e-3) var(--e-5); } }
+
+/* Bouton « Installer l'app » : caché tant que le navigateur n'a pas dit que l'app est installable (installation.js) */
+#installer { position: fixed; z-index: 5; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  background: var(--plein); color: var(--sur-plein); border: 0; border-radius: var(--r-p); padding: var(--e-3) var(--e-4); min-height: var(--cible); font: 600 var(--t-m) var(--display); cursor: pointer; box-shadow: var(--sh-2); }
+#installer[hidden] { display: none; }
