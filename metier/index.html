@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://*.cloud https://cocon.metamorphose-architecture.fr https://api.github.com; worker-src 'self'; manifest-src 'self'; frame-src 'none'; media-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="theme-color" content="#F5EEE2">
+<meta name="description" content="Classer des pistes de métier en euros par heure, avec leurs sources. Tout reste sur cet appareil.">
+<title>Métier</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="connexion.css">
+</head>
+<body>
+<div class="page" id="page">
+  <header data-idee="I57">
+    <div class="haut">
+      <div>
+        <h1 id="titre-app">Tes meilleures pistes</h1>
+        <p id="phrase-app">Classées en euros par heure de travail.</p>
+      </div>
+      <button class="discret" id="bouton-plus" type="button" aria-expanded="false" aria-controls="vue-plus">Plus</button>
+    </div>
+  </header>
+
+  <section id="vue-plus" class="bloc" hidden aria-label="Plus"></section>
+  <section id="vue-donnees" class="bloc" hidden aria-label="Données"></section>
+
+  <main id="ecran" aria-live="polite"></main>
+  <p class="pied">Version <span id="version"></span> · données sur l'appareil seulement (stockage du navigateur) · un chiffre sans source est marqué « supposé ».</p>
+</div>
+<script charset="utf-8" src="donnees.js"></script>
+<script charset="utf-8" src="enquete.js"></script>
+<script charset="utf-8" src="porteurs_donnees.js"></script>
+<script charset="utf-8" src="porteurs.js"></script>
+<script charset="utf-8" src="logique.js"></script>
+<script charset="utf-8" src="connexion.js"></script>
+<script charset="utf-8" src="synchro.js"></script>
+<script charset="utf-8" src="app.js"></script>
+<script charset="utf-8" src="installation.js"></script>
+</body>
+</html>
