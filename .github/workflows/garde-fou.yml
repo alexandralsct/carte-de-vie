@@ -57,5 +57,5 @@ jobs:
           MOTS: ${{ secrets.MOTS_INTERDITS }}
           # commits connus et acceptés par la propriétaire (pas de réécriture de l'historique, décision du 13/10) :
           # 62e7e79 premier commit (version 155) ; 04d20ed version 180 (nom du service d'automatisation dans 3 textes d'aide, retirés en 182) ; e049a37 V.1.9.6 (même nom dans la règle de sécurité, retiré en V.1.9.7).
-          HISTO_CONNUS: "62e7e79 04d20ed e049a37 76baccd 9cdfbee"
+          HISTO_CONNUS: "62e7e79 04d20ed e049a37 76baccd 9cdfbee eb3eb46 32dadd3"
         run: bash tests/garde-fou.sh --historique
