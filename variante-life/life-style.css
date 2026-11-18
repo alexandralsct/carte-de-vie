@@ -1,0 +1,125 @@
+/* Variante « style LIFE » de Ma carte de vie.
+   Même code, même fonctions : seule l'apparence change (palette, typo, formes, mise en page).
+   Deux apps pensées à part : téléphone (règles de base) et ordinateur (@media souris ≥ 900 px, en bas).
+   Aucun texte personnel. */
+
+:root {
+  --life-fond: #F5EEE2; --life-plateau: #FAF5EC; --life-surface: #FEFAF3;
+  --life-encre: #002FA7; --life-texte: #14204A; --life-pale: #DBE3F3;
+  --life-trait: 1.5px solid #002FA7; --life-ombre: 4px 4px 0 #002FA7;
+  --life-display: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  --life-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+
+/* ---------- Téléphone (règles de base) ---------- */
+body.variante-life {
+  background: var(--life-fond);
+  color: var(--life-texte);
+  font-family: var(--life-mono);
+  font-size: 14.5px;
+  line-height: 1.5;
+  margin: 0;
+}
+body.variante-life h1,
+body.variante-life h2,
+body.variante-life h3 {
+  font-family: var(--life-display);
+  font-weight: 700;
+  color: var(--life-encre);
+  letter-spacing: -0.01em;
+}
+body.variante-life h1 { font-size: 26px; margin: 4px 0 2px; }
+body.variante-life h2 { font-size: 22px; }
+body.variante-life h3 { font-size: 16px; }
+body.variante-life .motto,
+body.variante-life .hint,
+body.variante-life .help { color: var(--life-texte); opacity: .8; font-size: 13px; }
+body.variante-life .wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 16px;
+}
+body.variante-life header {
+  border-bottom: var(--life-trait);
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+body.variante-life .btn {
+  font-family: var(--life-mono);
+  font-size: 13px;
+  min-height: 44px;
+  border: var(--life-trait);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--life-encre);
+  padding: 8px 16px;
+  cursor: pointer;
+}
+body.variante-life .btn:not(.ghost) {
+  background: var(--life-encre);
+  color: var(--life-surface, #FEFAF3);
+  box-shadow: 2px 2px 0 var(--life-pale);
+}
+body.variante-life .card,
+body.variante-life .setlist li,
+body.variante-life .page-in .card {
+  background: var(--life-surface);
+  border: var(--life-trait);
+  border-radius: 14px;
+  box-shadow: var(--life-ombre);
+}
+body.variante-life .board {
+  background: var(--life-plateau);
+  border: var(--life-trait);
+  border-radius: 24px;
+  box-shadow: var(--life-ombre);
+}
+body.variante-life .moi {
+  border: var(--life-trait);
+  box-shadow: var(--life-ombre);
+}
+body.variante-life .page {
+  background: var(--life-fond);
+  color: var(--life-texte);
+}
+body.variante-life .page-in {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 16px;
+}
+body.variante-life input,
+body.variante-life textarea,
+body.variante-life select {
+  font-family: var(--life-mono);
+  border: var(--life-trait);
+  border-radius: 10px;
+  background: var(--life-surface);
+  color: var(--life-texte);
+  padding: 8px 10px;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+body.variante-life .setlist li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  list-style: none;
+}
+
+/* ---------- Ordinateur (souris, ≥ 900 px) : règles séparées ---------- */
+@media (min-width: 900px) and (pointer: fine) {
+  body.variante-life .wrap,
+  body.variante-life .page-in {
+    max-width: 1040px;
+    padding: 24px 32px;
+  }
+  body.variante-life h1 { font-size: 30px; }
+  body.variante-life .btn { min-height: 36px; padding: 6px 14px; }
+  body.variante-life .board {
+    border-radius: 24px;
+    box-shadow: 6px 6px 0 var(--life-encre);
+  }
+}
