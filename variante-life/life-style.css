@@ -157,3 +157,73 @@ body.variante-life #lifeMenu button:focus-visible { outline: 3px solid #002FA7; 
 body.variante-life #lifeMenu .grp { display: flex; flex-direction: column; align-items: stretch; flex-wrap: nowrap; }
 body.variante-life #lifeMenu .grp > button,
 body.variante-life #lifeMenu .grp > .grp-t { display: block; width: 100%; box-sizing: border-box; }
+
+/* ===== Reprise complète de l'apparence LIFE (la carte d'origine garde ses fonctions, pas son look) ===== */
+body.variante-life {
+  --bg: #F5EEE2; --board: #FAF5EC; --surface: #FEFAF3; --moi: #FEFAF3;
+  --fg: #002FA7; --ink: #002FA7; --line: #002FA7; --danger: #002FA7; --sh: #002FA7;
+  --muted: rgba(0, 47, 167, .72); --sh2: rgba(0, 47, 167, .25); --pale: #DBE3F3;
+  --zl: #C9D6F0; --zb: rgba(250, 245, 236, .6);
+  --sh-1: 2px 2px 0 #C9D6F0; --sh-2: 4px 4px 0 #C9D6F0;
+  --r-s: 8px; --r-m: 14px; --r-l: 24px;
+  --display: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --body: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+  background: var(--bg) !important;
+  color: #14204A !important;
+}
+/* une seule famille de texte (mono), titres en Instrument Sans, aucune police décorative */
+body.variante-life *, body.variante-life *::before, body.variante-life *::after {
+  font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace !important;
+  text-shadow: none !important;
+  animation: none !important;
+}
+body.variante-life h1, body.variante-life h2, body.variante-life h3,
+body.variante-life .bigtitle, body.variante-life .tampon {
+  font-family: "Instrument Sans", "Helvetica Neue", Arial, sans-serif !important;
+}
+/* formes : carrés arrondis partout (aucun rond, aucun dégradé) */
+body.variante-life .moi, body.variante-life .disc, body.variante-life .rond, body.variante-life .bulle,
+body.variante-life .hdot, body.variante-life .mz, body.variante-life .linklab, body.variante-life .biglogo,
+body.variante-life .phx, body.variante-life .fondx, body.variante-life .hmoins, body.variante-life .tampon {
+  border-radius: 14px !important;
+  background-image: none !important;
+}
+body.variante-life .bulle, body.variante-life .disc, body.variante-life .moi {
+  background-color: #002FA7 !important;
+  color: #FDFAF4 !important;
+  box-shadow: 4px 4px 0 #DBE3F3 !important;
+}
+body.variante-life .rond, body.variante-life .biglogo, body.variante-life .hdot, body.variante-life .mz {
+  background-color: #FEFAF3 !important;
+  border: 1.5px solid #002FA7 !important;
+  box-shadow: 3px 3px 0 #002FA7 !important;
+}
+body.variante-life .tampon { border: 1.5px solid #002FA7 !important; background: transparent !important; }
+body.variante-life .board, body.variante-life .card, body.variante-life .page-in,
+body.variante-life .setlist li, body.variante-life .pane > section {
+  background: var(--surface) !important;
+  border: 1.5px solid #002FA7 !important;
+  border-radius: 14px !important;
+  box-shadow: 4px 4px 0 #002FA7 !important;
+}
+body.variante-life .page, body.variante-life aside.page {
+  background: var(--bg) !important; color: #14204A !important;
+}
+body.variante-life button, body.variante-life .btn, body.variante-life .ia, body.variante-life .pill {
+  border-radius: 999px !important;
+  border: 1.5px solid #002FA7 !important;
+  color: #002FA7 !important;
+  background: transparent !important;
+}
+body.variante-life .btn:not(.ghost) { background: #002FA7 !important; color: #FDFAF4 !important; }
+body.variante-life input, body.variante-life textarea, body.variante-life select {
+  background: #FEFAF3 !important; color: #14204A !important;
+  border: 1.5px solid #002FA7 !important; border-radius: 10px !important;
+}
+body.variante-life .hint, body.variante-life .motto, body.variante-life .help, body.variante-life small {
+  color: #14204A !important; opacity: .8;
+}
+/* le menu ••• reste celui de LIFE */
+body.variante-life #lifePlus { border-radius: 999px !important; }
