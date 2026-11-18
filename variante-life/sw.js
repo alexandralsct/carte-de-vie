@@ -2,7 +2,7 @@
    Cache propre à la variante (préfixe carte-life-) ; pas de contrôle d'empreinte (le contenu privé n'est pas dans ce dossier). */
 const C = "carte-life-v2";
 const FILES = ["./", "./index.html", "./life-style.css", "./life-menu.js", "./manifest.webmanifest",
-  "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./monde.js", "./lecture.js",
+  "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./lecture.js",
   "./reglages.js", "./recevoir.js", "./connexion.js", "./connexion.css",
   "./fonts/instrument-sans.woff2", "./fonts/plex-mono-400.woff2", "./fonts/plex-mono-500.woff2",
   "./fonts/plex-mono-600.woff2", "./fonts/plex-mono-700.woff2", "./fonts/plex-mono-400-italique.woff2"];
