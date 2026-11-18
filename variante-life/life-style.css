@@ -1,229 +1,84 @@
-/* Variante « style LIFE » de Ma carte de vie.
-   Même code, même fonctions : seule l'apparence change (palette, typo, formes, mise en page).
-   Deux apps pensées à part : téléphone (règles de base) et ordinateur (@media souris ≥ 900 px, en bas).
-   Aucun texte personnel. */
+/* Ma carte de vie, variante « style LIFE » : mise en page de LIFE.
+   App téléphone : colonne centrée, tuiles en grille, pilules, pages empilées.
+   App ordinateur (souris, 900 px et plus) : espaces à gauche, plateau arrondi à droite. Règles séparées, en bas. */
 
 :root {
-  --life-fond: #F5EEE2; --life-plateau: #FAF5EC; --life-surface: #FEFAF3;
-  --life-encre: #002FA7; --life-texte: #14204A; --life-pale: #DBE3F3;
-  --life-trait: 1.5px solid #002FA7; --life-ombre: 4px 4px 0 #002FA7;
-  --life-display: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
-  --life-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
-}
-
-/* ---------- Téléphone (règles de base) ---------- */
-body.variante-life {
-  background: var(--life-fond);
-  color: var(--life-texte);
-  font-family: var(--life-mono);
-  font-size: 14.5px;
-  line-height: 1.5;
-  margin: 0;
-}
-body.variante-life h1,
-body.variante-life h2,
-body.variante-life h3 {
-  font-family: var(--life-display);
-  font-weight: 700;
-  color: var(--life-encre);
-  letter-spacing: -0.01em;
-}
-body.variante-life h1 { font-size: 26px; margin: 4px 0 2px; }
-body.variante-life h2 { font-size: 22px; }
-body.variante-life h3 { font-size: 16px; }
-body.variante-life .motto,
-body.variante-life .hint,
-body.variante-life .help { color: var(--life-texte); opacity: .8; font-size: 13px; }
-body.variante-life .wrap {
-  max-width: 760px;
-  margin: 0 auto;
-  padding: 16px;
-}
-body.variante-life header {
-  border-bottom: var(--life-trait);
-  padding-bottom: 12px;
-  margin-bottom: 12px;
-}
-body.variante-life .btn {
-  font-family: var(--life-mono);
-  font-size: 13px;
-  min-height: 44px;
-  border: var(--life-trait);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--life-encre);
-  padding: 8px 16px;
-  cursor: pointer;
-}
-body.variante-life .btn:not(.ghost) {
-  background: var(--life-encre);
-  color: var(--life-surface, #FEFAF3);
-  box-shadow: 2px 2px 0 var(--life-pale);
-}
-body.variante-life .card,
-body.variante-life .setlist li,
-body.variante-life .page-in .card {
-  background: var(--life-surface);
-  border: var(--life-trait);
-  border-radius: 14px;
-  box-shadow: var(--life-ombre);
-}
-body.variante-life .board {
-  background: var(--life-plateau);
-  border: var(--life-trait);
-  border-radius: 24px;
-  box-shadow: var(--life-ombre);
-}
-body.variante-life .moi {
-  border: var(--life-trait);
-  box-shadow: var(--life-ombre);
-}
-body.variante-life .page {
-  background: var(--life-fond);
-  color: var(--life-texte);
-}
-body.variante-life .page-in {
-  max-width: 760px;
-  margin: 0 auto;
-  padding: 16px;
-}
-body.variante-life input,
-body.variante-life textarea,
-body.variante-life select {
-  font-family: var(--life-mono);
-  border: var(--life-trait);
-  border-radius: 10px;
-  background: var(--life-surface);
-  color: var(--life-texte);
-  padding: 8px 10px;
-  min-height: 44px;
-  box-sizing: border-box;
-}
-body.variante-life .setlist li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  margin-bottom: 10px;
-  list-style: none;
-}
-
-/* ---------- Ordinateur (souris, ≥ 900 px) : règles séparées ---------- */
-@media (min-width: 900px) and (pointer: fine) {
-  body.variante-life .wrap,
-  body.variante-life .page-in {
-    max-width: 1040px;
-    padding: 24px 32px;
-  }
-  body.variante-life h1 { font-size: 30px; }
-  body.variante-life .btn { min-height: 36px; padding: 6px 14px; }
-  body.variante-life .board {
-    border-radius: 24px;
-    box-shadow: 6px 6px 0 var(--life-encre);
-  }
-}
-
-/* ---------- Menu ••• (même place et même forme que le menu de LIFE) ---------- */
-body.variante-life header { position: relative; }
-body.variante-life header .tools,
-body.variante-life header .hautg { display: none; }
-body.variante-life #lifePlus {
-  all: unset; box-sizing: border-box; cursor: pointer;
-  min-width: 44px; min-height: 44px; padding: 0 12px;
-  display: inline-flex; align-items: center; justify-content: center;
-  border: var(--life-trait); border-radius: 999px;
-  font: 600 14px/1 var(--life-mono); color: var(--life-encre); background: var(--life-surface);
-  position: absolute; top: 14px; right: 16px; z-index: 12;
-}
-body.variante-life #lifeMenu {
-  position: absolute; top: 60px; right: 16px; z-index: 12;
-  display: flex; flex-direction: column; min-width: 240px;
-  background: var(--life-surface); border: var(--life-trait); border-radius: 14px;
-  box-shadow: var(--life-ombre); overflow: hidden;
-}
-body.variante-life #lifeMenu[hidden] { display: none; }
-body.variante-life #lifeMenu button {
-  all: unset; box-sizing: border-box; cursor: pointer; min-height: 48px; padding: 14px 20px;
-  font: 500 14.5px/20px var(--life-mono); color: var(--life-encre);
-}
-body.variante-life #lifeMenu button + button { border-top: 1px solid #6F86C6; }
-body.variante-life #lifeMenu .grp + .grp { border-top: 1.5px solid #002FA7; }
-body.variante-life #lifeMenu .grp-t {
-  display: block; padding: 10px 20px 2px; font: 600 12px/1.2 var(--life-mono);
-  letter-spacing: .06em; text-transform: uppercase; color: #4768BD;
-}
-body.variante-life #lifeMenu button:focus-visible { outline: 3px solid #002FA7; outline-offset: -4px; }
-body.variante-life #lifeMenu .grp { display: flex; flex-direction: column; align-items: stretch; flex-wrap: nowrap; }
-body.variante-life #lifeMenu .grp > button,
-body.variante-life #lifeMenu .grp > .grp-t { display: block; width: 100%; box-sizing: border-box; }
-
-/* ===== Reprise complète de l'apparence LIFE (la carte d'origine garde ses fonctions, pas son look) ===== */
-body.variante-life {
-  --bg: #F5EEE2; --board: #FAF5EC; --surface: #FEFAF3; --moi: #FEFAF3;
-  --fg: #002FA7; --ink: #002FA7; --line: #002FA7; --danger: #002FA7; --sh: #002FA7;
-  --muted: rgba(0, 47, 167, .72); --sh2: rgba(0, 47, 167, .25); --pale: #DBE3F3;
-  --zl: #C9D6F0; --zb: rgba(250, 245, 236, .6);
-  --sh-1: 2px 2px 0 #C9D6F0; --sh-2: 4px 4px 0 #C9D6F0;
-  --r-s: 8px; --r-m: 14px; --r-l: 24px;
+  --fond: #F5EEE2; --plateau: #FAF5EC; --surface: #FEFAF3;
+  --encre: #002FA7; --texte: #14204A; --pale: #DBE3F3; --doux: #6F86C6; --gris: #6F7896;
+  --trait: 1.5px solid #002FA7; --ombre: 4px 4px 0 #002FA7; --ombre-pale: 4px 4px 0 #DBE3F3;
   --display: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
-  --body: "IBM Plex Mono", ui-monospace, Menlo, monospace;
-  color-scheme: light;
-  background: var(--bg) !important;
-  color: #14204A !important;
 }
-/* une seule famille de texte (mono), titres en Instrument Sans, aucune police décorative */
-body.variante-life *, body.variante-life *::before, body.variante-life *::after {
-  font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace !important;
-  text-shadow: none !important;
-  animation: none !important;
+
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--fond); color: var(--texte); }
+body { font: 400 14.5px/1.5 var(--mono); min-height: 100vh; }
+h1, h2 { font-family: var(--display); font-weight: 700; color: var(--encre); margin: 0; letter-spacing: -.01em; }
+h1 { font-size: 26px; }
+h2 { font-size: 22px; margin: 14px 0 4px; }
+small, .aide { font-size: 12.5px; color: var(--texte); opacity: .8; }
+button, input { font: inherit; color: inherit; }
+
+/* en-tête */
+.app { max-width: 760px; margin: 0 auto; padding: 16px 16px 40px; }
+.haut { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0 12px; border-bottom: var(--trait); }
+.actions { display: flex; gap: 8px; }
+
+/* pilules et boutons */
+.pilule, .bouton {
+  min-height: 44px; padding: 8px 16px; border-radius: 999px; border: var(--trait);
+  background: transparent; color: var(--encre); font-size: 13px; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
 }
-body.variante-life h1, body.variante-life h2, body.variante-life h3,
-body.variante-life .bigtitle, body.variante-life .tampon {
-  font-family: "Instrument Sans", "Helvetica Neue", Arial, sans-serif !important;
+.pilule.on, .bouton { background: var(--encre); color: var(--surface); }
+.pilule[hidden], .bouton[hidden] { display: none; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--encre); outline-offset: 2px; }
+
+.ecran { margin-top: 12px; }
+.ecran[hidden] { display: none; }
+.carte { background: var(--surface); border: var(--trait); border-radius: 14px; box-shadow: var(--ombre); padding: 14px; }
+.champ { display: flex; flex-direction: column; gap: 6px; margin: 12px 0; font-size: 13px; color: var(--encre); }
+.champ input { min-height: 44px; border: var(--trait); border-radius: 10px; background: var(--surface); padding: 8px 10px; }
+.rangee { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+.etat { min-height: 1.5em; color: var(--texte); font-size: 13px; margin: 10px 0; }
+
+/* accueil : Moi, puis les espaces en tuiles carrées */
+.moi-tuile {
+  width: 132px; height: 132px; margin: 6px auto 16px; border-radius: 14px; background: var(--encre); color: var(--surface);
+  box-shadow: var(--ombre-pale); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer;
 }
-/* formes : carrés arrondis partout (aucun rond, aucun dégradé) */
-body.variante-life .moi, body.variante-life .disc, body.variante-life .rond, body.variante-life .bulle,
-body.variante-life .hdot, body.variante-life .mz, body.variante-life .linklab, body.variante-life .biglogo,
-body.variante-life .phx, body.variante-life .fondx, body.variante-life .hmoins, body.variante-life .tampon {
-  border-radius: 14px !important;
-  background-image: none !important;
+.moi-tuile b { font-family: var(--display); font-size: 22px; }
+.moi-tuile small { color: var(--surface); opacity: .9; }
+.grille { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.tuile {
+  min-height: 96px; padding: 12px; border: var(--trait); border-radius: 14px; background: var(--surface); box-shadow: var(--ombre);
+  display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; text-align: left; cursor: pointer; color: var(--texte);
 }
-body.variante-life .bulle, body.variante-life .disc, body.variante-life .moi {
-  background-color: #002FA7 !important;
-  color: #FDFAF4 !important;
-  box-shadow: 4px 4px 0 #DBE3F3 !important;
+.tuile b { font-family: var(--display); font-size: 16px; color: var(--encre); }
+.pastille { width: 14px; height: 14px; border-radius: 4px; border: 1px solid var(--encre); display: inline-block; }
+
+/* page d'un espace */
+.onglets { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+.ligne { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px dashed var(--doux); }
+.ligne:last-child { border-bottom: 0; }
+.marque { width: 22px; text-align: center; color: var(--encre); flex-shrink: 0; }
+.texte { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.fin { color: var(--gris); }
+
+/* ordinateur : fils à gauche, plateau arrondi à droite (règles séparées) */
+@media (min-width: 900px) and (pointer: fine) {
+  .app { max-width: 1120px; padding: 24px 32px 40px; }
+  .haut { padding-bottom: 14px; }
+  h1 { font-size: 30px; }
+  .ecran { margin-top: 0; }
+  #ecran-accueil:not([hidden]) ~ #ecran-espace:not([hidden]) { display: block; }
+  #app { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 24px; align-items: start; }
+  #app > .haut { grid-column: 1 / -1; }
+  #ecran-accueil { position: sticky; top: 16px; }
+  .moi-tuile { width: 120px; height: 120px; margin: 0 0 12px; }
+  .grille { grid-template-columns: 1fr; gap: 8px; }
+  .tuile { min-height: 0; flex-direction: row; align-items: center; justify-content: flex-start; gap: 12px; padding: 10px 12px; box-shadow: var(--ombre-pale); }
+  .tuile small { margin-left: auto; }
+  #ecran-espace, #ecran-reglages { background: var(--plateau); border: var(--trait); border-radius: 24px; box-shadow: 6px 6px 0 var(--encre); padding: 24px 28px; min-height: 480px; margin-top: 0; }
+  #ecran-espace .carte { box-shadow: var(--ombre); }
 }
-body.variante-life .rond, body.variante-life .biglogo, body.variante-life .hdot, body.variante-life .mz {
-  background-color: #FEFAF3 !important;
-  border: 1.5px solid #002FA7 !important;
-  box-shadow: 3px 3px 0 #002FA7 !important;
-}
-body.variante-life .tampon { border: 1.5px solid #002FA7 !important; background: transparent !important; }
-body.variante-life .board, body.variante-life .card, body.variante-life .page-in,
-body.variante-life .setlist li, body.variante-life .pane > section {
-  background: var(--surface) !important;
-  border: 1.5px solid #002FA7 !important;
-  border-radius: 14px !important;
-  box-shadow: 4px 4px 0 #002FA7 !important;
-}
-body.variante-life .page, body.variante-life aside.page {
-  background: var(--bg) !important; color: #14204A !important;
-}
-body.variante-life button, body.variante-life .btn, body.variante-life .ia, body.variante-life .pill {
-  border-radius: 999px !important;
-  border: 1.5px solid #002FA7 !important;
-  color: #002FA7 !important;
-  background: transparent !important;
-}
-body.variante-life .btn:not(.ghost) { background: #002FA7 !important; color: #FDFAF4 !important; }
-body.variante-life input, body.variante-life textarea, body.variante-life select {
-  background: #FEFAF3 !important; color: #14204A !important;
-  border: 1.5px solid #002FA7 !important; border-radius: 10px !important;
-}
-body.variante-life .hint, body.variante-life .motto, body.variante-life .help, body.variante-life small {
-  color: #14204A !important; opacity: .8;
-}
-/* le menu ••• reste celui de LIFE */
-body.variante-life #lifePlus { border-radius: 999px !important; }
