@@ -123,3 +123,37 @@ body.variante-life .setlist li {
     box-shadow: 6px 6px 0 var(--life-encre);
   }
 }
+
+/* ---------- Menu ••• (même place et même forme que le menu de LIFE) ---------- */
+body.variante-life header { position: relative; }
+body.variante-life header .tools,
+body.variante-life header .hautg { display: none; }
+body.variante-life #lifePlus {
+  all: unset; box-sizing: border-box; cursor: pointer;
+  min-width: 44px; min-height: 44px; padding: 0 12px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: var(--life-trait); border-radius: 999px;
+  font: 600 14px/1 var(--life-mono); color: var(--life-encre); background: var(--life-surface);
+  position: absolute; top: 14px; right: 16px; z-index: 12;
+}
+body.variante-life #lifeMenu {
+  position: absolute; top: 60px; right: 16px; z-index: 12;
+  display: flex; flex-direction: column; min-width: 240px;
+  background: var(--life-surface); border: var(--life-trait); border-radius: 14px;
+  box-shadow: var(--life-ombre); overflow: hidden;
+}
+body.variante-life #lifeMenu[hidden] { display: none; }
+body.variante-life #lifeMenu button {
+  all: unset; box-sizing: border-box; cursor: pointer; min-height: 48px; padding: 14px 20px;
+  font: 500 14.5px/20px var(--life-mono); color: var(--life-encre);
+}
+body.variante-life #lifeMenu button + button { border-top: 1px solid #6F86C6; }
+body.variante-life #lifeMenu .grp + .grp { border-top: 1.5px solid #002FA7; }
+body.variante-life #lifeMenu .grp-t {
+  display: block; padding: 10px 20px 2px; font: 600 12px/1.2 var(--life-mono);
+  letter-spacing: .06em; text-transform: uppercase; color: #4768BD;
+}
+body.variante-life #lifeMenu button:focus-visible { outline: 3px solid #002FA7; outline-offset: -4px; }
+body.variante-life #lifeMenu .grp { display: flex; flex-direction: column; align-items: stretch; flex-wrap: nowrap; }
+body.variante-life #lifeMenu .grp > button,
+body.variante-life #lifeMenu .grp > .grp-t { display: block; width: 100%; box-sizing: border-box; }
