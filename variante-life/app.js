@@ -149,16 +149,6 @@
     var carte = el('div', 'item');
     var entete = el('div', 'item-tete');
     entete.appendChild(el('span', 'item-nom', libelle || ''));
-    var lab = el('label', 'interrupteur');
-    lab.title = 'Vue carte';
-    var cb = el('input');
-    cb.type = 'checkbox';
-    cb.setAttribute('aria-label', 'Vue carte');
-    cb.checked = !!vueCarte[cle];
-    cb.addEventListener('change', function () { vueCarte[cle] = cb.checked; rendre(); });
-    lab.appendChild(cb);
-    lab.appendChild(el('span', 'piste'));
-    entete.appendChild(lab);
     carte.appendChild(entete);
     if ((vueCarte[cle] || vueEspace[choisi]) && detail) {
       /* vue « comme dans la carte de vie » : les champs de l'élément */
