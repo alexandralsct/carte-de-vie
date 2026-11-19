@@ -57,8 +57,8 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--encre); out
   color: var(--encre); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; text-align: center;
 }
 .tuile.on { background: var(--encre); color: var(--surface); box-shadow: var(--sh-1); }
-.tuile .ico { width: 22px; height: 22px; }
-.tuile .nom { font: 700 10px/1.1 var(--display); text-transform: uppercase; letter-spacing: 0; overflow-wrap: break-word; hyphens: auto; max-width: 100%; }
+.tuile .ico { width: 24px; height: 24px; flex-shrink: 0; }
+.tuile .nom { font: 700 11px/1.12 var(--display); text-transform: uppercase; letter-spacing: .02em; overflow-wrap: break-word; hyphens: auto; max-width: 100%; }
 .pastille-n { position: absolute; top: -8px; right: -6px; min-width: 22px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--encre); color: var(--surface); font: 600 11px/20px var(--mono); text-align: center; }
 .replier-zone { display: flex; justify-content: center; padding: 4px 0 8px; }
 .replier { min-width: 88px; height: 36px; border-radius: 999px; border: var(--trait); background: var(--surface); color: var(--encre); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }

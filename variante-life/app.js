@@ -34,13 +34,13 @@
     nav.textContent = '';
     nav.classList.toggle('repliee', repliees);
     var moi = { cle: 'moi', nom: 'Moi', badge: 0, couleur: '#002FA7' };
-    [moi].concat(espaces().map(function (e) {
-      return { cle: e._cle, nom: e.name || 'Sans nom', badge: tachesOuvertes(e), couleur: e.color || '#002FA7' };
+    [moi].concat(espaces().map(function (e, i) {
+      return { cle: e._cle, nom: e.name || 'Sans nom', badge: tachesOuvertes(e), couleur: e.color || '#002FA7', rang: i };
     })).forEach(function (t) {
       var b = el('button', 'tuile' + (t.cle === choisi ? ' on' : ''));
       b.type = 'button';
       b.setAttribute('aria-pressed', String(t.cle === choisi));
-      b.appendChild(icone(t.cle === 'moi'));
+      b.appendChild(icone(t.cle === 'moi' ? 'coach' : ORDRE_ICONES[t.rang % ORDRE_ICONES.length]));
       b.appendChild(el('span', 'nom', t.nom));
       if (t.badge) b.appendChild(el('span', 'pastille-n', t.badge));
       b.addEventListener('click', function () { choisi = t.cle; vueCarte = {}; rendre(); });
@@ -49,8 +49,23 @@
   }
 
   /* ---------- fil de conversation (Omniscient) ---------- */
+  /* icônes de LIFE (tracés statiques, une par tuile) */
+  var ICONES = {
+    general: '<path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/>',
+    travail: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 12h18"/>',
+    metamorphose: '<path d="M12 21v-9"/><path d="M12 12c0-4 2.5-7 7-7 0 4.5-3 7-7 7z"/><path d="M12 15c0-3-2-5.5-6-5.5 0 3.5 2.5 5.5 6 5.5z"/>',
+    patrimoine: '<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>',
+    quotidien: '<path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3v3M12 3v3"/>',
+    voyage: '<path d="M10.5 13.5L3 11l1.5-1.5 8 1 4-4c1-1 3-1.5 3.5-1s0 2.5-1 3.5l-4 4 1 8L14.5 22 12 14.5l-3 3V20l-1.5 1.5-1-3-3-1L6 16h2.5z"/>',
+    experts: '<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5M22 9v6"/>',
+    comite: '<path d="M3 21h18M5 21V10M19 21V10M9 21v-7M15 21v-7M2 10l10-6 10 6z"/>',
+    brainstorm: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
+    coach: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>'
+  };
+  var ORDRE_ICONES = ['general', 'travail', 'patrimoine', 'quotidien', 'voyage', 'experts', 'comite', 'brainstorm', 'coach', 'metamorphose'];
+
   /* icône en trait fin, comme dans LIFE (aucune couleur d'espace) */
-  function icone(estMoi) {
+  function icone(cle) {
     var ns = 'http://www.w3.org/2000/svg';
     var svg = document.createElementNS(ns, 'svg');
     svg.setAttribute('viewBox', '0 0 24 24');
@@ -61,9 +76,8 @@
     svg.setAttribute('stroke-linejoin', 'round');
     svg.setAttribute('aria-hidden', 'true');
     svg.setAttribute('class', 'ico');
-    var forme = document.createElementNS(ns, 'path');
-    forme.setAttribute('d', estMoi ? 'M12 4a8 8 0 1 0 0.01 0' : 'M5 5h14v14H5z');
-    svg.appendChild(forme);
+    /* tracés constants du code (aucune donnée de la carte) */
+    svg.innerHTML = ICONES[cle] || ICONES.general;
     return svg;
   }
 
