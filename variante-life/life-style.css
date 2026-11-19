@@ -1,84 +1,103 @@
-/* Ma carte de vie, variante « style LIFE » : mise en page de LIFE.
-   App téléphone : colonne centrée, tuiles en grille, pilules, pages empilées.
-   App ordinateur (souris, 900 px et plus) : espaces à gauche, plateau arrondi à droite. Règles séparées, en bas. */
+/* Ma carte de vie, variante « style LIFE » : même interface que LIFE (en-tête, boutons ronds, tuiles carrées,
+   fil de conversation, saisie en pied). Téléphone : colonne centrée. Ordinateur (souris, 900 px et plus) : barre à gauche. */
 
 :root {
-  --fond: #F5EEE2; --plateau: #FAF5EC; --surface: #FEFAF3;
-  --encre: #002FA7; --texte: #14204A; --pale: #DBE3F3; --doux: #6F86C6; --gris: #6F7896;
-  --trait: 1.5px solid #002FA7; --ombre: 4px 4px 0 #002FA7; --ombre-pale: 4px 4px 0 #DBE3F3;
+  --fond: #F5EEE2; --surface: #FEFAF3; --plateau: #FAF5EC;
+  --encre: #002FA7; --encre-2: #4768BD; --texte: #14204A; --trait-doux: #6F86C6; --pale: #DBE3F3; --gris: #6F7896;
+  --trait: 1.5px solid #002FA7;
+  --r-s: 8px; --r-m: 14px; --r-l: 24px;
+  --sh-1: 2px 2px 0 #C9D6F0; --sh-2: 4px 4px 0 #002FA7;
   --display: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
 }
-
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--fond); color: var(--texte); }
 body { font: 400 14.5px/1.5 var(--mono); min-height: 100vh; }
-h1, h2 { font-family: var(--display); font-weight: 700; color: var(--encre); margin: 0; letter-spacing: -.01em; }
-h1 { font-size: 26px; }
-h2 { font-size: 22px; margin: 14px 0 4px; }
-small, .aide { font-size: 12.5px; color: var(--texte); opacity: .8; }
 button, input { font: inherit; color: inherit; }
-
-/* en-tête */
-.app { max-width: 760px; margin: 0 auto; padding: 16px 16px 40px; }
-.haut { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0 12px; border-bottom: var(--trait); }
-.actions { display: flex; gap: 8px; }
-
-/* pilules et boutons */
-.pilule, .bouton {
-  min-height: 44px; padding: 8px 16px; border-radius: 999px; border: var(--trait);
-  background: transparent; color: var(--encre); font-size: 13px; cursor: pointer;
-  display: inline-flex; align-items: center; justify-content: center;
-}
-.pilule.on, .bouton { background: var(--encre); color: var(--surface); }
-.pilule[hidden], .bouton[hidden] { display: none; }
 button:focus-visible, input:focus-visible { outline: 3px solid var(--encre); outline-offset: 2px; }
+[hidden] { display: none !important; }
 
-.ecran { margin-top: 12px; }
-.ecran[hidden] { display: none; }
-.carte { background: var(--surface); border: var(--trait); border-radius: 14px; box-shadow: var(--ombre); padding: 14px; }
-.champ { display: flex; flex-direction: column; gap: 6px; margin: 12px 0; font-size: 13px; color: var(--encre); }
-.champ input { min-height: 44px; border: var(--trait); border-radius: 10px; background: var(--surface); padding: 8px 10px; }
-.rangee { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
-.etat { min-height: 1.5em; color: var(--texte); font-size: 13px; margin: 10px 0; }
+/* colonne téléphone */
+.appli { max-width: 760px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; padding: 0 0 0; }
 
-/* accueil : Moi, puis les espaces en tuiles carrées */
-.moi-tuile {
-  width: 132px; height: 132px; margin: 6px auto 16px; border-radius: 14px; background: var(--encre); color: var(--surface);
-  box-shadow: var(--ombre-pale); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer;
+/* en-tête LIFE */
+.entete { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding: 18px 16px 12px; border-bottom: var(--trait); position: relative; }
+.titre h1 { margin: 0; font-family: var(--display); font-weight: 700; font-size: 30px; line-height: 1.05; color: var(--encre); letter-spacing: -.01em; }
+.ver { display: block; margin-top: 4px; font: 500 13px/1 var(--mono); letter-spacing: .08em; color: var(--encre); opacity: .85; }
+.boutons { display: flex; gap: 8px; position: relative; }
+.rond {
+  width: 46px; height: 46px; border-radius: 999px; border: var(--trait); background: var(--surface);
+  color: var(--encre); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; flex-shrink: 0;
 }
-.moi-tuile b { font-family: var(--display); font-size: 22px; }
-.moi-tuile small { color: var(--surface); opacity: .9; }
-.grille { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.rond svg { width: 22px; height: 22px; }
+.rond:disabled { opacity: .45; cursor: default; }
+.menu {
+  position: absolute; top: calc(100% + 6px); right: 0; z-index: 12; display: flex; flex-direction: column; min-width: 220px;
+  background: var(--surface); border: var(--trait); border-radius: var(--r-m); box-shadow: var(--sh-2); overflow: hidden;
+}
+.menu button { all: unset; box-sizing: border-box; cursor: pointer; min-height: 48px; padding: 14px 18px; font: 500 14.5px/20px var(--mono); color: var(--encre); }
+.menu button + button { border-top: 1px solid var(--trait-doux); }
+
+/* écran de connexion : neutre, seulement la proposition de se connecter */
+.connexion { padding: 28px 16px; display: flex; flex-direction: column; gap: 6px; }
+.connexion h2 { margin: 0; font-family: var(--display); font-weight: 700; font-size: 24px; color: var(--encre); }
+.aide { font-size: 13px; color: var(--texte); opacity: .85; margin: 4px 0 8px; }
+.champ { display: flex; flex-direction: column; gap: 6px; margin: 10px 0; font-size: 13px; color: var(--encre); }
+.champ input { min-height: 46px; border: var(--trait); border-radius: 12px; background: var(--surface); padding: 8px 12px; }
+.rangee { display: flex; gap: 8px; margin-top: 6px; }
+.pilule { min-height: 44px; padding: 8px 18px; border-radius: 999px; border: var(--trait); background: var(--surface); color: var(--encre); font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.pilule.plein { background: var(--encre); color: var(--surface); }
+.etat { min-height: 1.4em; font-size: 13px; color: var(--encre); margin: 8px 0 0; }
+
+/* rangée de tuiles carrées arrondies (espaces) */
+.tuiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; padding: 12px 12px 6px; }
+.tuiles.repliee { grid-template-rows: 1fr; max-height: 100px; overflow: hidden; }
 .tuile {
-  min-height: 96px; padding: 12px; border: var(--trait); border-radius: 14px; background: var(--surface); box-shadow: var(--ombre);
-  display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; text-align: left; cursor: pointer; color: var(--texte);
+  position: relative; min-height: 88px; padding: 8px 3px 7px; border: var(--trait); border-radius: var(--r-m); background: var(--surface);
+  color: var(--encre); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; text-align: center;
 }
-.tuile b { font-family: var(--display); font-size: 16px; color: var(--encre); }
-.pastille { width: 14px; height: 14px; border-radius: 4px; border: 1px solid var(--encre); display: inline-block; }
+.tuile.on { background: var(--encre); color: var(--surface); box-shadow: var(--sh-1); }
+.tuile .ico { width: 22px; height: 22px; border-radius: 7px; border: 1.5px solid currentColor; }
+.tuile .nom { font: 700 10px/1.1 var(--display); text-transform: uppercase; letter-spacing: 0; overflow-wrap: break-word; hyphens: auto; max-width: 100%; }
+.pastille-n { position: absolute; top: -8px; right: -6px; min-width: 22px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--encre); color: var(--surface); font: 600 11px/20px var(--mono); text-align: center; }
+.replier-zone { display: flex; justify-content: center; padding: 4px 0 8px; }
+.replier { min-width: 88px; height: 36px; border-radius: 999px; border: var(--trait); background: var(--surface); color: var(--encre); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.replier svg { width: 20px; height: 20px; }
 
-/* page d'un espace */
-.onglets { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
-.ligne { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px dashed var(--doux); }
-.ligne:last-child { border-bottom: 0; }
-.marque { width: 22px; text-align: center; color: var(--encre); flex-shrink: 0; }
-.texte { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.fin { color: var(--gris); }
+/* fil de conversation (Omniscient) */
+.fil { flex: 1; min-height: 0; overflow-y: auto; padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 10px; border-top: var(--trait); }
+.bulle { max-width: 86%; align-self: flex-start; padding: 12px 14px; border: var(--trait); border-radius: var(--r-m); background: var(--surface); font-size: 14px; line-height: 1.5; }
+.bulle p { margin: 0; overflow-wrap: anywhere; }
+.bulle.moi { align-self: flex-end; background: var(--encre); color: var(--surface); border-radius: var(--r-m) var(--r-m) 4px var(--r-m); }
+.titre-section { margin: 10px 0 0; font: 700 13px/1.2 var(--display); text-transform: uppercase; letter-spacing: .06em; color: var(--encre); }
+.item { border: var(--trait); border-radius: var(--r-m); background: var(--surface); padding: 10px 12px; box-shadow: var(--sh-1); }
+.item-tete { display: flex; align-items: center; gap: 8px; }
+.marque { color: var(--encre); width: 18px; text-align: center; }
+.item-nom { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.coche { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--encre); cursor: pointer; white-space: nowrap; }
+.coche input { width: 18px; height: 18px; accent-color: #002FA7; margin: 0; }
+.detail { margin: 6px 0 0 26px; font-size: 13px; color: var(--texte); overflow-wrap: anywhere; }
+.rapides { display: flex; flex-wrap: wrap; gap: 8px; }
 
-/* ordinateur : fils à gauche, plateau arrondi à droite (règles séparées) */
+/* saisie en pied : micro, champ, envoi */
+.saisie { display: flex; align-items: center; gap: 10px; padding: 10px 16px calc(14px + env(safe-area-inset-bottom, 0px)); border-top: var(--trait); background: var(--fond); }
+.champ-saisie { flex: 1; min-width: 0; min-height: 46px; display: flex; align-items: center; padding: 0 16px; border: var(--trait); border-radius: 999px; background: var(--surface); color: var(--encre-2); font-size: 14px; }
+
+/* ordinateur : barre des espaces à gauche, fil à droite dans un plateau arrondi (règles séparées) */
 @media (min-width: 900px) and (pointer: fine) {
-  .app { max-width: 1120px; padding: 24px 32px 40px; }
-  .haut { padding-bottom: 14px; }
-  h1 { font-size: 30px; }
-  .ecran { margin-top: 0; }
-  #ecran-accueil:not([hidden]) ~ #ecran-espace:not([hidden]) { display: block; }
-  #app { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 24px; align-items: start; }
-  #app > .haut { grid-column: 1 / -1; }
-  #ecran-accueil { position: sticky; top: 16px; }
-  .moi-tuile { width: 120px; height: 120px; margin: 0 0 12px; }
-  .grille { grid-template-columns: 1fr; gap: 8px; }
-  .tuile { min-height: 0; flex-direction: row; align-items: center; justify-content: flex-start; gap: 12px; padding: 10px 12px; box-shadow: var(--ombre-pale); }
-  .tuile small { margin-left: auto; }
-  #ecran-espace, #ecran-reglages { background: var(--plateau); border: var(--trait); border-radius: 24px; box-shadow: 6px 6px 0 var(--encre); padding: 24px 28px; min-height: 480px; margin-top: 0; }
-  #ecran-espace .carte { box-shadow: var(--ombre); }
+  .appli { max-width: 1200px; display: grid; grid-template-columns: 300px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; height: 100vh; min-height: 0; padding: 0 24px 24px; gap: 0 24px; }
+  .entete { grid-column: 1 / -1; padding: 18px 0 12px; }
+  .titre h1 { font-size: 34px; }
+  .connexion { grid-column: 1 / -1; max-width: 520px; }
+  .tuiles { grid-column: 1; grid-row: 2; grid-template-columns: 1fr; gap: 8px; padding: 14px 0 0; align-content: start; overflow-y: auto; }
+  .tuiles.repliee { max-height: none; }
+  .tuile { flex-direction: row; justify-content: flex-start; min-height: 0; padding: 12px 14px; text-align: left; box-shadow: var(--sh-1); }
+  .tuile.on { box-shadow: var(--sh-2); }
+  .tuile .nom { font-size: 14px; }
+  .pastille-n { position: static; margin-left: auto; }
+  .replier-zone { grid-column: 1; grid-row: 3; justify-content: flex-start; padding: 0; }
+  .fil { grid-column: 2; grid-row: 2; background: var(--plateau); border: var(--trait); border-radius: var(--r-l); box-shadow: 6px 6px 0 var(--encre); margin-top: 14px; padding: 22px 24px; border-top: var(--trait); }
+  .saisie { grid-column: 2; grid-row: 3; padding: 14px 0 0; background: transparent; border-top: 0; }
+  .replier-zone.masque-bureau { display: none; }
+  .bulle { max-width: 70%; }
 }

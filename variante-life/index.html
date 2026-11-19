@@ -6,58 +6,67 @@
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#F5EEE2">
-<title>Ma carte de vie (style LIFE)</title>
+<title>Ma carte de vie</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="stylesheet" href="life-style.css">
 </head>
-<body class="variante-life">
-<main class="app" id="app">
-  <header class="haut">
-    <h1>Ma carte de vie</h1>
-    <div class="actions">
-      <button type="button" class="pilule" id="actu">Actualiser</button>
-      <button type="button" class="pilule" id="reglages">Réglages</button>
+<body>
+<div class="appli" id="appli">
+
+  <header class="entete">
+    <div class="titre">
+      <h1>Ma carte</h1>
+      <span class="ver" id="ver">V.0.0.1</span>
+    </div>
+    <div class="boutons" role="toolbar" aria-label="Actions">
+      <button type="button" class="rond" id="actu" title="Actualiser" aria-label="Actualiser">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg>
+      </button>
+      <button type="button" class="rond" id="reglages" title="Réglages" aria-label="Réglages">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2-1.2L14 3h-4l-.6 2.6a7 7 0 0 0-2 1.2l-2.3-.9-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.3-.9a7 7 0 0 0 2 1.2L10 21h4l.6-2.6a7 7 0 0 0 2-1.2l2.3.9 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/></svg>
+      </button>
+      <button type="button" class="rond" id="plus" title="Plus" aria-label="Plus d'options" aria-haspopup="menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+      </button>
+      <div class="menu" id="menu" role="menu" hidden>
+        <button type="button" role="menuitem" id="m-reglages">Réglages</button>
+        <button type="button" role="menuitem" id="m-actu">Actualiser</button>
+      </div>
     </div>
   </header>
 
-  <section id="ecran-reglages" class="ecran" hidden>
-    <div class="carte">
-      <h2>Connexion</h2>
-      <p class="aide">Ta carte est lue depuis ton dépôt privé. La clé reste sur cet appareil et n'est envoyée qu'à GitHub.</p>
-      <label class="champ">Dépôt privé
-        <input id="repo" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="identifiant/nom-du-depot">
-      </label>
-      <label class="champ">Clé d'accès
-        <input id="cle" type="password" autocomplete="off" placeholder="github_pat_…">
-      </label>
-      <div class="rangee">
-        <button type="button" class="bouton" id="enregistrer">Enregistrer</button>
-        <button type="button" class="pilule" id="retour">Retour</button>
-      </div>
-      <p class="etat" id="etat-reglages" role="status"></p>
-    </div>
-  </section>
-
-  <section id="ecran-accueil" class="ecran">
-    <p class="etat" id="etat" role="status">Chargement de ta carte…</p>
-    <div class="moi-tuile" id="moi" role="button" tabindex="0" aria-label="Moi">
-      <b>Moi</b><small id="moi-sous"></small>
-    </div>
-    <div class="grille" id="espaces"></div>
-  </section>
-
-  <section id="ecran-espace" class="ecran" hidden>
+  <section class="connexion" id="ecran-connexion" hidden>
+    <h2>Relier ma carte</h2>
+    <p class="aide">Ta carte est lue depuis ton dépôt privé. La clé reste sur cet appareil et n'est envoyée qu'à GitHub.</p>
+    <label class="champ">Dépôt privé
+      <input id="repo" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="identifiant/nom-du-depot">
+    </label>
+    <label class="champ">Clé d'accès
+      <input id="cle" type="password" autocomplete="off" placeholder="github_pat_…">
+    </label>
     <div class="rangee">
-      <button type="button" class="pilule" id="retour-espace">← Ma carte</button>
+      <button type="button" class="pilule plein" id="enregistrer">Se connecter</button>
     </div>
-    <h2 id="espace-titre"></h2>
-    <p class="aide" id="espace-sous"></p>
-    <div class="onglets" id="espace-onglets"></div>
-    <div class="carte" id="espace-contenu"></div>
+    <p class="etat" id="etat-connexion" role="status"></p>
   </section>
-</main>
+
+  <nav class="tuiles" id="tuiles" aria-label="Mes espaces"></nav>
+  <div class="replier-zone"><button type="button" class="replier" id="replier" aria-expanded="true" aria-label="Replier les espaces"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button></div>
+
+  <main class="fil" id="fil" aria-live="polite"></main>
+
+  <footer class="saisie" id="saisie">
+    <button type="button" class="rond" aria-label="Micro (bientôt)" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+    </button>
+    <div class="champ-saisie" aria-label="Écrire à Omniscient">Écris à Omniscient…</div>
+    <button type="button" class="rond" aria-label="Envoyer (bientôt)" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+  </footer>
+</div>
 <script src="app.js"></script>
 </body>
 </html>
