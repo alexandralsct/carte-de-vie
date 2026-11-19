@@ -40,9 +40,7 @@
       var b = el('button', 'tuile' + (t.cle === choisi ? ' on' : ''));
       b.type = 'button';
       b.setAttribute('aria-pressed', String(t.cle === choisi));
-      var ico = el('span', 'ico');
-      ico.style.background = t.couleur;
-      b.appendChild(ico);
+      b.appendChild(icone(t.cle === 'moi'));
       b.appendChild(el('span', 'nom', t.nom));
       if (t.badge) b.appendChild(el('span', 'pastille-n', t.badge));
       b.addEventListener('click', function () { choisi = t.cle; vueCarte = {}; rendre(); });
@@ -51,6 +49,24 @@
   }
 
   /* ---------- fil de conversation (Omniscient) ---------- */
+  /* icône en trait fin, comme dans LIFE (aucune couleur d'espace) */
+  function icone(estMoi) {
+    var ns = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('stroke-width', '1.75');
+    svg.setAttribute('stroke-linecap', 'round');
+    svg.setAttribute('stroke-linejoin', 'round');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('class', 'ico');
+    var forme = document.createElementNS(ns, 'path');
+    forme.setAttribute('d', estMoi ? 'M12 4a8 8 0 1 0 0.01 0' : 'M5 5h14v14H5z');
+    svg.appendChild(forme);
+    return svg;
+  }
+
   function bulle(texte, moi) {
     var d = el('div', 'bulle' + (moi ? ' moi' : ''));
     d.appendChild(el('p', '', texte));
@@ -70,7 +86,6 @@
   function ligneItem(libelle, detail, cle, typeMarque) {
     var carte = el('div', 'item');
     var entete = el('div', 'item-tete');
-    entete.appendChild(el('span', 'marque', typeMarque || '•'));
     entete.appendChild(el('span', 'item-nom', libelle || ''));
     var lab = el('label', 'coche');
     var cb = el('input');
