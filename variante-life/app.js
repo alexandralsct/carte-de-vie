@@ -9,6 +9,7 @@
   var repliees = false;
   document.body.classList.add('grille');
   var vueCarte = {};             /* élément coché : affichage « comme dans la carte » */
+  var vueEspace = {};            /* espace coché : tout l'espace prend l'interface de la carte */
 
   function lire(cle) { try { return localStorage.getItem(cle) || ''; } catch (e) { return ''; } }
   function ecrire(cle, val) { try { localStorage.setItem(cle, val); return true; } catch (e) { return false; } }
@@ -110,7 +111,7 @@
     lab.appendChild(el('span', '', 'Vue carte'));
     entete.appendChild(lab);
     carte.appendChild(entete);
-    if (vueCarte[cle] && detail) {
+    if ((vueCarte[cle] || vueEspace[choisi]) && detail) {
       /* vue « comme dans la carte de vie » : les champs de l'élément */
       detail.forEach(function (d) { carte.appendChild(el('p', 'detail', d)); });
     }
@@ -133,6 +134,20 @@
     var e = donnees[choisi];
     if (!e) { fil.appendChild(bulle('Cet espace n\'existe plus.', false)); return; }
     fil.appendChild(bulle((e.name || 'Sans nom') + ' · ' + tachesOuvertes(e) + ' tâche(s) ouverte(s).', false));
+    var coche = el('label', 'coche coche-espace');
+    var cbE = el('input');
+    cbE.type = 'checkbox';
+    cbE.checked = !!vueEspace[choisi];
+    cbE.addEventListener('change', function () { vueEspace[choisi] = cbE.checked; rendre(); });
+    coche.appendChild(cbE);
+    coche.appendChild(el('span', '', 'Vue carte de tout l\'espace'));
+    fil.appendChild(coche);
+    if (vueEspace[choisi] && e.notes) {
+      var rc = el('div', 'item');
+      rc.appendChild(el('p', 'titre-section', 'Récap'));
+      rc.appendChild(el('p', 'detail', e.notes));
+      fil.appendChild(rc);
+    }
 
     var sections = [
       ['Tâches', (e.tasks || []).map(function (t) {
