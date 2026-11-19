@@ -11,19 +11,19 @@
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; background: var(--fond); color: var(--texte); }
+html, body { margin: 0; height: 100%; background: var(--fond); color: var(--texte); overflow: hidden; overscroll-behavior: none; }
 body { font: 400 14.5px/1.5 var(--mono); min-height: 100vh; }
 button, input { font: inherit; color: inherit; }
 button:focus-visible, input:focus-visible { outline: 3px solid var(--encre); outline-offset: 2px; }
 [hidden] { display: none !important; }
 
 /* colonne téléphone */
-.appli { max-width: 760px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; padding: 0 0 0; }
+.appli { max-width: 760px; margin: 0 auto; height: 100vh; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; padding: 0 0 0; }
 
 /* en-tête LIFE */
 .entete { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding: 18px 16px 12px; border-bottom: var(--trait); position: relative; }
-.titre h1 { margin: 0; font-family: var(--display); font-weight: 700; font-size: 30px; line-height: 1.05; color: var(--encre); letter-spacing: -.01em; }
-.ver { display: block; margin-top: 4px; font: 500 13px/1 var(--mono); letter-spacing: .08em; color: var(--encre); opacity: .85; }
+.titre h1 { margin: 0; font-family: var(--display); font-weight: 700; font-size: 26px; line-height: 1; color: var(--encre); letter-spacing: -.5px; }
+.titre h1 small { display: block; font: 400 12.5px/1.2 var(--mono); letter-spacing: .5px; color: var(--encre-2); margin-top: 4px; text-transform: uppercase; white-space: nowrap; }
 .boutons { display: flex; gap: 8px; position: relative; }
 .rond {
   width: 46px; height: 46px; border-radius: 999px; border: var(--trait); background: var(--surface);
