@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr" data-theme="light">
+<html lang="fr" data-theme="light" class="chargement">
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://api.github.com; object-src 'none'; base-uri 'none'; form-action 'none'">
@@ -18,7 +18,7 @@
 
   <header class="entete">
     <div class="titre">
-      <h1>Ma carte<small id="ver">V.0.0.16</small></h1>
+      <h1>Ma carte<small id="ver">V.0.0.18</small></h1>
     </div>
     <div class="boutons" role="toolbar" aria-label="Actions">
       <button type="button" class="rond" id="actu" title="Actualiser" aria-label="Actualiser">
@@ -62,8 +62,8 @@
     <button type="button" class="rond" aria-label="Micro (bientôt)" disabled>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
     </button>
-    <div class="champ-saisie" aria-label="Écrire à Omniscient">Écris à Omniscient…</div>
-    <button type="button" class="rond" aria-label="Envoyer (bientôt)" disabled>
+    <input id="texte" class="champ-saisie" type="text" autocomplete="off" placeholder="Écris à Omniscient…" aria-label="Écrire à Omniscient">
+    <button type="button" class="rond" id="envoi" aria-label="Envoyer">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h14M13 6l6 6-6 6"/></svg>
     </button>
   </footer>

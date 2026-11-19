@@ -229,11 +229,66 @@
   function rendre() {
     rendreTuiles();
     rendreFil();
+    montreEchanges();
     $('fil').scrollTop = 0;
+    prete();
   }
 
+  /* ---------- Omniscient : même échange que la carte (point d'accroche « app-lien ») ---------- */
+  var echanges = [];   /* { cle, type, texte, reponse } : mémoire de cette ouverture */
+  function lienServeur() {
+    var c = json('connexion') || {};
+    var s = String(c.serveur || '').trim();
+    return /^https:\/\/[^\s\/?#]+$/.test(s) ? s : '';
+  }
+  function montreEchanges() {
+    var fil = $('fil');
+    echanges.forEach(function (x) {
+      if (x.cle !== choisi) return;
+      fil.appendChild(bulle(x.texte, true));
+      fil.appendChild(bulle(x.reponse, false));
+    });
+  }
+  function envoieOmni(type, texte) {
+    var base = lienServeur(), cle = lire('carte-de-vie-lien');
+    var attente = bulle('L\'assistant lit et réfléchit…', false);
+    var cle0 = choisi;
+    $('fil').appendChild(bulle(texte, true));
+    $('fil').appendChild(attente);
+    if (!base || !cle) { attente.textContent = 'Le lien n\'est pas encore prêt sur cet appareil : vérifie la connexion de la carte.'; return; }
+    var element = { type: choisi === 'moi' ? 'moi' : 'espace', id: choisi };
+    fetch(base + '/crochets/app-lien', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Cle-App': cle },
+      body: JSON.stringify({ type: type, texte: texte, element: element })
+    }).then(function (r) {
+      if (r.status === 401 || r.status === 403) return 'Clé du lien refusée : vérifie-la dans la carte.';
+      if (r.status === 404) return 'Le lien n\'est pas encore activé côté système.';
+      if (!r.ok) return 'Le système a répondu une erreur (' + r.status + '). Réessaie dans un moment.';
+      return r.json().then(function (j) { return j.reponse || 'Réponse vide.'; });
+    }).catch(function () { return 'Impossible de joindre le système.'; })
+      .then(function (rep) {
+        echanges.push({ cle: cle0, type: type, texte: texte, reponse: rep });
+        if (attente.parentNode) attente.parentNode.removeChild(attente);
+        if (choisi === cle0) $('fil').appendChild(bulle(rep, false));
+      });
+  }
+  function envoieSaisie() {
+    var champ = $('texte');
+    var t = champ.value.trim();
+    if (!t) return;
+    champ.value = '';
+    envoieOmni('question', t);
+  }
+  $('envoi').addEventListener('click', envoieSaisie);
+  $('texte').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); envoieSaisie(); } });
+
   /* ---------- écrans : connexion neutre, puis carte ---------- */
+  /* coque neutre : tant que rien n'est prêt, le HTML reste masqué (pas d'ancienne version affichée) */
+  function prete() { document.documentElement.classList.remove('chargement'); }
+  setTimeout(prete, 6000);   /* filet : jamais d'écran blanc si le réseau traîne */
+
   function montreConnexion(vrai) {
+    if (vrai) prete();
     $('ecran-connexion').hidden = !vrai;
     $('tuiles').hidden = vrai;
     $('replier').parentNode.hidden = vrai;
