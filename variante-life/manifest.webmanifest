@@ -1,7 +1,7 @@
 {
- "id": "./",
+ "id": "./variante-style-life",
  "name": "Ma carte de vie (style LIFE)",
- "short_name": "Carte de vie",
+ "short_name": "Ma carte",
  "description": "Ma carte de vie : mes espaces, mes rubriques et mes jours, sur le téléphone et l'ordinateur.",
  "start_url": "./index.html",
  "scope": "./",
@@ -22,19 +22,19 @@
  "prefer_related_applications": false,
  "icons": [
   {
-   "src": "icon-192.png",
+   "src": "logo-a-192.png",
    "sizes": "192x192",
    "type": "image/png",
    "purpose": "any"
   },
   {
-   "src": "icon-512.png",
+   "src": "logo-a-512.png",
    "sizes": "512x512",
    "type": "image/png",
    "purpose": "any"
   },
   {
-   "src": "icon-maskable-512.png",
+   "src": "logo-a-maskable-512.png",
    "sizes": "512x512",
    "type": "image/png",
    "purpose": "maskable"
@@ -49,20 +49,5 @@
    "url": "lien"
   },
   "enctype": "application/x-www-form-urlencoded"
- },
- "shortcuts": [
-  {
-   "name": "LIFE",
-   "short_name": "LIFE",
-   "description": "Ma messagerie",
-   "url": "./index.html#life",
-   "icons": [
-    {
-     "src": "icon-192.png",
-     "sizes": "192x192",
-     "type": "image/png"
-    }
-   ]
-  }
- ]
+ }
 }
