@@ -6,7 +6,7 @@
    (tests/test_charte_apps.py vérifie que les trois copies sont identiques à la source et que les contrastes tiennent).
    Polices : deux familles, hébergées avec chaque app (dossier fonts/ à côté de la page, licence SIL OFL 1.1) :
    aucun appel à un tiers. Instrument Sans (titres, texte long) est une police variable : une seule déclaration.
-   Jour par défaut ; nuit par le réglage de l'appareil, ou forcée avec data-theme="nuit" (data-theme="jour" force le jour). */
+   Thème clair seul (pas de mode nuit dans cette app). *
 @font-face { font-family: 'Instrument Sans'; font-style: normal; font-weight: 400 700; font-display: swap; src: url(fonts/instrument-sans.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 @font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/plex-mono-400.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 @font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 500; font-display: swap; src: url(fonts/plex-mono-500.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
@@ -31,28 +31,9 @@
   --trait-l: 1.5px;
   --sh-1: 2px 2px 0 var(--ombre); --sh-2: 4px 4px 0 var(--ombre); --sh-3: 4px 4px 0 var(--encre);
   --cible: 44px;
-  color-scheme: light;
 }
-:root[data-theme="nuit"] {
-  --fond: #0E1830; --plateau: #122041; --surface: #172A52;
-  --encre: #E3EAFF; --encre-2: #9AABD4; --texte: #E3EAFF;
-  --trait: #93B3F0; --trait-doux: #6A80B8; --pale: #29447F; --ombre: #070F22;
-  --plein: #93B3F0; --sur-plein: #0E1830;
-  --ok: #4CC88E; --veille: #F0A93B; --panne: #FF858D; --neutre: #8F9AC0;
-  --sh-3: 4px 4px 0 #2F55D4;
-  color-scheme: dark;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="jour"]) {
-    --fond: #0E1830; --plateau: #122041; --surface: #172A52;
-    --encre: #E3EAFF; --encre-2: #9AABD4; --texte: #E3EAFF;
-    --trait: #93B3F0; --trait-doux: #6A80B8; --pale: #29447F; --ombre: #070F22;
-    --plein: #93B3F0; --sur-plein: #0E1830;
-    --ok: #4CC88E; --veille: #F0A93B; --panne: #FF858D; --neutre: #8F9AC0;
-    --sh-3: 4px 4px 0 #2F55D4;
-    color-scheme: dark;
-  }
-}
+
+
 /* ===== jetons communs : fin ===== */
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; background: var(--fond); color: var(--texte); overflow: hidden; overscroll-behavior: none; }
