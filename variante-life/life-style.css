@@ -1,18 +1,62 @@
-/* Ma carte de vie, variante « style LIFE » : même interface que LIFE (en-tête, boutons ronds, tuiles carrées,
-   fil de conversation, saisie en pied). Téléphone : colonne centrée. Ordinateur (souris, 900 px et plus) : barre à gauche. */
-
+/* Polices et jetons : charte commune aux trois apps (apps/charte/jetons.css). */
+/* ===== jetons communs : début (copie de apps/charte/jetons.css — ne pas modifier ici) ===== */
+/* ===== Jetons communs — LIFE, Coulisses, Tri Instagram (charte du 13/10/2026, audit design) =====
+   Source unique : apps/charte/jetons.css. Chaque app en garde une COPIE IDENTIQUE en tête de sa feuille de style,
+   entre les deux lignes « jetons communs » ; la recopier avec : python3 apps/charte/synchroniser.py
+   (tests/test_charte_apps.py vérifie que les trois copies sont identiques à la source et que les contrastes tiennent).
+   Polices : deux familles, hébergées avec chaque app (dossier fonts/ à côté de la page, licence SIL OFL 1.1) :
+   aucun appel à un tiers. Instrument Sans (titres, texte long) est une police variable : une seule déclaration.
+   Jour par défaut ; nuit par le réglage de l'appareil, ou forcée avec data-theme="nuit" (data-theme="jour" force le jour). */
+@font-face { font-family: 'Instrument Sans'; font-style: normal; font-weight: 400 700; font-display: swap; src: url(fonts/instrument-sans.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/plex-mono-400.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 500; font-display: swap; src: url(fonts/plex-mono-500.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 600; font-display: swap; src: url(fonts/plex-mono-600.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 700; font-display: swap; src: url(fonts/plex-mono-700.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 :root {
-  --fond: #F5EEE2; --surface: #FEFAF3; --plateau: #FAF5EC;
-  --encre: #002FA7; --encre-2: #4768BD; --texte: #14204A; --trait-doux: #6F86C6; --pale: #DBE3F3; --gris: #6F7896;
-  --trait: 1.5px solid #002FA7;
-  --r-s: 8px; --r-m: 14px; --r-l: 24px;
-  --sh-1: 2px 2px 0 #C9D6F0; --sh-2: 4px 4px 0 #002FA7;
+  /* couleurs : fond crème, encre bleu Klein (contrastes : tests/test_charte_apps.py) */
+  --fond: var(--fond); --plateau: var(--plateau); --surface: var(--surface);
+  --encre: var(--trait); --encre-2: #4768BD; --texte: #14204A;
+  --trait: var(--trait); --trait-doux: var(--trait-doux); --pale: var(--pale); --ombre: var(--ombre);
+  --plein: var(--trait); --sur-plein: var(--sur-plein);
+  /* états : toujours doublés d'une forme ou d'un mot (jamais la couleur seule) */
+  --ok: #186E48; --veille: #925500; --panne: #B42A35; --neutre: #6F7896;
+  /* typographie : deux familles, sept tailles */
   --display: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --t-xs: 12px; --t-s: 13px; --t-m: 14.5px; --t-l: 16px; --t-xl: 18px; --t-2xl: 22px; --t-3xl: 28px;
+  /* espace (grille de 4) */
+  --e-1: 4px; --e-2: 8px; --e-3: 12px; --e-4: 16px; --e-5: 24px; --e-6: 32px;
+  /* formes : trait de 1,5 px, ombres décalées sans flou */
+  --r-s: 8px; --r-m: 14px; --r-l: 24px; --r-p: 999px;
+  --trait-l: 1.5px;
+  --sh-1: 2px 2px 0 var(--ombre); --sh-2: 4px 4px 0 var(--ombre); --sh-3: 4px 4px 0 var(--encre);
+  --cible: 44px;
+  color-scheme: light;
 }
+:root[data-theme="nuit"] {
+  --fond: #0E1830; --plateau: #122041; --surface: #172A52;
+  --encre: #E3EAFF; --encre-2: #9AABD4; --texte: #E3EAFF;
+  --trait: #93B3F0; --trait-doux: #6A80B8; --pale: #29447F; --ombre: #070F22;
+  --plein: #93B3F0; --sur-plein: #0E1830;
+  --ok: #4CC88E; --veille: #F0A93B; --panne: #FF858D; --neutre: #8F9AC0;
+  --sh-3: 4px 4px 0 #2F55D4;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="jour"]) {
+    --fond: #0E1830; --plateau: #122041; --surface: #172A52;
+    --encre: #E3EAFF; --encre-2: #9AABD4; --texte: #E3EAFF;
+    --trait: #93B3F0; --trait-doux: #6A80B8; --pale: #29447F; --ombre: #070F22;
+    --plein: #93B3F0; --sur-plein: #0E1830;
+    --ok: #4CC88E; --veille: #F0A93B; --panne: #FF858D; --neutre: #8F9AC0;
+    --sh-3: 4px 4px 0 #2F55D4;
+    color-scheme: dark;
+  }
+}
+/* ===== jetons communs : fin ===== */
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; background: var(--fond); color: var(--texte); overflow: hidden; overscroll-behavior: none; }
-body { font: 400 14.5px/1.5 var(--mono); min-height: 100vh; }
+body { font: var(--t-l)/1.45 var(--mono); min-height: 100vh; }
 button, input { font: inherit; color: inherit; }
 button:focus-visible, input:focus-visible { outline: 3px solid var(--encre); outline-offset: 2px; }
 [hidden] { display: none !important; }
@@ -21,19 +65,19 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--encre); out
 .appli { max-width: 760px; margin: 0 auto; height: 100vh; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; padding: 0 0 0; }
 
 /* en-tête LIFE */
-.entete { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding: 18px 16px 12px; border-bottom: var(--trait); position: relative; }
+.entete { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding: 18px 16px 12px; border-bottom: var(--trait-l) solid var(--trait); position: relative; }
 .titre h1 { margin: 0; font-family: var(--display); font-weight: 700; font-size: 26px; line-height: 1; color: var(--encre); letter-spacing: -.5px; }
-.titre h1 small { display: block; font: 400 12.5px/1.2 var(--mono); letter-spacing: .5px; color: var(--encre-2); margin-top: 4px; text-transform: uppercase; white-space: nowrap; }
+.titre h1 small { display: block; font: 400 var(--t-xs)/1.2 var(--mono); letter-spacing: .5px; color: var(--encre-2); margin-top: 4px; text-transform: uppercase; white-space: nowrap; }
 .boutons { display: flex; gap: 8px; position: relative; }
 .rond {
-  width: 46px; height: 46px; border-radius: 999px; border: var(--trait); background: var(--surface);
+  width: 40px; height: 40px; border-radius: 999px; border: var(--trait-l) solid var(--trait); background: var(--surface);
   color: var(--encre); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; flex-shrink: 0;
 }
-.rond svg { width: 22px; height: 22px; }
+.rond svg { width: 20px; height: 20px; }
 .rond:disabled { opacity: .45; cursor: default; }
 .menu {
   position: absolute; top: calc(100% + 6px); right: 0; z-index: 12; display: flex; flex-direction: column; min-width: 220px;
-  background: var(--surface); border: var(--trait); border-radius: var(--r-m); box-shadow: var(--sh-2); overflow: hidden;
+  background: var(--surface); border: var(--trait-l) solid var(--trait); border-radius: var(--r-m); box-shadow: var(--sh-3); overflow: hidden;
 }
 .menu button { all: unset; box-sizing: border-box; cursor: pointer; min-height: 48px; padding: 14px 18px; font: 500 14.5px/20px var(--mono); color: var(--encre); }
 .menu button + button { border-top: 1px solid var(--trait-doux); }
@@ -43,9 +87,9 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--encre); out
 .connexion h2 { margin: 0; font-family: var(--display); font-weight: 700; font-size: 24px; color: var(--encre); }
 .aide { font-size: 13px; color: var(--texte); opacity: .85; margin: 4px 0 8px; }
 .champ { display: flex; flex-direction: column; gap: 6px; margin: 10px 0; font-size: 13px; color: var(--encre); }
-.champ input { min-height: 46px; border: var(--trait); border-radius: 12px; background: var(--surface); padding: 8px 12px; }
+.champ input { min-height: 46px; border: var(--trait-l) solid var(--trait); border-radius: 12px; background: var(--surface); padding: 8px 12px; }
 .rangee { display: flex; gap: 8px; margin-top: 6px; }
-.pilule { min-height: 44px; padding: 8px 18px; border-radius: 999px; border: var(--trait); background: var(--surface); color: var(--encre); font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.pilule { min-height: 44px; padding: 8px 18px; border-radius: 999px; border: var(--trait-l) solid var(--trait); background: var(--surface); color: var(--encre); font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
 .pilule.plein { background: var(--encre); color: var(--surface); }
 .etat { min-height: 1.4em; font-size: 13px; color: var(--encre); margin: 8px 0 0; }
 
@@ -54,10 +98,10 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--encre); out
 body:not(.grille) .tuiles { grid-template-columns: repeat(10, 1fr); gap: 6px; padding: 8px 0 10px; }
 .tuile {
   position: relative; aspect-ratio: 1; height: auto; min-width: 0; padding: 6px 2px; gap: 4px;
-  border: 1.5px solid #002FA7; border-radius: 16px; background: #FEFAF3; color: #002FA7;
+  border: 1.5px solid var(--trait); border-radius: 16px; background: var(--surface); color: var(--trait);
   display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; white-space: nowrap;
 }
-.tuile.on { background: #002FA7; color: #FDFAF4; }
+.tuile.on { background: var(--plein); color: var(--sur-plein); box-shadow: var(--sh-1); }
 body:not(.grille) .tuile { border-radius: 10px; padding: 0; }
 .tuile .ico { width: 27px; height: 27px; flex-shrink: 0; }
 body:not(.grille) .tuile .ico { width: 20px; height: 20px; }
@@ -65,30 +109,30 @@ body:not(.grille) .tuile .ico { width: 20px; height: 20px; }
 .tuile .nom.moyen { font-size: 8.4px; }
 .tuile .nom.long { font-size: 7.4px; letter-spacing: -.25px; }
 body:not(.grille) .tuile .nom { display: none; }
-.pastille-n { position: absolute; top: -7px; right: -7px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 999px; background: #002FA7; color: #FDFAF4; font: 600 10.5px/20px var(--mono); text-align: center; }
+.pastille-n { position: absolute; top: -7px; right: -7px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 999px; background: var(--plein); color: var(--sur-plein); font: 600 10.5px/20px var(--mono); text-align: center; }
 .replier-zone { display: flex; justify-content: center; margin: -8px 16px 0; }
-.replier { width: 46px; height: 20px; min-height: 20px; padding: 0; border: 1.5px solid #002FA7; border-radius: 999px; background: #FEFAF3; color: #002FA7; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.replier { width: 46px; height: 20px; min-height: 20px; padding: 0; border: 1.5px solid var(--trait); border-radius: 999px; background: var(--surface); color: var(--trait); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
 .replier svg { width: 16px; height: 16px; }
 body:not(.grille) .replier svg { transform: rotate(180deg); }
 
 /* fil de conversation (Omniscient) */
-.fil { flex: 1; min-height: 0; overflow-y: auto; padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 10px; border-top: var(--trait); }
-.bulle { max-width: 86%; align-self: flex-start; padding: 12px 14px; border: var(--trait); border-radius: var(--r-m); background: var(--surface); font-size: 14px; line-height: 1.5; }
+.fil { flex: 1; min-height: 0; overflow-y: auto; padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 10px; border-top: var(--trait-l) solid var(--trait); }
+.bulle { max-width: 86%; align-self: flex-start; padding: 12px 14px; border: var(--trait-l) solid var(--trait); border-radius: var(--r-m); background: var(--surface); font-size: 14px; line-height: 1.5; }
 .bulle p { margin: 0; overflow-wrap: anywhere; }
 .bulle.moi { align-self: flex-end; background: var(--encre); color: var(--surface); border-radius: var(--r-m) var(--r-m) 4px var(--r-m); }
 .titre-section { margin: 10px 0 0; font: 700 13px/1.2 var(--display); text-transform: uppercase; letter-spacing: .06em; color: var(--encre); }
-.item { border: var(--trait); border-radius: var(--r-m); background: var(--surface); padding: 10px 12px; box-shadow: var(--sh-1); }
+.item { border: var(--trait-l) solid var(--trait); border-radius: var(--r-m); background: var(--surface); padding: 10px 12px; box-shadow: var(--sh-1); }
 .item-tete { display: flex; align-items: center; gap: 8px; }
 .marque { color: var(--encre); width: 18px; text-align: center; }
 .item-nom { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .coche { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--encre); cursor: pointer; white-space: nowrap; }
-.coche input { width: 18px; height: 18px; accent-color: #002FA7; margin: 0; }
+.coche input { width: 18px; height: 18px; accent-color: var(--trait); margin: 0; }
 .detail { margin: 6px 0 0 26px; font-size: 13px; color: var(--texte); overflow-wrap: anywhere; }
 .rapides { display: flex; flex-wrap: wrap; gap: 8px; }
 
 /* saisie en pied : micro, champ, envoi */
-.saisie { display: flex; align-items: center; gap: 10px; padding: 10px 16px calc(14px + env(safe-area-inset-bottom, 0px)); border-top: var(--trait); background: var(--fond); }
-.champ-saisie { flex: 1; min-width: 0; min-height: 46px; display: flex; align-items: center; padding: 0 16px; border: var(--trait); border-radius: 999px; background: var(--surface); color: var(--encre-2); font-size: 14px; }
+.saisie { display: flex; align-items: center; gap: 10px; padding: 10px 16px calc(14px + env(safe-area-inset-bottom, 0px)); border-top: var(--trait-l) solid var(--trait); background: var(--fond); }
+.champ-saisie { flex: 1; min-width: 0; min-height: 46px; display: flex; align-items: center; padding: 0 16px; border: var(--trait-l) solid var(--trait); border-radius: 999px; background: var(--surface); color: var(--encre-2); font-size: 14px; }
 
 /* ordinateur : barre des espaces à gauche, fil à droite dans un plateau arrondi (règles séparées) */
 @media (min-width: 900px) and (pointer: fine) {
@@ -105,7 +149,7 @@ body:not(.grille) .replier svg { transform: rotate(180deg); }
   .tuile .nom { font-size: 14px; }
   .pastille-n { position: static; margin-left: auto; }
   .replier-zone { grid-column: 1; grid-row: 3; justify-content: flex-start; padding: 0; margin: 0; }
-  .fil { grid-column: 2; grid-row: 2; background: var(--plateau); border: var(--trait); border-radius: var(--r-l); box-shadow: 6px 6px 0 var(--encre); margin-top: 14px; padding: 22px 24px; border-top: var(--trait); }
+  .fil { grid-column: 2; grid-row: 2; background: var(--plateau); border: var(--trait-l) solid var(--trait); border-radius: var(--r-l); box-shadow: 6px 6px 0 var(--encre); margin-top: 14px; padding: 22px 24px; border-top: var(--trait-l) solid var(--trait); }
   .saisie { grid-column: 2; grid-row: 3; padding: 14px 0 0; background: transparent; border-top: 0; }
   .replier-zone.masque-bureau { display: none; }
   .bulle { max-width: 70%; }
