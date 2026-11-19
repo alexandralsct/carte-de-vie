@@ -21,6 +21,21 @@
   }
   function json(k) { try { var v = JSON.parse(lire(k) || 'null'); return v && typeof v === 'object' ? v : null; } catch (e) { return null; } }
 
+  /* thème jour / nuit : clé propre à la variante, jour par défaut */
+  var CLE_THEME = 'variante-theme';
+  function appliqueTheme(nuit) {
+    document.documentElement.setAttribute('data-theme', nuit ? 'nuit' : 'jour');
+    var b = document.getElementById('theme'); if (b) b.setAttribute('aria-pressed', String(nuit));
+    var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', nuit ? '#0E1830' : '#F5EEE2');
+  }
+  function themeNuit() { try { return localStorage.getItem(CLE_THEME) === 'nuit'; } catch (e) { return false; } }
+  appliqueTheme(themeNuit());
+  document.getElementById('theme').addEventListener('click', function () {
+    var nuit = !themeNuit();
+    try { localStorage.setItem(CLE_THEME, nuit ? 'nuit' : 'jour'); } catch (e) { /* stockage indisponible : le choix vaut pour cette ouverture */ }
+    appliqueTheme(nuit);
+  });
+
   function lire(cle) { try { return localStorage.getItem(cle) || ''; } catch (e) { return ''; } }
   function ecrire(cle, val) { try { localStorage.setItem(cle, val); return true; } catch (e) { return false; } }
   function el(tag, cls, texte) {

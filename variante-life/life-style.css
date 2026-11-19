@@ -1,4 +1,5 @@
 html { color-scheme: light; }
+:root[data-theme="nuit"] { --fond: #0E1830; --plateau: #122041; --surface: #172A52; --encre: #E3EAFF; --encre-2: #9AABD4; --texte: #E3EAFF; --trait: #93B3F0; --trait-doux: #6A80B8; --pale: #29447F; --ombre: #070F22; --plein: #93B3F0; --sur-plein: #0E1830; --neutre: #8F9AC0; --sh-3: 4px 4px 0 #2F55D4; color-scheme: dark; }
 /* Polices et jetons : charte commune aux trois apps (apps/charte/jetons.css). */
 /* ===== jetons communs : début (copie de apps/charte/jetons.css — ne pas modifier ici) ===== */
 /* ===== Jetons communs — LIFE, Coulisses, Tri Instagram (charte du 13/10/2026, audit design) =====
