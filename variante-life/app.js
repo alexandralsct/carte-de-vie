@@ -7,6 +7,7 @@
   var donnees = null;
   var choisi = 'moi';            /* 'moi' ou la clé d'un espace */
   var repliees = false;
+  document.body.classList.add('grille');
   var vueCarte = {};             /* élément coché : affichage « comme dans la carte » */
 
   function lire(cle) { try { return localStorage.getItem(cle) || ''; } catch (e) { return ''; } }
@@ -32,16 +33,15 @@
   function rendreTuiles() {
     var nav = $('tuiles');
     nav.textContent = '';
-    nav.classList.toggle('repliee', repliees);
     var moi = { cle: 'moi', nom: 'Moi', badge: 0, couleur: '#002FA7' };
     [moi].concat(espaces().map(function (e, i) {
       return { cle: e._cle, nom: e.name || 'Sans nom', badge: tachesOuvertes(e), couleur: e.color || '#002FA7', rang: i };
     })).forEach(function (t) {
-      var b = el('button', 'tuile' + (t.cle === choisi ? ' on' : ''));
+      var b = el('button', 'tuile' + (t.cle === choisi ? ' on' : '') + (t.nom.length > 14 ? ' long' : t.nom.length > 9 ? ' moyen' : ''));
       b.type = 'button';
       b.setAttribute('aria-pressed', String(t.cle === choisi));
       b.appendChild(icone(t.cle === 'moi' ? 'coach' : ORDRE_ICONES[t.rang % ORDRE_ICONES.length]));
-      b.appendChild(el('span', 'nom', t.nom));
+      b.appendChild(el('span', 'nom' + (t.nom.length > 14 ? ' long' : t.nom.length > 9 ? ' moyen' : ''), t.nom));
       if (t.badge) b.appendChild(el('span', 'pastille-n', t.badge));
       b.addEventListener('click', function () { choisi = t.cle; vueCarte = {}; rendre(); });
       nav.appendChild(b);
@@ -204,7 +204,9 @@
   $('m-reglages').addEventListener('click', function () { fermeMenu(); montreConnexion(true); $('repo').value = lire('cv_repo'); $('cle').value = lire('cv_cle'); });
   $('replier').addEventListener('click', function () {
     repliees = !repliees;
+    document.body.classList.toggle('grille', !repliees);
     this.setAttribute('aria-expanded', String(!repliees));
+    this.setAttribute('aria-label', repliees ? 'Déplier les espaces' : 'Replier les espaces');
     rendreTuiles();
   });
 
