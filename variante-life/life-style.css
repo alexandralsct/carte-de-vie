@@ -154,3 +154,6 @@ body:not(.grille) .replier svg { transform: rotate(180deg); }
   .replier-zone.masque-bureau { display: none; }
   .bulle { max-width: 70%; }
 }
+/* image importée d'un espace, dans la tuile (même place que l'icône) */
+.tuile .ico-image { width: 27px; height: 27px; object-fit: contain; flex-shrink: 0; }
+body:not(.grille) .tuile .ico-image { width: 20px; height: 20px; }

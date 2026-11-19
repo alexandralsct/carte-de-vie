@@ -30,6 +30,24 @@
   }
   function tachesOuvertes(e) { return (e.tasks || []).filter(function (t) { return !t.done; }).length; }
 
+  /* image importée d'un espace (f:chemin dans le dépôt privé) : lue avec la clé, remplace l'icône de repli */
+  var imagesEspace = {};
+  function chargeImageTuile(ico, chemin) {
+    var repo = lire('cv_repo'), cle = lire('cv_cle');
+    if (!repo || !cle || !chemin || chemin.indexOf('..') >= 0) return;
+    var fin = function (url) {
+      var img = document.createElement('img');
+      img.src = url; img.alt = ''; img.className = 'ico-image';
+      if (ico.parentNode) ico.parentNode.replaceChild(img, ico);
+    };
+    if (imagesEspace[chemin]) { fin(imagesEspace[chemin]); return; }
+    fetch('https://api.github.com/repos/' + repo + '/contents/' + chemin.split('/').map(encodeURIComponent).join('/'), {
+      headers: { Authorization: 'Bearer ' + cle, Accept: 'application/vnd.github.raw+json' }
+    }).then(function (r) { if (!r.ok) throw new Error('img'); return r.blob(); })
+      .then(function (blob) { var url = URL.createObjectURL(blob); imagesEspace[chemin] = url; fin(url); })
+      .catch(function () { /* icône de repli gardée */ });
+  }
+
   /* ---------- barre des espaces (tuiles carrées) ---------- */
   function rendreTuiles() {
     var nav = $('tuiles');
@@ -41,7 +59,9 @@
       var b = el('button', 'tuile' + (t.cle === choisi ? ' on' : '') + (t.nom.length > 14 ? ' long' : t.nom.length > 9 ? ' moyen' : ''));
       b.type = 'button';
       b.setAttribute('aria-pressed', String(t.cle === choisi));
-      b.appendChild(t.cle === 'moi' ? icone('coach') : iconeEspace(t.icone, t.rang));
+      var ico = t.cle === 'moi' ? icone('coach') : iconeEspace(t.icone, t.rang);
+      b.appendChild(ico);
+      if (typeof t.icone === 'string' && t.icone.indexOf('f:') === 0) chargeImageTuile(ico, t.icone.slice(2));
       b.appendChild(el('span', 'nom' + (t.nom.length > 14 ? ' long' : t.nom.length > 9 ? ' moyen' : ''), t.nom));
       if (t.badge) b.appendChild(el('span', 'pastille-n', t.badge));
       b.addEventListener('click', function () { choisi = t.cle; vueCarte = {}; rendre(); });
