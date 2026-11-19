@@ -11,6 +11,16 @@
   var vueCarte = {};             /* élément coché : affichage « comme dans la carte » */
   var vueEspace = {};            /* espace coché : tout l'espace prend l'interface de la carte */
 
+  /* identifiants : ceux que la carte a déjà rangés sur cet appareil (même origine, donc même stockage), sinon ceux saisis ici */
+  function identifiants() {
+    var r = json('carte-de-vie-sync');
+    if (r && r.repo && r.token) return { repo: String(r.repo).trim(), cle: String(r.token).trim() };
+    var c = json('connexion');
+    if (c && c.depot && c.jeton) return { repo: String(c.depot).trim(), cle: String(c.jeton).trim() };
+    return { repo: lire('cv_repo'), cle: lire('cv_cle') };
+  }
+  function json(k) { try { var v = JSON.parse(lire(k) || 'null'); return v && typeof v === 'object' ? v : null; } catch (e) { return null; } }
+
   function lire(cle) { try { return localStorage.getItem(cle) || ''; } catch (e) { return ''; } }
   function ecrire(cle, val) { try { localStorage.setItem(cle, val); return true; } catch (e) { return false; } }
   function el(tag, cls, texte) {
@@ -33,7 +43,7 @@
   /* image importée d'un espace (f:chemin dans le dépôt privé) : lue avec la clé, remplace l'icône de repli */
   var imagesEspace = {};
   function chargeImageTuile(ico, chemin) {
-    var repo = lire('cv_repo'), cle = lire('cv_cle');
+    var id = identifiants(), repo = id.repo, cle = id.cle;
     if (!repo || !cle || !chemin || chemin.indexOf('..') >= 0) return;
     var fin = function (url) {
       var img = document.createElement('img');
@@ -221,8 +231,7 @@
   }
 
   function charge() {
-    var repo = lire('cv_repo');
-    var cle = lire('cv_cle');
+    var id = identifiants(), repo = id.repo, cle = id.cle;
     if (!repo || !cle) {
       donnees = null;
       montreConnexion(true);
