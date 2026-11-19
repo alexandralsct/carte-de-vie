@@ -262,3 +262,16 @@
 
   charge();
 })();
+
+/* hors ligne et mises à jour : le service worker n'était jamais enregistré. Une nouvelle version recharge la page toute seule. */
+(function () {
+  if (!('serviceWorker' in navigator)) return;
+  var avaitControle = !!navigator.serviceWorker.controller;
+  var recharge = false;
+  navigator.serviceWorker.addEventListener('controllerchange', function () {
+    if (!avaitControle || recharge) return;
+    recharge = true;
+    location.reload();
+  });
+  navigator.serviceWorker.register('sw.js').then(function (reg) { reg.update(); }).catch(function () { /* hors service : l'app marche sans */ });
+})();
