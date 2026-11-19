@@ -149,13 +149,15 @@
     var carte = el('div', 'item');
     var entete = el('div', 'item-tete');
     entete.appendChild(el('span', 'item-nom', libelle || ''));
-    var lab = el('label', 'coche');
+    var lab = el('label', 'interrupteur');
+    lab.title = 'Vue carte';
     var cb = el('input');
     cb.type = 'checkbox';
+    cb.setAttribute('aria-label', 'Vue carte');
     cb.checked = !!vueCarte[cle];
     cb.addEventListener('change', function () { vueCarte[cle] = cb.checked; rendre(); });
     lab.appendChild(cb);
-    lab.appendChild(el('span', '', 'Vue carte'));
+    lab.appendChild(el('span', 'piste'));
     entete.appendChild(lab);
     carte.appendChild(entete);
     if ((vueCarte[cle] || vueEspace[choisi]) && detail) {
@@ -181,13 +183,15 @@
     var e = donnees[choisi];
     if (!e) { fil.appendChild(bulle('Cet espace n\'existe plus.', false)); return; }
     fil.appendChild(bulle((e.name || 'Sans nom') + ' · ' + tachesOuvertes(e) + ' tâche(s) ouverte(s).', false));
-    var coche = el('label', 'coche coche-espace');
+    var coche = el('label', 'interrupteur coche-espace');
+    coche.title = 'Vue carte de tout l\'espace';
     var cbE = el('input');
     cbE.type = 'checkbox';
+    cbE.setAttribute('aria-label', 'Vue carte de tout l\'espace');
     cbE.checked = !!vueEspace[choisi];
     cbE.addEventListener('change', function () { vueEspace[choisi] = cbE.checked; rendre(); });
     coche.appendChild(cbE);
-    coche.appendChild(el('span', '', 'Vue carte de tout l\'espace'));
+    coche.appendChild(el('span', 'piste'));
     fil.appendChild(coche);
     if (vueEspace[choisi] && e.notes) {
       var rc = el('div', 'item');

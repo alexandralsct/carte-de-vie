@@ -1,6 +1,6 @@
 /* Hors ligne pour la variante « style LIFE » : cache des fichiers de l'app, réseau pour le reste.
    Cache propre à la variante (préfixe carte-life-) ; pas de contrôle d'empreinte (le contenu privé n'est pas dans ce dossier). */
-const C = "carte-life-v15";
+const C = "carte-life-v16";
 const FILES = ["./", "./index.html", "./life-style.css", "./app.js", "./manifest.webmanifest",
   "./logo-a-192.png", "./logo-a-512.png", "./logo-a-maskable-512.png",
   "./fonts/instrument-sans.woff2", "./fonts/plex-mono-400.woff2", "./fonts/plex-mono-500.woff2"];

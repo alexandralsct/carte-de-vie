@@ -138,3 +138,12 @@ body:not(.grille) .replier svg { transform: rotate(180deg); }
 /* image importée d'un espace : silhouette bleue Klein, même taille que les icônes LIFE */
 .tuile .ico-image { display: block; width: 27px; height: 27px; flex-shrink: 0; background: var(--trait); -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; mask-mode: luminance; }
 body:not(.grille) .tuile .ico-image { width: 20px; height: 20px; }
+
+/* interrupteur « Vue carte » : sans texte, style LIFE (bordure bleue, rond plein quand actif) */
+.interrupteur { position: relative; display: inline-block; flex: none; width: 46px; height: 26px; cursor: pointer; }
+.interrupteur input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; z-index: 1; }
+.interrupteur .piste { position: absolute; inset: 0; border: var(--trait-l) solid var(--trait); border-radius: var(--r-p); background: var(--surface); transition: background .15s; }
+.interrupteur .piste::after { content: ''; position: absolute; top: 3px; left: 3px; width: 17px; height: 17px; border-radius: 50%; background: var(--trait); transition: transform .15s; }
+.interrupteur input:checked + .piste { background: var(--plein); }
+.interrupteur input:checked + .piste::after { background: var(--sur-plein); transform: translateX(20px); }
+.interrupteur input:focus-visible + .piste { outline: 3px solid var(--trait-doux); outline-offset: 2px; }
