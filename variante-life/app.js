@@ -47,8 +47,11 @@
     if (!repo || !cle || !chemin || chemin.indexOf('..') >= 0) return;
     var fin = function (url) {
       var img = document.createElement('img');
-      img.src = url; img.alt = ''; img.className = 'ico-image';
-      if (ico.parentNode) ico.parentNode.replaceChild(img, ico);
+      /* silhouette monochrome bleue (luminance), nette à 27 px : pas de couleurs de l'image */
+      var sp = document.createElement('span');
+      sp.className = 'ico-image'; sp.setAttribute('aria-hidden', 'true');
+      sp.style.maskImage = 'url("' + url + '")'; sp.style.webkitMaskImage = sp.style.maskImage;
+      if (ico.parentNode) ico.parentNode.replaceChild(sp, ico);
     };
     if (imagesEspace[chemin]) { fin(imagesEspace[chemin]); return; }
     fetch('https://api.github.com/repos/' + repo + '/contents/' + chemin.split('/').map(encodeURIComponent).join('/'), {
@@ -112,10 +115,11 @@
   function icone(cle, corps) {
     var ns = 'http://www.w3.org/2000/svg';
     var svg = document.createElementNS(ns, 'svg');
-    svg.setAttribute('viewBox', '0 0 24 24');
+    /* icônes de la carte : grille 48 ; icônes LIFE : grille 24 */
+    svg.setAttribute('viewBox', corps ? '0 0 48 48' : '0 0 24 24');
     svg.setAttribute('fill', 'none');
     svg.setAttribute('stroke', 'currentColor');
-    svg.setAttribute('stroke-width', '1.75');
+    svg.setAttribute('stroke-width', corps ? '1.6' : '1.75');
     svg.setAttribute('stroke-linecap', 'round');
     svg.setAttribute('stroke-linejoin', 'round');
     svg.setAttribute('aria-hidden', 'true');
