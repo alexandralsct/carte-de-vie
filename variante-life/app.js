@@ -214,7 +214,19 @@
       })],
       ['Idées', (e.ideas || []).map(function (i) { return ['i' + i.id, i.text, [], '•']; })]
     ];
-    sections.forEach(function (s) {
+        (e.rub || []).forEach(function (r) {
+      sections.push([r.name || 'Liste', (r.items || []).map(function (it) {
+        return ['r' + it.id, it.text, [it.done ? 'Fait' : 'À faire'], it.done ? '☑' : '☐'];
+      })]);
+    });
+    var objectifs = ((donnees['meta/objectifs'] || {}).liste || []).filter(function (o) {
+      return o && o.id && (o.espace === e.id || o.espace === e._cle.slice(8)) && o.etat !== 'atteint';
+    });
+    sections.push(['Objectifs', objectifs.map(function (o) {
+      var etat = o.etat === 'encours' ? 'En cours' : 'À faire';
+      return ['o' + o.id, o.titre || '', [etat + (o.date ? ' · pour le ' + o.date : ' · plus tard')], '◎'];
+    })]);
+     sections.forEach(function (s) {
       if (!s[1].length) return;
       fil.appendChild(el('p', 'titre-section', s[0]));
       s[1].forEach(function (it) {
