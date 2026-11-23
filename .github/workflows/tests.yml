@@ -64,3 +64,5 @@ jobs:
         run: node tests/objectifs.mjs
       - name: Glisser une image sur la fiche d'un assistant (téléphone puis ordinateur)
         run: node tests/avatar-glisser.mjs
+      - name: Omni, compteur « affichées sur connues » et archive mensuelle (téléphone puis ordinateur)
+        run: node tests/omni-vitrine.mjs
